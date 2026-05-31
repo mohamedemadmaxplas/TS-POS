@@ -3553,6 +3553,108 @@ body.light-mode .about-page-footer {
         font-size: 18px;
     }
 }
+/* ==================== NEW CENTER LOGO WITH ANIMATION ==================== */
+.center-logo-container {
+    text-align: center;
+    margin: 20px 0 25px 0;
+    animation: floatLogoCenter 3s ease-in-out infinite;
+}
+
+.center-logo-img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #d4a017;
+    box-shadow: 0 15px 35px rgba(212, 160, 23, 0.3);
+    background: #fff;
+    padding: 5px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.center-logo-img:hover {
+    transform: scale(1.03);
+    box-shadow: 0 20px 45px rgba(212, 160, 23, 0.5);
+}
+
+@keyframes floatLogoCenter {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* للشاشات الصغيرة */
+@media (max-width: 768px) {
+    .center-logo-img {
+        width: 120px;
+        height: 120px;
+        border-width: 3px;
+    }
+    .center-logo-container {
+        margin: 10px 0 15px 0;
+    }
+}
+/* ==================== HEADER CENTER IMAGE STYLES ==================== */
+.header-center-image {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.header-center-img {
+    height: 70px;
+    width: auto;
+    max-width: 280px;
+    border-radius: 35px;
+    object-fit: cover;
+    border: 2px solid #d4a017;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    animation: headerImageFloat 3s ease-in-out infinite;
+}
+
+.header-center-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(212, 160, 23, 0.4);
+    border-color: #ffd700;
+}
+
+@keyframes headerImageFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* للشاشات الصغيرة */
+@media (max-width: 768px) {
+    .header-center-img {
+        height: 55px;
+        max-width: 200px;
+        border-radius: 28px;
+    }
+}
+
+@media (max-width: 600px) {
+    .header-center-img {
+        height: 45px;
+        max-width: 160px;
+        border-radius: 22px;
+    }
+}
+
+@media (max-width: 500px) {
+    .header-center-img {
+        display: none;
+    }
+}
     </style>
 </head>
 <body>
@@ -7993,12 +8095,18 @@ function renderLandingPage() {
     
     app.innerHTML = `
         <div class="landing-new-container">
-            <!-- Header -->
-            <div class="landing-header-fixed">
+            <!-- Header مع الصورة في المنتصف -->
+            <div class="landing-header-fixed" style="position: relative;">
                 <div class="header-logo-landing">
                     <img src="https://i.ibb.co/VfWPtdk/5794143090170859641.jpg" alt="شعار كيان">
                     <span>مجموعة كيان</span>
                 </div>
+                
+                <!-- الصورة الجديدة في منتصف الهيدر -->
+                <div class="header-center-image">
+                    <img src="https://i.ibb.co/d9sKxjZ/In-Shot-20260528-143153172.jpg" alt="صورة المجموعة" class="header-center-img">
+                </div>
+                
                 <div class="header-buttons-landing">
                     <button class="btn-landing about-btn" onclick="renderAboutPage()">
                         <i class="fas fa-info-circle"></i> من نحن
