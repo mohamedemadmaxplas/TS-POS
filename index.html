@@ -2824,6 +2824,735 @@ body {
     .floating-anchor-new { font-size: 30px; }
     .btn-marine { padding: 10px 20px; font-size: 14px; }
 }
+.btn-landing.about-btn {
+    background: rgba(212, 160, 23, 0.15);
+    border: 1px solid #d4a017;
+    color: #d4a017;
+}
+
+.btn-landing.about-btn:hover {
+    background: #d4a017;
+    color: #1a472a;
+    transform: translateY(-2px);
+}
+/* ==================== ABOUT PAGE NEW STYLES ==================== */
+.about-page-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a2e1a, #0d2818, #071a0f);
+    position: relative;
+    overflow-x: hidden;
+}
+
+.about-page-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10, 46, 26, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(212, 160, 23, 0.4);
+}
+
+.about-page-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.about-page-logo img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #d4a017;
+}
+
+.about-page-logo span {
+    font-size: 18px;
+    font-weight: bold;
+    color: #d4a017;
+}
+
+.about-page-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.about-page-btn-home {
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid #d4a017;
+    color: #d4a017;
+    font-family: 'Cairo', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.about-page-btn-home:hover {
+    background: #d4a017;
+    color: #1a472a;
+    transform: translateY(-2px);
+}
+
+.about-page-btn-theme {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid #d4a017;
+    color: #d4a017;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.about-page-btn-theme:hover {
+    background: #d4a017;
+    color: #1a472a;
+    transform: scale(1.05);
+}
+
+/* Hero Section */
+.about-hero-section {
+    position: relative;
+    height: 60vh;
+    min-height: 400px;
+    background: linear-gradient(135deg, rgba(10,46,26,0.6), rgba(7,26,15,0.8)), url('https://i.ibb.co/VfWPtdk/5794143090170859641.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+.about-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+}
+
+.about-hero-content {
+    position: relative;
+    z-index: 2;
+    animation: fadeInUp 0.8s ease;
+}
+
+.about-logo-animation {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    animation: floatLogo 3s ease-in-out infinite;
+}
+
+.about-logo-animation img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #d4a017;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+@keyframes floatLogo {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.about-hero-title {
+    font-size: 48px;
+    color: #d4a017;
+    margin-bottom: 10px;
+    font-weight: 800;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.about-hero-subtitle {
+    font-size: 20px;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 20px;
+}
+
+.about-hero-anchor {
+    font-size: 40px;
+    color: #d4a017;
+    opacity: 0.7;
+    animation: bounceAnchor 2s ease-in-out infinite;
+}
+
+@keyframes bounceAnchor {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(10px); }
+}
+
+/* Typing Section */
+.about-typing-section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 30px;
+    min-height: 500px;
+    max-height: 70vh;
+    overflow-y: auto;
+    direction: rtl;
+}
+
+.about-typing-container {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    padding: 40px;
+    border: 1px solid rgba(212,160,23,0.3);
+    position: relative;
+}
+
+.about-typing-content {
+    line-height: 1.9;
+    color: rgba(255,255,255,0.9);
+    font-size: 16px;
+}
+
+.about-typing-content h1 {
+    color: #d4a017;
+    font-size: 28px;
+    margin: 25px 0 15px;
+    text-align: center;
+}
+
+.about-typing-content h2 {
+    color: #e8c84a;
+    font-size: 22px;
+    margin: 20px 0 12px;
+    border-right: 4px solid #d4a017;
+    padding-right: 15px;
+}
+
+.about-typing-content h3 {
+    color: #d4a017;
+    font-size: 18px;
+    margin: 15px 0 10px;
+}
+
+.about-typing-content p {
+    margin-bottom: 15px;
+}
+
+.about-typing-content ul {
+    margin: 10px 20px 15px;
+    padding-right: 20px;
+}
+
+.about-typing-content li {
+    margin-bottom: 8px;
+}
+
+.about-typing-content strong {
+    color: #d4a017;
+}
+
+.about-typing-cursor {
+    display: inline-block;
+    width: 3px;
+    height: 24px;
+    background-color: #d4a017;
+    margin-right: 5px;
+    animation: blink 1s infinite;
+    vertical-align: middle;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Scrollbar */
+.about-typing-section::-webkit-scrollbar {
+    width: 6px;
+}
+
+.about-typing-section::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+}
+
+.about-typing-section::-webkit-scrollbar-thumb {
+    background: #d4a017;
+    border-radius: 10px;
+}
+
+/* Footer */
+.about-page-footer {
+    text-align: center;
+    padding: 30px 20px;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    border-top: 1px solid rgba(212,160,23,0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .about-page-header {
+        padding: 10px 15px;
+    }
+    .about-page-logo span {
+        font-size: 14px;
+    }
+    .about-hero-title {
+        font-size: 32px;
+    }
+    .about-hero-subtitle {
+        font-size: 16px;
+    }
+    .about-logo-animation {
+        width: 90px;
+        height: 90px;
+    }
+    .about-typing-section {
+        padding: 30px 20px;
+    }
+    .about-typing-container {
+        padding: 20px;
+    }
+    .about-typing-content {
+        font-size: 14px;
+    }
+    .about-typing-content h1 {
+        font-size: 22px;
+    }
+    .about-typing-content h2 {
+        font-size: 18px;
+    }
+}
+/* ==================== ABOUT PAGE NEW STYLES ==================== */
+.about-page-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a2e1a, #0d2818, #071a0f);
+    position: relative;
+    overflow-x: hidden;
+    transition: background 0.3s ease;
+}
+
+body.light-mode .about-page-container {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9, #a5d6a7);
+}
+
+/* Header */
+.about-page-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10, 46, 26, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(212, 160, 23, 0.4);
+}
+
+body.light-mode .about-page-header {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.about-page-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.about-page-logo img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #d4a017;
+}
+
+.about-page-logo span {
+    font-size: 18px;
+    font-weight: bold;
+    color: #d4a017;
+}
+
+.about-page-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.about-page-btn-home {
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid #d4a017;
+    color: #d4a017;
+    font-family: 'Cairo', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.about-page-btn-home:hover {
+    background: #d4a017;
+    color: #1a472a;
+    transform: translateY(-2px);
+}
+
+.about-page-btn-theme {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid #d4a017;
+    color: #d4a017;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.about-page-btn-theme:hover {
+    background: #d4a017;
+    color: #1a472a;
+    transform: scale(1.05);
+}
+
+/* Hero Section */
+.about-hero-section {
+    position: relative;
+    height: 55vh;
+    min-height: 400px;
+    background: linear-gradient(135deg, rgba(10,46,26,0.5), rgba(7,26,15,0.7)), url('https://i.ibb.co/VfWPtdk/5794143090170859641.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+.about-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+}
+
+.about-hero-content {
+    position: relative;
+    z-index: 2;
+    animation: fadeInUp 0.8s ease;
+}
+
+.about-logo-animation {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    animation: floatLogo 3s ease-in-out infinite;
+}
+
+.about-logo-animation img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #d4a017;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+@keyframes floatLogo {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.about-hero-title {
+    font-size: 48px;
+    color: #d4a017;
+    margin-bottom: 10px;
+    font-weight: 800;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.about-hero-subtitle {
+    font-size: 18px;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 20px;
+}
+
+.about-hero-anchor {
+    font-size: 30px;
+    color: #d4a017;
+    opacity: 0.8;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* Typing Wrapper - Full Width */
+.about-typing-wrapper {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 60px 5%;
+    min-height: 500px;
+    max-height: 70vh;
+    overflow-y: auto;
+    direction: rtl;
+    background: transparent;
+}
+
+.about-typing-section {
+    width: 100%;
+}
+
+.about-typing-container {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    padding: 40px;
+    border: 1px solid rgba(212,160,23,0.3);
+    position: relative;
+    width: 100%;
+}
+
+body.light-mode .about-typing-container {
+    background: rgba(255,255,255,0.9);
+    border-color: rgba(212,160,23,0.5);
+}
+
+.about-typing-content {
+    line-height: 1.9;
+    color: rgba(255,255,255,0.9);
+    font-size: 16px;
+}
+
+body.light-mode .about-typing-content {
+    color: #1a472a;
+}
+
+/* Typing Content Styles */
+.about-typing-content strong {
+    color: #d4a017;
+    font-size: 1.1em;
+}
+
+.about-typing-content hr {
+    margin: 25px 0;
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #d4a017, #d4a017, transparent);
+}
+
+.about-typing-content .title-anchor {
+    font-size: 28px;
+    font-weight: 800;
+    color: #d4a017;
+    text-align: center;
+    margin: 30px 0 20px;
+    padding: 10px;
+    background: linear-gradient(135deg, rgba(212,160,23,0.1), rgba(212,160,23,0.05));
+    border-radius: 15px;
+}
+
+.about-typing-content .title-wave {
+    font-size: 26px;
+    font-weight: 800;
+    color: #d4a017;
+    text-align: center;
+    margin: 30px 0 20px;
+}
+
+.about-typing-content .title-star {
+    font-size: 26px;
+    font-weight: 800;
+    color: #ffd700;
+    text-align: center;
+    margin: 30px 0 20px;
+}
+
+.about-typing-content .title-target {
+    font-size: 26px;
+    font-weight: 800;
+    color: #e74c3c;
+    text-align: center;
+    margin: 30px 0 20px;
+}
+
+.about-typing-content .title-boat {
+    font-size: 26px;
+    font-weight: 800;
+    color: #3498db;
+    text-align: center;
+    margin: 30px 0 20px;
+}
+
+.about-typing-content .title-building {
+    font-size: 26px;
+    font-weight: 800;
+    color: #2ecc71;
+    text-align: center;
+    margin: 30px 0 20px;
+}
+
+.about-typing-content .title-heart {
+    font-size: 26px;
+    font-weight: 800;
+    color: #e91e63;
+    text-align: center;
+    margin: 30px 0 20px;
+}
+
+.about-typing-content .title-handshake {
+    font-size: 26px;
+    font-weight: 800;
+    color: #f39c12;
+    text-align: center;
+    margin: 30px 0 20px;
+}
+
+/* Subtitles */
+.about-typing-content .subtitle-fish,
+.about-typing-content .subtitle-tent,
+.about-typing-content .subtitle-circus,
+.about-typing-content .subtitle-trophy,
+.about-typing-content .subtitle-run,
+.about-typing-content .subtitle-book {
+    font-size: 22px;
+    font-weight: 700;
+    color: #d4a017;
+    margin: 25px 0 15px;
+    padding-right: 15px;
+    border-right: 4px solid #d4a017;
+}
+
+/* Location & Items */
+.about-typing-content .location {
+    font-size: 18px;
+    font-weight: 600;
+    color: #3498db;
+    margin: 10px 0 5px;
+    padding-right: 20px;
+}
+
+.about-typing-content .check-item {
+    font-size: 16px;
+    margin: 8px 0;
+    padding-right: 25px;
+    color: #2ecc71;
+}
+
+.about-typing-content .bullet-item {
+    font-size: 15px;
+    margin: 5px 0;
+    padding-right: 30px;
+    color: rgba(255,255,255,0.8);
+}
+
+body.light-mode .about-typing-content .bullet-item {
+    color: #555;
+}
+
+.about-typing-cursor {
+    display: inline-block;
+    width: 3px;
+    height: 24px;
+    background-color: #d4a017;
+    margin-right: 5px;
+    animation: blink 1s infinite;
+    vertical-align: middle;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Scrollbar */
+.about-typing-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.about-typing-wrapper::-webkit-scrollbar-track {
+    background: rgba(212,160,23,0.1);
+    border-radius: 10px;
+}
+
+.about-typing-wrapper::-webkit-scrollbar-thumb {
+    background: #d4a017;
+    border-radius: 10px;
+}
+
+/* Footer */
+.about-page-footer {
+    text-align: center;
+    padding: 30px 20px;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    border-top: 1px solid rgba(212,160,23,0.2);
+}
+
+body.light-mode .about-page-footer {
+    color: #666;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .about-page-header {
+        padding: 10px 15px;
+    }
+    .about-page-logo span {
+        font-size: 14px;
+    }
+    .about-hero-title {
+        font-size: 32px;
+    }
+    .about-hero-subtitle {
+        font-size: 14px;
+    }
+    .about-logo-animation {
+        width: 90px;
+        height: 90px;
+    }
+    .about-typing-wrapper {
+        padding: 30px 20px;
+    }
+    .about-typing-container {
+        padding: 20px;
+    }
+    .about-typing-content {
+        font-size: 14px;
+    }
+    .about-typing-content .title-anchor,
+    .about-typing-content .title-wave,
+    .about-typing-content .title-star,
+    .about-typing-content .title-target {
+        font-size: 22px;
+    }
+    .about-typing-content .subtitle-fish,
+    .about-typing-content .subtitle-tent,
+    .about-typing-content .subtitle-circus {
+        font-size: 18px;
+    }
+}
     </style>
 </head>
 <body>
@@ -2854,6 +3583,9 @@ body {
         let passwordVisible = false;
         let isUpdatingSeenStatus = false;
         let isTypingAnimationStarted = false;
+        let aboutTypingInterval = null;
+        let aboutTypingTimeout = null;
+
       let appData = {
     branches: [],
     subBranches: [],     // <-- تأكد من وجود هذا السطر
@@ -7268,7 +8000,7 @@ function renderLandingPage() {
                     <span>مجموعة كيان</span>
                 </div>
                 <div class="header-buttons-landing">
-                    <button class="btn-landing" onclick="renderAboutPage()" style="background: #d4a017; color: #1a472a;">
+                    <button class="btn-landing about-btn" onclick="renderAboutPage()">
                         <i class="fas fa-info-circle"></i> من نحن
                     </button>
                     <button class="btn-landing btn-login-landing" onclick="goToLoginFromLanding()">
@@ -7321,16 +8053,6 @@ function renderLandingPage() {
                 </div>
             </div>
 
-            <!-- About Section -->
-            <div class="about-section-landing" style="background: #f5f5f5; padding: 60px 20px;">
-                <div class="container" style="max-width:1200px; margin:0 auto;">
-                    <h2 class="section-title-landing" style="color: #1a472a;">🇪🇬 عن مجموعة كيان</h2>
-                    <div class="about-card-landing" style="background: white; border: 1px solid rgba(26,71,42,0.15);">
-                        <div class="typing-container-landing" id="typingContainerLanding" style="color: #333;"></div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Social Section -->
             <div class="social-section-landing" style="background: #1a472a; padding: 40px 20px;">
                 <h3 class="social-title-landing" style="color: #d4a017;">📱 تواصل معنا</h3>
@@ -7357,13 +8079,7 @@ function renderLandingPage() {
             </div>
         </div>
     `;
-    
-    // بدء تأثير الكتابة التلقائية
-    if (typeof startTypingAnimation === 'function') {
-        startTypingAnimation();
-    }
 }
-
 // النص الكامل لقسم "عنا"
 const fullAboutText = `# من نحن – مجموعة كيان الكشفية البحرية
 
@@ -7526,6 +8242,162 @@ function startTypingAnimation() {
     container.innerHTML = formattedHtml;
 }
 
+function startAboutTypingAnimation() {
+    const container = document.getElementById('aboutTypingContent');
+    if (!container) return;
+    
+    if (aboutTypingInterval) clearInterval(aboutTypingInterval);
+    if (aboutTypingTimeout) clearTimeout(aboutTypingTimeout);
+    
+    // النص المنسق مع إيموجيز وعناوين جذابة
+    const formattedAboutText = `🌊🏴‍☠️ **مجموعة كيان الكشفية البحرية** 🏴‍☠️🌊
+
+نصنع القادة... ونبني المستقبل
+
+---
+
+⚓ **من نحن؟** ⚓
+
+نحن **مجموعة كيان الكشفية البحرية**، مجموعة كشفية بحرية تهدف إلى صناعة جيل قوي وواعٍ يمتلك روح القيادة والانتماء والتعاون. تأسست المجموعة عام **2017**، ومنذ ذلك الوقت ونحن نسعى إلى تقديم تجربة كشفية مختلفة تجمع بين التعليم والترفيه والمغامرة وتنمية الشخصية.
+
+---
+
+🌟 **رؤيتنا** 🌟
+
+نسعى إلى بناء جيل قادر على القيادة وتحمل المسؤولية، يمتلك الثقة بالنفس وروح الفريق والانضباط، ويستطيع مواجهة التحديات وخدمة المجتمع بإيجابية.
+
+---
+
+🎯 **رسالتنا** 🎯
+
+تقديم تجربة كشفية بحرية متكاملة تساعد الأعضاء على تنمية مهاراتهم الجسدية والعقلية والاجتماعية، من خلال برامج وأنشطة عملية ممتعة وآمنة تناسب مختلف الأعمار.
+
+---
+
+🚤 **ماذا نقدم في الكشافة البحرية؟** 🚤
+
+🐠 **الأنشطة البحرية**
+• أساسيات الحياة البحرية والتجديف
+• استخدام القوارب وقواعد السلامة والإنقاذ
+• التعامل مع المياه بشكل آمن
+• العمل الجماعي أثناء الأنشطة البحرية
+• مهارات الشجاعة وتحمل المسؤولية
+
+⛺ **الكامبات والمعسكرات**
+• كيفية نصب الخيام والاعتماد على النفس
+• إعداد الطعام داخل المعسكر
+• النظام والانضباط والعمل الجماعي
+• القيادة وتحمل المسؤولية
+• مهارات البقاء والتعامل مع الطبيعة
+
+🎪 **الأنشطة الترفيهية في المعسكرات**
+• الألعاب الكشفية والسمر الليلي
+• المسابقات والتحديات
+• العروض الكشفية وتدريبات اللياقة
+• الأنشطة الترفيهية والثقافية
+
+🏆 **تنمية المهارات القيادية**
+• القيادة والتواصل واتخاذ القرار
+• تحمل المسؤولية وتنظيم الوقت
+• حل المشكلات والعمل تحت الضغط
+
+🏃 **الأنشطة الرياضية والترفيهية**
+• تحسين اللياقة البدنية
+• تنمية الروح الرياضية
+• خلق أجواء ممتعة مليئة بالحماس والطاقة الإيجابية
+
+📚 **الأنشطة الثقافية والتربوية**
+• ورش العمل والندوات التعليمية
+• الأنشطة الثقافية والمسابقات
+• تعليم القيم والسلوكيات الإيجابية
+
+---
+
+🏢 **فروع مجموعة كيان الكشفية البحرية** 🏢
+
+📍 **الفرع الأول – التجمع الثالث**
+نادي مركز شباب المستقبل بالقطامية
+
+📍 **الفرع الثاني – التجمع الخامس**
+معاهد الكمال الأزهرية
+
+📍 **الفرع الثالث – الدقي**
+بحرية الجيزة على النيل
+
+📍 **الفرع الرابع**
+نادي حارس على النيل
+
+📍 **الفرع الخامس – العبور**
+جمعية أحمد عرابي
+
+---
+
+💙 **لماذا تنضم إلى مجموعة كيان؟** 💙
+
+✓ التعلم والمتعة معاً
+✓ المغامرة والانضباط
+✓ الصداقة والعمل الجماعي
+✓ القيادة والثقة بالنفس
+✓ الأنشطة البحرية والكشفية
+✓ المعسكرات والرحلات الممتعة
+
+---
+
+🤝 **انضم إلينا** 🤝
+
+إذا كنت تبحث عن مكان يساعدك على تطوير مهاراتك، واكتشاف قدراتك، وخوض مغامرات وتجارب جديدة، فإن مجموعة كيان الكشفية البحرية ترحب بك دائمًا لتكون جزءًا من عائلتنا الكشفية.
+
+⚓ **معاً نصنع القادة... ونبني المستقبل** ⚓`;
+
+    let currentIndex = 0;
+    let resultHtml = '';
+    
+    const cursor = document.querySelector('.about-typing-cursor');
+    
+    aboutTypingInterval = setInterval(() => {
+        if (currentIndex < formattedAboutText.length) {
+            let char = formattedAboutText[currentIndex];
+            resultHtml += char;
+            
+            // تطبيق التنسيق
+            let displayHtml = resultHtml;
+            
+            // معالجة العناوين مع الإيموجيز
+            displayHtml = displayHtml.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            displayHtml = displayHtml.replace(/^---$/gm, '<hr>');
+            displayHtml = displayHtml.replace(/^⚓ (.+) ⚓$/gm, '<div class="title-anchor">⚓ $1 ⚓</div>');
+            displayHtml = displayHtml.replace(/^🌊(.+)🌊$/gm, '<div class="title-wave">🌊 $1 🌊</div>');
+            displayHtml = displayHtml.replace(/^🌟 (.+) 🌟$/gm, '<div class="title-star">🌟 $1 🌟</div>');
+            displayHtml = displayHtml.replace(/^🎯 (.+) 🎯$/gm, '<div class="title-target">🎯 $1 🎯</div>');
+            displayHtml = displayHtml.replace(/^🚤 (.+) 🚤$/gm, '<div class="title-boat">🚤 $1 🚤</div>');
+            displayHtml = displayHtml.replace(/^🐠 (.+)$/gm, '<div class="subtitle-fish">🐠 $1</div>');
+            displayHtml = displayHtml.replace(/^⛺ (.+)$/gm, '<div class="subtitle-tent">⛺ $1</div>');
+            displayHtml = displayHtml.replace(/^🎪 (.+)$/gm, '<div class="subtitle-circus">🎪 $1</div>');
+            displayHtml = displayHtml.replace(/^🏆 (.+)$/gm, '<div class="subtitle-trophy">🏆 $1</div>');
+            displayHtml = displayHtml.replace(/^🏃 (.+)$/gm, '<div class="subtitle-run">🏃 $1</div>');
+            displayHtml = displayHtml.replace(/^📚 (.+)$/gm, '<div class="subtitle-book">📚 $1</div>');
+            displayHtml = displayHtml.replace(/^🏢 (.+) 🏢$/gm, '<div class="title-building">🏢 $1 🏢</div>');
+            displayHtml = displayHtml.replace(/^📍 (.+)$/gm, '<div class="location">📍 $1</div>');
+            displayHtml = displayHtml.replace(/^💙 (.+) 💙$/gm, '<div class="title-heart">💙 $1 💙</div>');
+            displayHtml = displayHtml.replace(/^✓ (.+)$/gm, '<div class="check-item">✓ $1</div>');
+            displayHtml = displayHtml.replace(/^🤝 (.+) 🤝$/gm, '<div class="title-handshake">🤝 $1 🤝</div>');
+            displayHtml = displayHtml.replace(/^• (.+)$/gm, '<div class="bullet-item">• $1</div>');
+            
+            container.innerHTML = displayHtml;
+            currentIndex++;
+            
+            // Auto-scroll
+            const wrapper = document.querySelector('.about-typing-wrapper');
+            if (wrapper) {
+                wrapper.scrollTop = wrapper.scrollHeight;
+            }
+        } else {
+            clearInterval(aboutTypingInterval);
+            if (cursor) cursor.style.opacity = '0';
+        }
+    }, 20);
+}
+
 // دوال الانتقال والتواصل
 function goToLoginFromLanding() {
     renderLogin(document.getElementById('app'));
@@ -7571,32 +8443,70 @@ function renderAboutPage() {
                     <span>مجموعة كيان</span>
                 </div>
                 <div class="about-page-buttons">
-                    <button class="about-page-btn about-page-btn-home" onclick="goToLandingPage()">
+                    <button class="about-page-btn about-page-btn-home" onclick="renderLandingPage()">
                         <i class="fas fa-home"></i> الرئيسية
                     </button>
-                    <button class="about-page-btn-theme" id="aboutThemeBtn" onclick="toggleThemeAbout()">
+                    <button class="about-page-btn-theme" id="aboutThemeBtn">
                         <i class="fas ${isLight ? 'fa-sun' : 'fa-moon'}"></i>
                     </button>
                 </div>
             </div>
             
-            <!-- Content -->
-            <div class="about-page-content">
-                <div class="about-page-logo-center">
-                    <img src="https://i.ibb.co/VfWPtdk/5794143090170859641.jpg" alt="شعار مجموعة كيان">
+            <!-- Hero Section -->
+            <div class="about-hero-section">
+                <div class="about-hero-overlay"></div>
+                <div class="about-hero-content">
+                    <div class="about-logo-animation">
+                        <img src="https://i.ibb.co/VfWPtdk/5794143090170859641.jpg" alt="شعار مجموعة كيان">
+                    </div>
+                    <h1 class="about-hero-title">⚓ من نحن ⚓</h1>
+                    <p class="about-hero-subtitle">مجموعة كيان الكشفية البحرية | نصنع القادة... ونبني المستقبل</p>
+                    <div class="about-hero-anchor">
+                        <i class="fas fa-ship"></i> <i class="fas fa-anchor"></i> <i class="fas fa-compass"></i>
+                    </div>
                 </div>
-                <div class="about-page-text-container" id="aboutTextContainer"></div>
             </div>
-            
-            <div class="about-page-wave"></div>
+
+            <!-- Typing Animation Section - Full Width -->
+            <div class="about-typing-wrapper">
+                <div class="about-typing-section">
+                    <div class="about-typing-container">
+                        <div class="about-typing-content" id="aboutTypingContent"></div>
+                        <div class="about-typing-cursor">|</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
             <div class="about-page-footer">
                 <p>© 2025 مجموعة كيان الكشفية البحرية | 01144100018 / 01126125881</p>
             </div>
         </div>
     `;
     
-    // عرض النص مع تأثير الكتابة
-    renderAboutText();
+    // بدء تأثير الكتابة
+    startAboutTypingAnimation();
+    
+    // إضافة حدث زر تغيير الوضع - الطريقة الصحيحة
+    const themeBtn = document.getElementById('aboutThemeBtn');
+    if (themeBtn) {
+        themeBtn.onclick = function(e) {
+            e.preventDefault();
+            if (document.body.classList.contains('light-mode')) {
+                document.body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+                this.innerHTML = '<i class="fas fa-moon"></i>';
+                // تحديث خلفية الصفحة
+                document.querySelector('.about-page-container').style.background = 'linear-gradient(135deg, #0a2e1a, #0d2818, #071a0f)';
+            } else {
+                document.body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+                this.innerHTML = '<i class="fas fa-sun"></i>';
+                // تحديث خلفية الصفحة
+                document.querySelector('.about-page-container').style.background = 'linear-gradient(135deg, #e8f5e9, #c8e6c9, #a5d6a7)';
+            }
+        };
+    }
 }
 
 // دالة عرض النص في صفحة من نحن
