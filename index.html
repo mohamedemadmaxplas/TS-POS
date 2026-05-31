@@ -4270,6 +4270,7 @@ function renderLogin(container) {
             loginHomeBtn.innerHTML = '<i class="fas fa-home" style="font-size: 20px;"></i>';
         });
         
+        // ✅ التعديل المطلوب: استدعاء نافذة التأكيد التي تعيد إلى صفحة الهبوط
         loginHomeBtn.addEventListener('click', () => {
             showReturnToLandingConfirmation();
         });
@@ -4308,7 +4309,7 @@ function renderLogin(container) {
                 const loginBox = document.querySelector('.login-box');
                 if (loginBox) {
                     loginBox.style.background = 'white';
-                    loginBox.style.color = '#333';
+                    loginBox.style.boxShadow = '0 20px 40px rgba(0,0,0,0.1)';
                 }
             }
         });
@@ -4823,31 +4824,31 @@ function showReturnToLandingConfirmation() {
     
     document.body.appendChild(modal);
     
-   document.getElementById('returnToLandingYes').onclick = async () => {
-    modal.remove();
+    document.getElementById('returnToLandingYes').onclick = async () => {
+        modal.remove();
+        
+        currentUser = null;
+        isAdmin = false;
+        isLeader = false;
+        
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+        
+        // ✅ التغيير المطلوب: استدعاء صفحة الهبوط الرئيسية بدلاً من تسجيل الدخول
+        renderLandingPage();
+        addFixedLogoButton();
+        initTheme();
+        
+        showToast('تم تسجيل الخروج والعودة للصفحة الرئيسية');
+    };
     
-    currentUser = null;
-    isAdmin = false;
-    isLeader = false;
-    
-    if (countdownInterval) {
-        clearInterval(countdownInterval);
-        countdownInterval = null;
-    }
-    
-    // بدلاً من renderLandingPage، نعرض صفحة تسجيل الدخول
-    renderLogin(document.getElementById('app'));
-    addFixedLogoButton();
-    initTheme();
-    
-    showToast('تم تسجيل الخروج');
-};
     // زر "لا، إلغاء" - يغلق النافذة فقط
     document.getElementById('returnToLandingNo').onclick = () => {
         modal.remove();
     };
 }
-
 
 function updateLandingStats() {
     const membersCount = document.getElementById('statMembers');
