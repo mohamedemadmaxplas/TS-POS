@@ -3655,6 +3655,286 @@ body.light-mode .about-page-footer {
         display: none;
     }
 }
+/* ==================== LEADERBOARD SECTION STYLES ==================== */
+.leaderboard-section {
+    padding: 60px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    direction: rtl;
+}
+
+.leaderboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 30px;
+    padding: 25px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(5px);
+}
+
+body.light-mode .leaderboard-container {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard-title {
+    text-align: center;
+    font-size: 32px;
+    color: #d4a017;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.leaderboard-title i {
+    font-size: 36px;
+}
+
+.leaderboard-filters {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a472a;
+    margin-bottom: 8px;
+    margin-right: 5px;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 30px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: #d4a017;
+}
+
+.filter-group select:disabled {
+    background: #f0f0f0;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.leaderboard-table-wrapper {
+    overflow-x: auto;
+    border-radius: 20px;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.leaderboard-table th {
+    background: #1a472a;
+    color: white;
+    padding: 15px 12px;
+    text-align: center;
+    font-weight: 600;
+}
+
+body.light-mode .leaderboard-table th {
+    background: #2e7d32;
+}
+
+.leaderboard-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+.leaderboard-table tr:hover {
+    background: #f5f5f5;
+}
+
+.leaderboard-table .rank-cell {
+    font-weight: bold;
+    width: 80px;
+}
+
+.rank-medal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+.rank-1 { background: #d4a017; color: white; }
+.rank-2 { background: #c0c0c0; color: white; }
+.rank-3 { background: #cd7f32; color: white; }
+.rank-other { background: #666; color: white; }
+
+.no-data {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-size: 16px;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+    .leaderboard-section {
+        padding: 40px 15px;
+    }
+    .leaderboard-container {
+        padding: 15px;
+    }
+    .leaderboard-title {
+        font-size: 24px;
+    }
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+    .filter-group {
+        min-width: 100%;
+    }
+}
+/* ==================== FOOTER NEW STYLES ==================== */
+.footer-landing-new button {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.footer-landing-new button:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.footer-landing-new a {
+    text-decoration: none;
+}
+
+/* أزرار الواتساب */
+.footer-landing-new a:first-child button:hover {
+    background: #075e54 !important;
+}
+
+/* زر الاتصال */
+.footer-landing-new a:nth-child(2) button:hover {
+    background: #2980b9 !important;
+}
+
+/* زر فيسبوك */
+.footer-landing-new a:nth-child(3) button:hover {
+    background: #0d47a1 !important;
+}
+
+/* زر تيك توك */
+.footer-landing-new a:nth-child(4) button:hover {
+    background: #1a1a1a !important;
+}
+
+/* زر الموقع */
+.footer-landing-new a:last-child button:hover {
+    background: #b8860b !important;
+    color: white !important;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+    .footer-landing-new {
+        padding: 30px 15px 20px;
+    }
+    .footer-landing-new button {
+        padding: 10px 18px !important;
+        font-size: 12px !important;
+    }
+    .footer-landing-new button i {
+        font-size: 16px !important;
+    }
+    .footer-landing-new div[style*="background: rgba(255,255,255,0.08)"] {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+    }
+}
+/* ==================== UNIFIED FOOTER STYLES ==================== */
+.unified-footer {
+    width: 100%;
+}
+
+.unified-footer button {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.unified-footer button:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.unified-footer a {
+    text-decoration: none;
+}
+
+/* Hover effects for buttons */
+.footer-btn[data-color="whatsapp"] button:hover {
+    background: #075e54 !important;
+}
+.footer-btn[data-color="call"] button:hover {
+    background: #2980b9 !important;
+}
+.footer-btn[data-color="facebook"] button:hover {
+    background: #0d47a1 !important;
+}
+.footer-btn[data-color="tiktok"] button:hover {
+    background: #1a1a1a !important;
+}
+.footer-btn[data-color="website"] button:hover {
+    background: #b8860b !important;
+    color: white !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .unified-footer {
+        padding: 30px 15px 20px !important;
+    }
+    .unified-footer button {
+        padding: 10px 18px !important;
+        font-size: 12px !important;
+    }
+    .unified-footer button i {
+        font-size: 16px !important;
+    }
+    .unified-footer div[style*="background: rgba(255,255,255,0.08)"] {
+        padding: 5px 12px !important;
+        font-size: 11px !important;
+    }
+    .unified-footer h3 {
+        font-size: 18px !important;
+    }
+}
     </style>
 </head>
 <body>
@@ -3687,6 +3967,10 @@ body.light-mode .about-page-footer {
         let isTypingAnimationStarted = false;
         let aboutTypingInterval = null;
         let aboutTypingTimeout = null;
+        let currentBranchFilter = 'all';
+        let currentTypeFilter = 'all';
+
+
 
       let appData = {
     branches: [],
@@ -4070,7 +4354,89 @@ function getSubBranchesCheckboxes(branchId, selectedSubBranchIds) {
     `).join('');
 }
 
+// ==================== UNIFIED FOOTER FOR ALL PAGES ====================
+function renderUnifiedFooter() {
+    return `
+        <div class="unified-footer" style="background: linear-gradient(135deg, #0a2e1a, #0d2818); padding: 40px 20px 25px; text-align: center; border-top: 2px solid rgba(212,160,23,0.4); margin-top: auto;">
+            
+            <!-- قسم تواصل معنا (يظهر أعلى الفوتر) -->
+            <div style="margin-bottom: 35px;">
+                <h3 style="color: #d4a017; margin-bottom: 20px; font-size: 22px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fas fa-headset"></i>
+                    <span>📞 Contact us</span>
+                    <i class="fas fa-comments"></i>
+                </h3>
+                <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                    <!-- واتساب -->
+                    <a href="https://wa.me/201035636654" target="_blank" class="footer-btn" data-color="whatsapp">
+                        <button style="background: #25D366; border: none; padding: 12px 28px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; font-family: 'Cairo', sans-serif; font-weight: 600; color: white; font-size: 14px;">
+                            <i class="fab fa-whatsapp" style="font-size: 20px;"></i>
+                            <span>WhatsApp 01035636654</span>
+                        </button>
+                    </a>
+                    <!-- اتصال -->
+                    <a href="tel:01144100018" class="footer-btn" data-color="call">
+                        <button style="background: #3498db; border: none; padding: 12px 28px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; font-family: 'Cairo', sans-serif; font-weight: 600; color: white; font-size: 14px;">
+                            <i class="fas fa-phone-alt" style="font-size: 20px;"></i>
+                            <span> Contact us 01144100018</span>
+                        </button>
+                    </a>
+                    <!-- فيسبوك -->
+                    <a href="https://www.facebook.com/share/18oMJ3PRYG/" target="_blank" class="footer-btn" data-color="facebook">
+                        <button style="background: #1877f2; border: none; padding: 12px 28px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; font-family: 'Cairo', sans-serif; font-weight: 600; color: white; font-size: 14px;">
+                            <i class="fab fa-facebook-f" style="font-size: 20px;"></i>
+                            <span>FaceBook</span>
+                        </button>
+                    </a>
+                    <!-- تيك توك -->
+                    <a href="https://www.tiktok.com/@tecno.shark47?_r=1&_t=ZS-96lpm0BrDt7" target="_blank" class="footer-btn" data-color="tiktok">
+                        <button style="background: #000000; border: none; padding: 12px 28px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; font-family: 'Cairo', sans-serif; font-weight: 600; color: white; font-size: 14px;">
+                            <i class="fab fa-tiktok" style="font-size: 20px;"></i>
+                            <span>Tik Tok</span>
+                        </button>
+                    </a>
+                    <!-- الموقع الرسمي -->
+                    <a href="https://tecno-shark.vercel.app/" target="_blank" class="footer-btn" data-color="website">
+                        <button style="background: #d4a017; border: none; padding: 12px 28px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; font-family: 'Cairo', sans-serif; font-weight: 600; color: #1a472a; font-size: 14px;">
+                            <i class="fas fa-globe" style="font-size: 20px;"></i>
+                            <span>Website</span>
+                        </button>
+                    </a>
+                </div>
+            </div>
 
+            <!-- شركة تكنو شارك -->
+            <div style="margin-bottom: 25px;">
+                <div style="display: inline-block; background: rgba(212,160,23,0.12); padding: 8px 25px; border-radius: 50px; margin-bottom: 15px;">
+                    <i class="fas fa-laptop-code" style="color: #d4a017; font-size: 18px;"></i>
+                    <span style="color: #d4a017; font-weight: 600; margin-right: 8px;">Developed by Tecno Shark Company</span>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 10px;">
+                    <div style="background: rgba(255,255,255,0.08); padding: 6px 16px; border-radius: 40px;">
+                        <i class="fas fa-user-tie" style="color: #d4a017; margin-left: 8px;"></i>
+                        <span style="color: #fff;"> Abdul Rahman Muhammad Sobhi </span>
+                        <span style="color: rgba(255,255,255,0.6); font-size: 12px; margin-right: 8px;">(Owner)</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.08); padding: 6px 16px; border-radius: 40px;">
+                        <i class="fas fa-handshake" style="color: #d4a017; margin-left: 8px;"></i>
+                        <span style="color: #fff;">Mohamed Emad Abdel-Ati</span>
+                        <span style="color: rgba(255,255,255,0.6); font-size: 12px; margin-right: 8px;">(Director and partner)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- حقوق الملكية -->
+            <div style="border-top: 1px solid rgba(212,160,23,0.2); padding-top: 20px; margin-top: 10px;">
+                <p style="color: rgba(255,255,255,0.5); font-size: 12px; margin: 5px 0;">
+                    <i class="far fa-copyright"></i> 2025 مجموعة كيان الكشفية البحرية | جميع الحقوق محفوظة
+                </p>
+                <p style="color: rgba(255,255,255,0.4); font-size: 11px; margin: 5px 0;">
+                    <i class="fas fa-code"></i> تم تصميم هذا المنتج | Developed by Tecno Shark Company
+                </p>
+            </div>
+        </div>
+    `;
+}
         function listenForRealTimeUpdates() {
     database.ref('appData').on('value', (snapshot) => {
         const data = snapshot.val();
@@ -8162,33 +8528,65 @@ function renderLandingPage() {
                 </div>
             </div>
 
-            <!-- Social Section -->
-            <div class="social-section-landing" style="background: #1a472a; padding: 40px 20px;">
-                <h3 class="social-title-landing" style="color: #d4a017;">📱 تواصل معنا</h3>
-                <div class="social-icons-landing">
-                    <div onclick="openWhatsAppLanding()">
-                        <div class="social-icon-landing" style="border-color: #d4a017;">
-                            <i class="fab fa-whatsapp" style="color: #d4a017;"></i>
-                        </div>
-                        <div class="social-label-landing" style="color: rgba(255,255,255,0.7);">واتساب</div>
-                    </div>
-                    <div onclick="openFacebookLanding()">
-                        <div class="social-icon-landing" style="border-color: #d4a017;">
-                            <i class="fab fa-facebook-f" style="color: #d4a017;"></i>
-                        </div>
-                        <div class="social-label-landing" style="color: rgba(255,255,255,0.7);">فيسبوك</div>
-                    </div>
-                </div>
-            </div>
+            <!-- قسم الترتيب (Leaderboard) -->
+            <div id="leaderboardSectionContainer"></div>
 
-            <!-- Footer -->
-            <div class="footer-landing" style="background: #0d2818;">
-                <p>© 2025 مجموعة كيان الكشفية البحرية | جميع الحقوق محفوظة</p>
-                <p style="font-size: 12px; margin-top: 8px;">01144100018 | 01126125881</p>
+            <!-- الفوتر الموحد الجديد -->
+            ${renderUnifiedFooter()}
+        </div>
+    `;
+    
+    setTimeout(() => {
+        addLeaderboardToLanding();
+    }, 100);
+}
+// دالة إضافة قسم السوشيال ميديا في أسفل الصفحة (قبل الفوتر)
+function addSocialSectionToBottom() {
+    const landingContainer = document.querySelector('.landing-new-container');
+    if (!landingContainer) return;
+    
+    // البحث عن الفوتر
+    const footer = document.querySelector('.footer-landing');
+    
+    // حذف قسم السوشيال ميديا القديم إذا وجد
+    const oldSocialSection = document.querySelector('.social-section-landing');
+    if (oldSocialSection) {
+        oldSocialSection.remove();
+    }
+    
+    // إنشاء قسم السوشيال ميديا جديد
+    const socialSection = document.createElement('div');
+    socialSection.className = 'social-section-landing';
+    socialSection.style.cssText = 'background: #1a472a; padding: 40px 20px; text-align: center;';
+    
+    socialSection.innerHTML = `
+        <h3 class="social-title-landing" style="color: #d4a017; font-size: 28px; margin-bottom: 30px;">
+            <i class="fas fa-headset"></i> تواصل معنا
+        </h3>
+        <div class="social-icons-landing" style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
+            <div onclick="openWhatsAppLanding()" style="cursor: pointer; text-align: center;">
+                <div class="social-icon-landing" style="width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #d4a017; transition: all 0.3s ease;">
+                    <i class="fab fa-whatsapp" style="font-size: 40px; color: #d4a017;"></i>
+                </div>
+                <div class="social-label-landing" style="margin-top: 10px; font-size: 14px; color: rgba(255,255,255,0.7);">واتساب</div>
+            </div>
+            <div onclick="openFacebookLanding()" style="cursor: pointer; text-align: center;">
+                <div class="social-icon-landing" style="width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #d4a017; transition: all 0.3s ease;">
+                    <i class="fab fa-facebook-f" style="font-size: 40px; color: #d4a017;"></i>
+                </div>
+                <div class="social-label-landing" style="margin-top: 10px; font-size: 14px; color: rgba(255,255,255,0.7);">فيسبوك</div>
             </div>
         </div>
     `;
+    
+    // إضافة قسم السوشيال ميديا قبل الفوتر مباشرة
+    if (footer) {
+        landingContainer.insertBefore(socialSection, footer);
+    } else {
+        landingContainer.appendChild(socialSection);
+    }
 }
+
 // النص الكامل لقسم "عنا"
 const fullAboutText = `# من نحن – مجموعة كيان الكشفية البحرية
 
@@ -8742,7 +9140,218 @@ function toggleThemeLanding() {
     }
 }
 
+// ==================== LEADERBOARD FUNCTIONS ====================
 
+
+
+// دالة عرض جدول الترتيب في صفحة الهبوط
+function renderLeaderboard() {
+    const container = document.getElementById('leaderboardTableContainer');
+    if (!container) return;
+    
+    // جلب البيانات بناءً على الفلاتر
+    let filteredMembers = [...appData.members];
+    
+    // فلتر الفرع (إذا لم يكن 'all')
+    if (currentBranchFilter !== 'all') {
+        const branchId = parseInt(currentBranchFilter);
+        filteredMembers = filteredMembers.filter(m => m.branchId === branchId);
+    }
+    
+    // فلتر النوع (يظهر فقط عند اختيار فرع معين)
+    if (currentBranchFilter !== 'all' && currentTypeFilter !== 'all') {
+        const squadIdsOfType = appData.squads
+            .filter(s => s.type === currentTypeFilter && s.branchId == currentBranchFilter)
+            .map(s => s.id);
+        filteredMembers = filteredMembers.filter(m => squadIdsOfType.includes(m.squadId));
+    }
+    
+    // ترتيب حسب النقاط (تنازلي)
+    filteredMembers.sort((a, b) => b.points - a.points);
+    
+    // بناء HTML الجدول
+    if (filteredMembers.length === 0) {
+        container.innerHTML = '<div class="no-data"><i class="fas fa-info-circle"></i> لا توجد بيانات لعرضها</div>';
+        return;
+    }
+    
+    let tableHtml = `
+        <div class="leaderboard-table-wrapper">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الاسم</th>
+                        <th>الفرع / الطليعة</th>
+                        <th>الرتبة</th>
+                        <th><i class="fas fa-star"></i> النقاط</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    filteredMembers.forEach((member, index) => {
+        const rank = index + 1;
+        let rankClass = '';
+        let rankDisplay = '';
+        
+        if (rank === 1) {
+            rankClass = 'rank-1';
+            rankDisplay = '🥇';
+        } else if (rank === 2) {
+            rankClass = 'rank-2';
+            rankDisplay = '🥈';
+        } else if (rank === 3) {
+            rankClass = 'rank-3';
+            rankDisplay = '🥉';
+        } else {
+            rankClass = 'rank-other';
+            rankDisplay = rank;
+        }
+        
+        // جلب معلومات الفرع والطليعة
+        const squad = appData.squads.find(s => s.id === member.squadId);
+        const branch = appData.branches.find(b => b.id === member.branchId);
+        
+        let locationText = '';
+        if (currentBranchFilter !== 'all') {
+            // إذا كان مختار فرع معين، نعرض اسم الطليعة
+            locationText = squad ? `${squad.name} ${squad.type ? `(${squad.type})` : ''}` : branch?.name || '-';
+        } else {
+            // إذا كان الكل، نعرض المنطقة ثم الطليعة
+            locationText = branch ? `${branch.name} - ${squad?.name || ''}` : squad?.name || '-';
+        }
+        
+        tableHtml += `
+            <tr>
+                <td class="rank-cell">
+                    <span class="rank-medal ${rankClass}">${rankDisplay}</span>
+                </td>
+                <td><strong>${escapeHtml(member.name)}</strong></td>
+                <td>${escapeHtml(locationText)}</td>
+                <td><span class="badge" style="background: #d4a01720; color: #1a472a; padding: 4px 10px;">${member.rank || 'عضو'}</span></td>
+                <td><strong style="color: #d4a017; font-size: 18px;">${member.points}</strong></td>
+            </tr>
+        `;
+    });
+    
+    tableHtml += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.innerHTML = tableHtml;
+}
+
+// دالة تحديث الفلاتر
+function updateLeaderboardFilters() {
+    const branchSelect = document.getElementById('branchFilterLeaderboard');
+    const typeSelect = document.getElementById('typeFilterLeaderboard');
+    
+    if (!branchSelect) return;
+    
+    currentBranchFilter = branchSelect.value;
+    
+    // تفعيل/تعطيل فلتر النوع
+    if (currentBranchFilter !== 'all') {
+        typeSelect.disabled = false;
+        // تعبئة خيارات النوع بناءً على الفروع الموجودة في المنطقة المختارة
+        const branchId = parseInt(currentBranchFilter);
+        const availableTypes = [...new Set(
+            appData.squads
+                .filter(s => s.branchId === branchId)
+                .map(s => s.type || 'الكشافة')
+        )];
+        
+        // حفظ القيمة الحالية مؤقتاً
+        const oldTypeValue = typeSelect.value;
+        
+        typeSelect.innerHTML = '<option value="all">🎯 جميع الأنواع</option>';
+        availableTypes.forEach(type => {
+            const typeNames = {
+                'الكشافة': '⚜️ الكشافة',
+                'المرشدات': '🌸 المرشدات',
+                'الأشبال': '🦁 الأشبال',
+                'الزهرات': '🌺 الزهرات',
+                'البراعم': '🌱 البراعم'
+            };
+            typeSelect.innerHTML += `<option value="${type}">${typeNames[type] || type}</option>`;
+        });
+        
+        // استعادة القيمة إذا كانت لا تزال موجودة
+        if (availableTypes.includes(oldTypeValue)) {
+            typeSelect.value = oldTypeValue;
+            currentTypeFilter = oldTypeValue;
+        } else {
+            typeSelect.value = 'all';
+            currentTypeFilter = 'all';
+        }
+    } else {
+        typeSelect.disabled = true;
+        typeSelect.value = 'all';
+        currentTypeFilter = 'all';
+    }
+    
+    // تحديث الجدول
+    renderLeaderboard();
+}
+
+// دالة تغيير فلتر النوع
+function onTypeFilterChange() {
+    const typeSelect = document.getElementById('typeFilterLeaderboard');
+    if (typeSelect) {
+        currentTypeFilter = typeSelect.value;
+        renderLeaderboard();
+    }
+}
+
+// دالة إضافة قسم الترتيب إلى صفحة الهبوط
+// دالة إضافة قسم الترتيب إلى صفحة الهبوط
+function addLeaderboardToLanding() {
+    // البحث عن الحاوية المخصصة لقسم الترتيب
+    const container = document.getElementById('leaderboardSectionContainer');
+    if (!container) return;
+    
+    // حذف أي محتوى قديم
+    container.innerHTML = '';
+    
+    // تعبئة الفروع في قائمة الاختيار
+    let branchesOptions = '<option value="all">🌍 جميع الفروع</option>';
+    appData.branches.forEach(branch => {
+        branchesOptions += `<option value="${branch.id}">🏢 ${branch.name}</option>`;
+    });
+    
+    container.innerHTML = `
+        <div class="leaderboard-section">
+            <div class="leaderboard-container">
+                <div class="leaderboard-title">
+                    <i class="fas fa-trophy"></i>
+                    <span>🏆 ترتيب المجموعة حسب النقاط 🏆</span>
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="leaderboard-filters">
+                    <div class="filter-group">
+                        <label><i class="fas fa-map-marker-alt"></i> اختر الفرع</label>
+                        <select id="branchFilterLeaderboard" onchange="updateLeaderboardFilters()">
+                            ${branchesOptions}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label><i class="fas fa-users"></i> اختر النوع (عند اختيار فرع)</label>
+                        <select id="typeFilterLeaderboard" onchange="onTypeFilterChange()" disabled>
+                            <option value="all">🎯 جميع الأنواع</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="leaderboardTableContainer"></div>
+            </div>
+        </div>
+    `;
+    
+    // عرض الجدول
+    renderLeaderboard();
+}
 
 // ==================== تشغيل التطبيق ====================
 window.startApp = async function() {
