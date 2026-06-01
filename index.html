@@ -4021,38 +4021,50 @@ body.light-mode .leaderboard-table th {
 
 
 
-      let appData = {
+   let appData = {
     branches: [],
-    subBranches: [],     // <-- تأكد من وجود هذا السطر
+    subBranches: [],
     squads: [],
     members: [],
-    leaders: [],         // <-- تأكد من وجود هذا السطر
+    leaders: [],
+    forms: [],                      // ← أضف هذا
+    leaderForms: [],                // ← أضف هذا
+    memberForms: [],                // ← أضف هذا
+    evaluationForms: [],            // ← أضف هذا
+    leaderEvaluationForms: [],      // ← أضف هذا
+    memberEvaluationAnswers: [],    // ← أضف هذا
     tasks: [],
     taskSubmissions: [],
     joinRequests: [],
     messages: []
 };
 
+
         // ==================== FIREBASE OPERATIONS ====================
         
     async function saveAllDataToFirebase() {
     try {
-        await database.ref('appData').set({
-            branches: appData.branches,
-            subBranches: appData.subBranches,
-            squads: appData.squads,
-            members: appData.members,
-            leaders: appData.leaders,   
-            forms: appData.forms,                    // الفورمات العادية
-            leaderForms: appData.leaderForms,        // الفورمات المرسلة للقادة
-            memberForms: appData.memberForms,        // الفورمات المرسلة للأعضاء
-            evaluationForms: appData.evaluationForms, // فورمات التقييم
-            tasks: appData.tasks,
-            taskSubmissions: appData.taskSubmissions,
-            messages: appData.messages,
-            joinRequests: appData.joinRequests,
+        // التأكد من وجود جميع المصفوفات قبل الحفظ
+        const dataToSave = {
+            branches: appData.branches || [],
+            subBranches: appData.subBranches || [],
+            squads: appData.squads || [],
+            members: appData.members || [],
+            leaders: appData.leaders || [],
+            forms: appData.forms || [],
+            leaderForms: appData.leaderForms || [],
+            memberForms: appData.memberForms || [],
+            evaluationForms: appData.evaluationForms || [],
+            leaderEvaluationForms: appData.leaderEvaluationForms || [],
+            memberEvaluationAnswers: appData.memberEvaluationAnswers || [],
+            tasks: appData.tasks || [],
+            taskSubmissions: appData.taskSubmissions || [],
+            messages: appData.messages || [],
+            joinRequests: appData.joinRequests || [],
             lastUpdated: new Date().toISOString()
-        });
+        };
+        
+        await database.ref('appData').set(dataToSave);
         console.log('✅ All data saved to Firebase');
         return true;
     } catch (error) {
@@ -4344,10 +4356,10 @@ function changeLeaderPage(page) {
             { id: 5, branchId: 3, name: "فرع سيدي جابر", createdAt: new Date().toISOString() }
         ],
         squads: [
-            { id: 1, branchId: 1, name: "طليعة النصر", leader: "قائد أحمد", isOpen: true, createdAt: new Date().toISOString() },
-            { id: 2, branchId: 1, name: "طليعة الفتح", leader: "قائد محمد", isOpen: true, createdAt: new Date().toISOString() },
-            { id: 3, branchId: 2, name: "طليعة الأمل", leader: "قائد علي", isOpen: true, createdAt: new Date().toISOString() },
-            { id: 4, branchId: 3, name: "طليعة العزم", leader: "قائد خالد", isOpen: true, createdAt: new Date().toISOString() }
+            { id: 1, branchId: 1, subBranchId: 1, name: "طليعة النصر", leader: "قائد أحمد", type: "الكشافة", isOpen: true, createdAt: new Date().toISOString() },
+            { id: 2, branchId: 1, subBranchId: 2, name: "طليعة الفتح", leader: "قائد محمد", type: "الكشافة", isOpen: true, createdAt: new Date().toISOString() },
+            { id: 3, branchId: 2, subBranchId: 3, name: "طليعة الأمل", leader: "قائد علي", type: "المرشدات", isOpen: true, createdAt: new Date().toISOString() },
+            { id: 4, branchId: 3, subBranchId: 5, name: "طليعة العزم", leader: "قائد خالد", type: "الأشبال", isOpen: true, createdAt: new Date().toISOString() }
         ],
         members: [
             { id: 1, code: "S001", name: "أحمد محمد", age: 16, username: "ahmed", password: "123456", phone: "01012345678", branchId: 1, subBranchId: 1, squadId: 1, points: 150, rank: "قائد", joinedAt: new Date().toISOString() },
@@ -4356,7 +4368,7 @@ function changeLeaderPage(page) {
             { id: 4, code: "S004", name: "يوسف إبراهيم", age: 17, username: "youssef", password: "123456", phone: "01234567890", branchId: 2, subBranchId: 3, squadId: 3, points: 75, rank: "عضو", joinedAt: new Date().toISOString() },
             { id: 5, code: "S005", name: "عمر سعيد", age: 13, username: "omar", password: "123456", phone: "01555667788", branchId: 3, subBranchId: 5, squadId: 4, points: 60, rank: "عضو", joinedAt: new Date().toISOString() }
         ],
-        leaders: [],  // 🔄 تم إفراغ القادة - لن يتم حفظ أي قائد
+        leaders: [],
         tasks: [
             { id: 1, squadId: 1, title: "حفظ أخلاق الكشاف", description: "حفظ مبادئ وقانون الكشافة", pointsValue: 15, createdAt: new Date().toISOString(), startDate: defaultStartDate, endDate: defaultEndDate, seenByMembers: [] },
             { id: 2, squadId: 1, title: "مهارات التخييم", description: "تعلم كيفية نصب الخيمة وإشعال النار", pointsValue: 20, createdAt: new Date().toISOString(), startDate: defaultStartDate, endDate: new Date(now.getTime() + 10*24*60*60*1000).toISOString(), seenByMembers: [] },
@@ -4364,28 +4376,20 @@ function changeLeaderPage(page) {
         ],
         taskSubmissions: [],
         messages: [],
-        joinRequests: []
+        joinRequests: [],
+        
+        // ==================== بيانات الفورمات (النماذج) ====================
+        forms: [],                           // الفورمات العادية
+        leaderForms: [],                     // الفورمات المرسلة للقادة
+        memberForms: [],                     // الفورمات المرسلة للأعضاء
+        evaluationForms: [],                 // فورمات التقييم
+        leaderEvaluationForms: [],           // فورمات التقييم المرسلة للقادة
+        memberEvaluationAnswers: []          // إجابات فورمات التقييم
     };
-    // أضف هذه الأسطر داخل initializeDefaultData() بعد تعريف appData
-appData.forms = appData.forms || [];
-appData.leaderForms = appData.leaderForms || [];
-appData.memberForms = appData.memberForms || [];
-appData.evaluationForms = appData.evaluationForms || [];
-appData.leaderEvaluationForms = appData.leaderEvaluationForms || [];
-appData.memberEvaluationAnswers = appData.memberEvaluationAnswers || [];
+    
     await saveAllDataToFirebase();
 }
-// ==================== نظام فورم التقييم (بالتقييم بالنجوم) ====================
 
-// ==================== 1. إضافة المتغيرات الجديدة ====================
-// أضف هذه الأسطر داخل initializeDefaultData() إذا لم تكن موجودة
-/*
-appData.evaluationForms = appData.evaluationForms || [];
-appData.leaderEvaluationForms = appData.leaderEvaluationForms || [];
-appData.memberEvaluationAnswers = appData.memberEvaluationAnswers || [];
-*/
-
-// ==================== 2. دوال حفظ فورم التقييم ====================
 
 async function saveEvaluationFormToFirebase(formData) {
     try {
