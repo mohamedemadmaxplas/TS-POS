@@ -4146,7 +4146,7 @@ function renderAdminSettings() {
                         <input type="password" id="confirmNewPassword" placeholder="أعد كتابة كلمة المرور الجديدة">
                     </div>
                     
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <button type="submit" class="btn btn-primary" style="width:100%;">
                         <i class="fas fa-save"></i> حفظ التغييرات
                     </button>
                 </form>
@@ -4169,6 +4169,18 @@ function renderAdminSettings() {
                     </div>
                 </div>
             </div>
+
+            <!-- زر إعادة تعيين النظام -->
+            <div class="settings-card" style="border-right-color: #e74c3c;">
+                <h4><i class="fas fa-exclamation-triangle"></i> إعادة تعيين النظام</h4>
+                <p style="color: #666; margin-bottom: 15px; font-size: 13px;">
+                    <i class="fas fa-info-circle"></i> تحذير: هذا الإجراء سيمسح جميع البيانات (الأعضاء، القادة، الطلايع، التكاليف، الطلبات) 
+                    ويعيد النظام إلى حالته الافتراضية. لا يمكن التراجع عن هذا الإجراء!
+                </p>
+                <button class="btn btn-danger" onclick="showResetConfirmation()" style="width:100%;">
+                    <i class="fas fa-trash-alt"></i> إعادة تعيين النظام بالكامل
+                </button>
+            </div>
         </div>
     `;
     
@@ -4181,7 +4193,7 @@ function renderAdminSettings() {
         const confirmNewPassword = document.getElementById('confirmNewPassword').value;
         
         // التحقق من كلمة المرور الحالية
-        if (currentPassword !== 'Kayan123') {
+        if (currentPassword !== 'Kayan123' && currentPassword !== currentUser.password) {
             showToast('❌ كلمة المرور الحالية غير صحيحة', 'error');
             return;
         }
@@ -4193,7 +4205,7 @@ function renderAdminSettings() {
         }
         
         // التحقق من عدم وجود اسم مستخدم مكرر
-        if (newUsername !== 'Kayan') {
+        if (newUsername !== 'Kayan' && newUsername !== currentUser.username) {
             if (appData.leaders.some(l => l.username === newUsername)) {
                 showToast('❌ اسم المستخدم موجود مسبقاً لدى قائد آخر', 'error');
                 return;
@@ -4205,7 +4217,7 @@ function renderAdminSettings() {
         }
         
         // حفظ التغييرات
-        if (newUsername && newUsername !== 'Kayan') {
+        if (newUsername && newUsername !== currentUser.username) {
             currentUser.username = newUsername;
             currentUser.name = newUsername;
         }
@@ -4213,6 +4225,9 @@ function renderAdminSettings() {
         if (newPassword) {
             currentUser.password = newPassword;
         }
+        
+        // حفظ بيانات القائد العام في Firebase
+        await saveAdminCredentialsToFirebase();
         
         showToast('✅ تم تحديث بيانات الدخول بنجاح');
         
@@ -4233,6 +4248,36 @@ function renderAdminSettings() {
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmNewPassword').value = '';
     });
+}
+
+// دالة حفظ بيانات القائد العام في Firebase
+async function saveAdminCredentialsToFirebase() {
+    try {
+        await database.ref('adminCredentials').set({
+            username: currentUser.username || 'Kayan',
+            password: currentUser.password || 'Kayan123',
+            updatedAt: new Date().toISOString()
+        });
+        console.log('✅ تم حفظ بيانات القائد العام في Firebase');
+    } catch (error) {
+        console.error('❌ خطأ في حفظ بيانات القائد العام:', error);
+    }
+}
+
+// دالة تحميل بيانات القائد العام من Firebase
+async function loadAdminCredentialsFromFirebase() {
+    try {
+        const snapshot = await database.ref('adminCredentials').once('value');
+        const data = snapshot.val();
+        if (data && data.username && data.password) {
+            console.log('✅ تم تحميل بيانات القائد العام من Firebase:', data.username);
+            return { username: data.username, password: data.password };
+        }
+    } catch (error) {
+        console.error('❌ خطأ في تحميل بيانات القائد العام:', error);
+    }
+    // إرجاع القيم الافتراضية إذا لم توجد بيانات
+    return { username: 'Kayan', password: 'Kayan123' };
 }
 function changeLeaderPage(page) {
     document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
@@ -4313,43 +4358,13 @@ function changeLeaderPage(page) {
             { id: 4, code: "S004", name: "يوسف إبراهيم", age: 17, username: "youssef", password: "123456", phone: "01234567890", branchId: 2, subBranchId: 3, squadId: 3, points: 75, rank: "عضو", joinedAt: new Date().toISOString() },
             { id: 5, code: "S005", name: "عمر سعيد", age: 13, username: "omar", password: "123456", phone: "01555667788", branchId: 3, subBranchId: 5, squadId: 4, points: 60, rank: "عضو", joinedAt: new Date().toISOString() }
         ],
-        // ========== القادة الافتراضيين (التجريبيين) ==========
-        leaders: [
-            { 
-                id: 100, 
-                name: "قائد محمد", 
-                age: 35, 
-                phone: "01000000001", 
-                branchId: 1, 
-                subBranchIds: [1, 2], 
-                subBranches: [{id:1, name:"فرع النزهة"},{id:2, name:"فرع مدينة نصر"}], 
-                username: "leader1", 
-                password: "123456", 
-                createdAt: new Date().toISOString(), 
-                isLeader: true 
-            },
-            { 
-                id: 101, 
-                name: "قائد علي", 
-                age: 40, 
-                phone: "01000000002", 
-                branchId: 2, 
-                subBranchIds: [3, 4], 
-                subBranches: [{id:3, name:"فرع المهندسين"},{id:4, name:"فرع الهرم"}], 
-                username: "leader2", 
-                password: "123456", 
-                createdAt: new Date().toISOString(), 
-                isLeader: true 
-            }
-        ],
+        leaders: [],  // 🔄 تم إفراغ القادة - لن يتم حفظ أي قائد
         tasks: [
             { id: 1, squadId: 1, title: "حفظ أخلاق الكشاف", description: "حفظ مبادئ وقانون الكشافة", pointsValue: 15, createdAt: new Date().toISOString(), startDate: defaultStartDate, endDate: defaultEndDate, seenByMembers: [] },
             { id: 2, squadId: 1, title: "مهارات التخييم", description: "تعلم كيفية نصب الخيمة وإشعال النار", pointsValue: 20, createdAt: new Date().toISOString(), startDate: defaultStartDate, endDate: new Date(now.getTime() + 10*24*60*60*1000).toISOString(), seenByMembers: [] },
             { id: 3, squadId: 2, title: "الإسعافات الأولية", description: "تعلم أساسيات الإسعافات الأولية", pointsValue: 25, createdAt: new Date().toISOString(), startDate: defaultStartDate, endDate: new Date(now.getTime() + 5*24*60*60*1000).toISOString(), seenByMembers: [] }
         ],
-        taskSubmissions: [
-            { id: 1, taskId: 1, memberId: 1, status: "submitted", submittedAt: new Date().toISOString(), pointsAwarded: null, reviewedBy: null, reviewedAt: null }
-        ],
+        taskSubmissions: [],
         messages: [],
         joinRequests: []
     };
@@ -4871,7 +4886,9 @@ function renderLogin(container) {
         const password = document.getElementById('password').value;
         
         // التحقق من حساب القائد العام
-        if (username === 'Kayan' && password === 'Kayan123') {
+       // التحقق من حساب القائد العام (من Firebase)
+const adminCreds = await loadAdminCredentialsFromFirebase();
+if (username === adminCreds.username && password === adminCreds.password) {
             currentUser = { id: 'admin', name: 'القائد العام', isAdmin: true };
             isAdmin = true;
             isLeader = false;
@@ -4881,7 +4898,95 @@ function renderLogin(container) {
             render();
             return;
         }
-        
+        // ==================== دوال إعادة تعيين النظام ====================
+
+function showResetConfirmation() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:500px; text-align:center;">
+            <div class="modal-header">
+                <h3 style="color: #e74c3c;"><i class="fas fa-exclamation-triangle"></i> تحذير! إعادة تعيين النظام</h3>
+                <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <div style="padding: 10px;">
+                <i class="fas fa-database" style="font-size: 60px; color: #e74c3c; margin-bottom: 15px;"></i>
+                <p style="color: #333; margin-bottom: 15px;">
+                    <strong>سيتم مسح جميع البيانات التالية نهائياً:</strong>
+                </p>
+                <ul style="text-align: right; color: #666; margin-bottom: 20px; padding-right: 20px;">
+                    <li>✓ جميع الأعضاء المسجلين</li>
+                    <li>✓ جميع القادة</li>
+                    <li>✓ جميع الطلايع والمناطق والفروع</li>
+                    <li>✓ جميع التكاليف والتسليمات</li>
+                    <li>✓ جميع طلبات الانضمام</li>
+                    <li>✓ جميع رسائل الدردشة</li>
+                </ul>
+                <p style="color: #e74c3c; font-weight: bold; margin-bottom: 20px;">
+                    ⚠️ هذا الإجراء لا يمكن التراجع عنه!
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button class="btn btn-danger" onclick="resetSystem()" style="padding: 10px 25px;">
+                        <i class="fas fa-check"></i> نعم، أعد تعيين النظام
+                    </button>
+                    <button class="btn btn-primary" onclick="this.closest('.modal').remove()" style="padding: 10px 25px;">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+async function resetSystem() {
+    showToast('🔄 جاري إعادة تعيين النظام بالكامل...', 'info');
+    
+    // ✅ 1. مسح جميع البيانات من Firebase بالكامل (appData)
+    try {
+        await database.ref('appData').remove();
+        console.log('✅ تم مسح جميع بيانات appData من Firebase');
+    } catch (error) {
+        console.error('❌ خطأ في مسح البيانات:', error);
+    }
+    
+    // ✅ 2. إعادة تهيئة البيانات الافتراضية (بدون أي بيانات محفوظة مسبقاً)
+    await initializeDefaultData();
+    
+    // ✅ 3. إعادة تعيين بيانات القائد العام إلى القيم الافتراضية فقط
+    const defaultUsername = 'Kayan';
+    const defaultPassword = 'Kayan123';
+    
+    // تحديث كائن currentUser
+    currentUser = { 
+        id: 'admin', 
+        name: 'القائد العام', 
+        isAdmin: true, 
+        username: defaultUsername, 
+        password: defaultPassword 
+    };
+    
+    // ✅ 4. حفظ بيانات القائد العام الافتراضية في Firebase (بدون أي بيانات أخرى)
+    await database.ref('adminCredentials').set({
+        username: defaultUsername,
+        password: defaultPassword,
+        updatedAt: new Date().toISOString()
+    });
+    
+    // ✅ 5. حفظ جميع البيانات (الافتراضية فقط)
+    await saveAllDataToFirebase();
+    
+    // إغلاق جميع النوافذ المنبثقة
+    document.querySelectorAll('.modal').forEach(m => m.remove());
+    
+    showToast('✅ تم إعادة تعيين النظام! جميع البيانات تم مسحها، وبيانات الدخول عادت إلى Kayan / Kayan123', 'success');
+    
+    // ✅ 6. تسجيل الخروج والعودة إلى صفحة تسجيل الدخول بعد 2 ثانية
+    setTimeout(() => {
+        logout();
+    }, 2000);
+}
         // التحقق من القادة
         const leader = appData.leaders.find(l => l.username === username && l.password === password);
         if (leader) {
@@ -9122,15 +9227,7 @@ function openFacebookLanding() {
     window.open('https://www.facebook.com/share/18pyoHNCSE/', '_blank');
 }
 
-// تعديل دالة startApp الأصلية لعرض صفحة الهبوط بدلاً من تسجيل الدخول
-const originalStartApp = window.startApp;
-window.startApp = async function() {
-    await loadAllDataFromFirebase();
-    listenForRealTimeUpdates();
-    renderLandingPage();  // ← هنا التغيير: نعرض صفحة الهبوط بدلاً من تسجيل الدخول
-    addFixedLogoButton();
-    initTheme();
-};
+
 // ==================== ABOUT PAGE RENDER FUNCTION ====================
 function renderAboutPage() {
     const app = document.getElementById('app');
@@ -9570,11 +9667,29 @@ function addLeaderboardToLanding() {
 
 // ==================== تشغيل التطبيق ====================
 window.startApp = async function() {
+    // تحميل جميع البيانات من Firebase
     await loadAllDataFromFirebase();
+    
+    // محاولة تحميل بيانات القائد العام المحفوظة (إذا وجدت)
+    const adminCreds = await loadAdminCredentialsFromFirebase();
+    
+    // تخزين بيانات القائد العام في متغير عام للاستخدام
+    window.adminCredentials = adminCreds;
+    
+    // بدء الاستماع للتحديثات المباشرة من Firebase
     listenForRealTimeUpdates();
+    
+    // عرض صفحة الهبوط (Landing Page)
     renderLandingPage();
+    
+    // إضافة الزر الثابت (شعار المجموعة)
     addFixedLogoButton();
+    
+    // تهيئة الوضع (داكن/فاتح)
     initTheme();
+    
+    console.log('✅ تم تشغيل التطبيق بنجاح');
+    console.log('🔐 بيانات القائد العام الحالية:', adminCreds);
 };
 // استدعاء التطبيق
 startApp();
