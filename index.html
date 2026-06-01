@@ -4043,7 +4043,11 @@ async function saveAllDataToFirebase() {
             subBranches: appData.subBranches,  // <-- أضف هذا السطر (كان مفقوداً)
             squads: appData.squads,
             members: appData.members,
-            leaders: appData.leaders,          // <-- أضف هذا السطر
+            leaders: appData.leaders,   
+                forms: appData.forms,                    // ← الفورمات العادية
+        leaderForms: appData.leaderForms,        // ← الفورمات المرسلة للقادة
+        memberForms: appData.memberForms,        // ← الفورمات المرسلة للأعضاء
+        evaluationForms: appData.evaluationForms,       // <-- أضف هذا السطر
             tasks: appData.tasks,
             taskSubmissions: appData.taskSubmissions,
             messages: appData.messages,
