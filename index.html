@@ -11551,6 +11551,226 @@ window.startApp = async function() {
     console.log('✅ تم تشغيل التطبيق بنجاح');
     console.log('🔐 بيانات القائد العام الحالية:', adminCreds);
 };
+// ==================== إصلاح مشكلة إرسال فورمات التقييم للقادة ====================
+
+// إعادة تعريف دالة sendEvaluationFormToAllLeaders بشكل صحيح
+window.sendEvaluationFormToAllLeaders = async function(formId) {
+    try {
+        console.log('🔍 جاري البحث عن فورم التقييم:', formId);
+        const form = appData.evaluationForms.find(f => f.id === formId);
+        
+        if (!form) {
+            console.error('❌ فورم التقييم غير موجود في evaluationForms');
+            showToast('❌ فورم التقييم غير موجود', 'error');
+            return false;
+        }
+        
+        console.log('✅ تم العثور على الفورم:', form.title);
+        
+        // تغيير حالة الفورم
+        form.status = 'sent_to_leaders';
+        
+        // التأكد من وجود المصفوفة
+        if (!appData.leaderEvaluationForms) appData.leaderEvaluationForms = [];
+        
+        // إرسال الفورم لكل قائد
+        let sentCount = 0;
+        for (const leader of appData.leaders) {
+            const alreadySent = appData.leaderEvaluationForms.some(lf => 
+                lf.formId === formId && lf.leaderId === leader.id
+            );
+            
+            if (!alreadySent) {
+                appData.leaderEvaluationForms.push({
+                    id: Date.now() + Math.random(),
+                    formId: formId,
+                    leaderId: leader.id,
+                    sentToMembers: false,
+                    sentAt: new Date().toISOString(),
+                    formData: JSON.parse(JSON.stringify(form)) // نسخة عميقة
+                });
+                sentCount++;
+                console.log(`✅ تم إرسال الفورم للقائد: ${leader.name}`);
+            }
+        }
+        
+        // حفظ البيانات في Firebase
+        await saveAllDataToFirebase();
+        
+        console.log(`✅ تم إرسال فورم التقييم إلى ${sentCount} قائد`);
+        showToast(`✅ تم إرسال فورم التقييم إلى ${sentCount} قائد`);
+        
+        // تحديث الواجهة
+        if (typeof renderEvaluationFormsPage === 'function') {
+            renderEvaluationFormsPage();
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('❌ خطأ في إرسال فورم التقييم:', error);
+        showToast('❌ حدث خطأ أثناء الإرسال', 'error');
+        return false;
+    }
+};
+
+// إعادة تعريف دالة renderLeaderEvaluationFormsPage للتأكد من عرض الفورمات بشكل صحيح
+window.renderLeaderEvaluationFormsPage = function() {
+    const container = document.getElementById('leaderPageContent');
+    if (!container) return;
+    
+    // التأكد من وجود leaderEvaluationForms
+    const leaderForms = (appData.leaderEvaluationForms || []).filter(lf => lf.leaderId === currentUser.id);
+    
+    console.log('📋 فورمات التقييم للقائد:', leaderForms.length);
+    
+    container.innerHTML = `
+        <div class="card">
+            <h3><i class="fas fa-star"></i> فورمات التقييم المستلمة</h3>
+            <div id="leaderEvaluationFormsList">
+                ${leaderForms.length === 0 ? 
+                    '<p style="text-align:center; color:#999;">⚠️ لا توجد فورمات تقييم مستلمة بعد</p>' : 
+                    leaderForms.map(lf => {
+                        const form = lf.formData || appData.evaluationForms?.find(f => f.id === lf.formId);
+                        if (!form) {
+                            console.warn('⚠️ فورم غير موجود للمعرف:', lf.formId);
+                            return '';
+                        }
+                        return `
+                            <div style="background:#f8f9fa; border-radius:15px; padding:15px; margin-bottom:15px; border-right:4px solid ${lf.sentToMembers ? '#2ecc71' : '#d4a017'}">
+                                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                                    <div>
+                                        <strong><i class="fas fa-star"></i> ${escapeHtml(form.title || 'فورم تقييم')}</strong>
+                                        <br>
+                                        <small><i class="fas fa-tag"></i> نوع الفريق: ${form.squadType || 'الكل'}</small>
+                                        <br>
+                                        <small><i class="fas fa-calendar"></i> تاريخ الاستلام: ${new Date(lf.sentAt).toLocaleString('ar-EG')}</small>
+                                    </div>
+                                    <div style="display:flex; gap:8px; margin-top:10px;">
+                                        <button class="btn btn-sm btn-info" onclick="viewLeaderEvaluationFormDetails(${lf.formId})">
+                                            <i class="fas fa-eye"></i> عرض
+                                        </button>
+                                        <button class="btn btn-sm btn-primary" onclick="showEvaluationResultsForLeader(${lf.formId})">
+                                            <i class="fas fa-chart-bar"></i> النتائج
+                                        </button>
+                                        ${!lf.sentToMembers ? 
+                                            `<button class="btn btn-sm btn-success" onclick="showSendEvaluationFormDestinationModal(${lf.formId})">
+                                                <i class="fas fa-paper-plane"></i> إرسال للأعضاء
+                                            </button>` : 
+                                            `<span class="badge" style="background:#2ecc71;">✓ تم الإرسال للأعضاء</span>`
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')
+                }
+            </div>
+        </div>
+    `;
+};
+
+// إعادة تعريف دالة viewLeaderEvaluationFormDetails
+window.viewLeaderEvaluationFormDetails = function(formId) {
+    // البحث عن الفورم في leaderEvaluationForms أولاً
+    const leaderForm = (appData.leaderEvaluationForms || []).find(lf => lf.formId === formId && lf.leaderId === currentUser.id);
+    const form = leaderForm?.formData || appData.evaluationForms?.find(f => f.id === formId);
+    
+    if (!form) {
+        showToast('❌ فورم التقييم غير موجود', 'error');
+        return;
+    }
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    
+    let questionsHtml = '';
+    if (form.questions && form.questions.length > 0) {
+        form.questions.forEach((q, idx) => {
+            questionsHtml += `
+                <div style="background:#f8f9fa; border-radius:12px; padding:12px; margin-bottom:12px;">
+                    <strong>${idx + 1}. ${escapeHtml(q.text)}</strong>
+                    <p style="color:#666; font-size:12px;">(سؤال نصي - إجابة مفتوحة)</p>
+                </div>
+            `;
+        });
+    } else {
+        questionsHtml = '<p>لا توجد أسئلة إضافية</p>';
+    }
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:600px; max-height:80vh; overflow-y:auto;">
+            <div class="modal-header">
+                <h3><i class="fas fa-star"></i> ${escapeHtml(form.title)}</h3>
+                <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <p><i class="fas fa-tag"></i> نوع الفريق: ${form.squadType || 'الكل'}</p>
+            <p><i class="fas fa-star"></i> عنوان التقييم: ${escapeHtml(form.starRatingTitle || 'تقييم عام')}</p>
+            ${form.description ? `<p>${escapeHtml(form.description)}</p>` : ''}
+            <hr>
+            <h4>الأسئلة الإضافية:</h4>
+            ${questionsHtml}
+            <div style="text-align:center; margin-top:20px;">
+                <button class="btn btn-primary" onclick="this.closest('.modal').remove()">إغلاق</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+};
+
+// دالة لإصلاح البيانات الحالية (تشغيلها مرة واحدة)
+async function fixExistingEvaluationForms() {
+    console.log('🔧 جاري إصلاح بيانات فورمات التقييم...');
+    
+    // التأكد من وجود المصفوفات
+    if (!appData.leaderEvaluationForms) appData.leaderEvaluationForms = [];
+    
+    // الحصول على جميع فورمات التقييم المرسلة
+    const sentForms = (appData.evaluationForms || []).filter(f => f.status === 'sent_to_leaders');
+    
+    let addedCount = 0;
+    
+    for (const form of sentForms) {
+        for (const leader of appData.leaders) {
+            const alreadyExists = appData.leaderEvaluationForms.some(lf => 
+                lf.formId === form.id && lf.leaderId === leader.id
+            );
+            
+            if (!alreadyExists) {
+                appData.leaderEvaluationForms.push({
+                    id: Date.now() + Math.random(),
+                    formId: form.id,
+                    leaderId: leader.id,
+                    sentToMembers: false,
+                    sentAt: new Date().toISOString(),
+                    formData: JSON.parse(JSON.stringify(form))
+                });
+                addedCount++;
+                console.log(`✅ تم إضافة فورم "${form.title}" للقائد ${leader.name}`);
+            }
+        }
+    }
+    
+    if (addedCount > 0) {
+        await saveAllDataToFirebase();
+        console.log(`✅ تم إضافة ${addedCount} فورم للقادة`);
+        showToast(`✅ تم إصلاح البيانات: تم إضافة ${addedCount} فورم للقادة`);
+    } else {
+        console.log('✅ لا توجد بيانات تحتاج للإصلاح');
+    }
+    
+    // تحديث الواجهة إذا كانت مفتوحة
+    if (document.getElementById('leaderPageContent') && currentUser && isLeader) {
+        renderLeaderEvaluationFormsPage();
+    }
+}
+
+// تشغيل دالة الإصلاح بعد تحميل البيانات
+setTimeout(() => {
+    if (appData.evaluationForms && appData.leaders) {
+        fixExistingEvaluationForms();
+    }
+}, 2000);
 // استدعاء التطبيق
 startApp();
     </script>
