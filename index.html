@@ -11771,6 +11771,301 @@ setTimeout(() => {
         fixExistingEvaluationForms();
     }
 }, 2000);
+// ==================== إصلاح مشكلة إرسال فورم التقييم للأعضاء ====================
+
+// إعادة تعريف دالة showSendEvaluationFormDestinationModal
+window.showSendEvaluationFormDestinationModal = function(formId) {
+    console.log('📤 فتح نافذة إرسال فورم تقييم:', formId);
+    
+    // البحث عن الفورم في leaderEvaluationForms
+    const leaderForm = (appData.leaderEvaluationForms || []).find(lf => 
+        lf.formId === formId && lf.leaderId === currentUser.id
+    );
+    
+    if (!leaderForm) {
+        showToast('❌ فورم التقييم غير موجود في قائمة الفورمات المرسلة لك', 'error');
+        console.error('❌ لم يتم العثور على الفورم في leaderEvaluationForms');
+        return;
+    }
+    
+    // جلب بيانات الفورم
+    const form = leaderForm.formData || appData.evaluationForms?.find(f => f.id === formId);
+    if (!form) {
+        showToast('❌ بيانات الفورم غير موجودة', 'error');
+        return;
+    }
+    
+    // فتح نافذة اختيار الوجهة (مخصصة لفورمات التقييم)
+    showEvaluationFormDestinationModal(formId, form);
+};
+
+// دالة نافذة اختيار الوجهة لفورمات التقييم
+function showEvaluationFormDestinationModal(formId, form) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    
+    // جلب الفروع والطلايع المتاحة للقائد
+    const mySubBranchIds = currentUser.subBranchIds || [];
+    
+    // جلب المناطق التي يتبعها القائد
+    const myBranchIds = [...new Set(appData.subBranches
+        .filter(sb => mySubBranchIds.includes(sb.id))
+        .map(sb => sb.branchId)
+    )];
+    
+    // جلب الفروع التي يتبعها القائد فقط
+    const mySubBranches = appData.subBranches.filter(sb => mySubBranchIds.includes(sb.id));
+    
+    // جلب الطلايع التي يتبعها القائد
+    const mySquads = appData.squads.filter(s => myBranchIds.includes(s.branchId));
+    
+    // أنواع الفرق للفلتر
+    const squadTypes = ['الكشافة', 'المرشدات', 'الأشبال', 'الزهرات', 'البراعم'];
+    
+    // بناء خيارات المناطق
+    let branchesOptions = '<option value="">-- اختر المنطقة --</option>';
+    myBranchIds.forEach(branchId => {
+        const branch = appData.branches.find(b => b.id === branchId);
+        if (branch) {
+            branchesOptions += `<option value="${branch.id}">🏢 ${branch.name}</option>`;
+        }
+    });
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-paper-plane"></i> إرسال فورم التقييم: ${escapeHtml(form.title)}</h3>
+                <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <form id="sendEvaluationDestinationForm">
+                <div class="input-group">
+                    <label><i class="fas fa-map-marker-alt"></i> اختر المنطقة</label>
+                    <select id="destinationBranch" required style="width:100%; padding:10px; border-radius:10px;">
+                        ${branchesOptions}
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-code-branch"></i> اختر الفرع</label>
+                    <select id="destinationSubBranch" required style="width:100%; padding:10px; border-radius:10px;">
+                        <option value="">-- اختر المنطقة أولاً --</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-flag"></i> اختر الطليعة</label>
+                    <select id="destinationSquad" required style="width:100%; padding:10px; border-radius:10px;">
+                        <option value="all">-- جميع الطلايع في هذا الفرع --</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-users"></i> اختر نوع الفريق (اختياري)</label>
+                    <select id="destinationType" style="width:100%; padding:10px; border-radius:10px;">
+                        <option value="all">🎯 جميع الأنواع</option>
+                        ${squadTypes.map(type => `<option value="${type}">${type === 'الكشافة' ? '⚜️' : type === 'المرشدات' ? '🌸' : type === 'الأشبال' ? '🦁' : type === 'الزهرات' ? '🌺' : '🌱'} ${type}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div class="input-group" id="selectedMembersCount" style="background:#e8f5e9; padding:10px; border-radius:10px; text-align:center;">
+                    <i class="fas fa-info-circle"></i> سيتم الإرسال إلى <span id="membersCount">0</span> عضو
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> إرسال
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // العناصر
+    const branchSelect = document.getElementById('destinationBranch');
+    const subBranchSelect = document.getElementById('destinationSubBranch');
+    const squadSelect = document.getElementById('destinationSquad');
+    const typeSelect = document.getElementById('destinationType');
+    const membersCountSpan = document.getElementById('membersCount');
+    
+    function updateSubBranches() {
+        const branchId = parseInt(branchSelect.value);
+        if (branchId) {
+            const mySubBranchesFiltered = mySubBranches.filter(sb => sb.branchId === branchId);
+            subBranchSelect.innerHTML = '<option value="">-- اختر الفرع --</option>' +
+                mySubBranchesFiltered.map(sb => `<option value="${sb.id}">📍 ${sb.name}</option>`).join('');
+            squadSelect.innerHTML = '<option value="all">-- جميع الطلايع في هذا الفرع --</option>';
+        } else {
+            subBranchSelect.innerHTML = '<option value="">-- اختر المنطقة أولاً --</option>';
+            squadSelect.innerHTML = '<option value="all">-- اختر الفرع أولاً --</option>';
+        }
+        updateMembersCount();
+    }
+    
+    function updateSquads() {
+        const subBranchId = parseInt(subBranchSelect.value);
+        if (subBranchId) {
+            const selectedSubBranch = mySubBranches.find(sb => sb.id === subBranchId);
+            if (selectedSubBranch) {
+                const squads = mySquads.filter(s => s.branchId === selectedSubBranch.branchId);
+                squadSelect.innerHTML = '<option value="all">-- جميع الطلايع في هذا الفرع --</option>' +
+                    squads.map(s => `<option value="${s.id}">🏴 ${s.name} (${s.type || 'كشافة'})</option>`).join('');
+            }
+        }
+        updateMembersCount();
+    }
+    
+    function updateMembersCount() {
+        const branchId = parseInt(branchSelect.value);
+        const subBranchId = parseInt(subBranchSelect.value);
+        const squadId = squadSelect.value;
+        const typeFilter = typeSelect.value;
+        
+        let targetMembers = [];
+        
+        if (branchId && subBranchId && squadId === 'all') {
+            targetMembers = appData.members.filter(m => m.subBranchId === subBranchId);
+        } else if (branchId && subBranchId && squadId !== 'all') {
+            targetMembers = appData.members.filter(m => m.squadId == squadId);
+        }
+        
+        if (typeFilter !== 'all') {
+            const squadIdsOfType = appData.squads
+                .filter(s => s.type === typeFilter)
+                .map(s => s.id);
+            targetMembers = targetMembers.filter(m => squadIdsOfType.includes(m.squadId));
+        }
+        
+        membersCountSpan.textContent = targetMembers.length;
+        membersCountSpan.style.fontWeight = 'bold';
+        membersCountSpan.style.color = targetMembers.length > 0 ? '#2ecc71' : '#e74c3c';
+    }
+    
+    branchSelect.addEventListener('change', updateSubBranches);
+    subBranchSelect.addEventListener('change', updateSquads);
+    squadSelect.addEventListener('change', updateMembersCount);
+    typeSelect.addEventListener('change', updateMembersCount);
+    
+    updateSubBranches();
+    
+    document.getElementById('sendEvaluationDestinationForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const branchId = parseInt(branchSelect.value);
+        const subBranchId = parseInt(subBranchSelect.value);
+        const squadId = squadSelect.value;
+        const typeFilter = typeSelect.value;
+        
+        if (!branchId || !subBranchId) {
+            showToast('الرجاء اختيار المنطقة والفرع', 'error');
+            return;
+        }
+        
+        let targetMembers = [];
+        if (squadId === 'all') {
+            targetMembers = appData.members.filter(m => m.subBranchId === subBranchId);
+        } else {
+            targetMembers = appData.members.filter(m => m.squadId == squadId);
+        }
+        
+        if (typeFilter !== 'all') {
+            const squadIdsOfType = appData.squads
+                .filter(s => s.type === typeFilter)
+                .map(s => s.id);
+            targetMembers = targetMembers.filter(m => squadIdsOfType.includes(m.squadId));
+        }
+        
+        if (targetMembers.length === 0) {
+            showToast('⚠️ لا يوجد أعضاء مستهدفين للإرسال', 'error');
+            return;
+        }
+        
+        // تحديث leaderForm بأنه تم الإرسال
+        const leaderFormData = (appData.leaderEvaluationForms || []).find(lf => 
+            lf.formId === formId && lf.leaderId === currentUser.id
+        );
+        if (leaderFormData) {
+            leaderFormData.sentToMembers = true;
+            leaderFormData.sentToMembersAt = new Date().toISOString();
+        }
+        
+        // إنشاء نسخ من الفورم لكل عضو
+        if (!appData.memberEvaluationForms) appData.memberEvaluationForms = [];
+        
+        targetMembers.forEach(member => {
+            appData.memberEvaluationForms.push({
+                id: Date.now() + Math.random(),
+                formId: formId,
+                memberId: member.id,
+                leaderId: currentUser.id,
+                sentAt: new Date().toISOString(),
+                isAnswered: false,
+                starRating: null,
+                answers: [],
+                formData: form
+            });
+        });
+        
+        await saveAllDataToFirebase();
+        showToast(`✅ تم إرسال فورم التقييم "${form.title}" إلى ${targetMembers.length} عضو`);
+        modal.remove();
+        
+        // تحديث الصفحة
+        if (typeof renderLeaderEvaluationFormsPage === 'function') {
+            renderLeaderEvaluationFormsPage();
+        }
+    });
+}
+
+// إعادة تعريف دالة إرسال فورم التقييم للقادة (للتأكد من حفظ البيانات)
+window.sendEvaluationFormToAllLeaders = async function(formId) {
+    try {
+        const form = appData.evaluationForms.find(f => f.id === formId);
+        if (!form) {
+            showToast('❌ فورم التقييم غير موجود', 'error');
+            return false;
+        }
+        
+        form.status = 'sent_to_leaders';
+        
+        if (!appData.leaderEvaluationForms) appData.leaderEvaluationForms = [];
+        
+        for (const leader of appData.leaders) {
+            const alreadySent = appData.leaderEvaluationForms.some(lf => 
+                lf.formId === formId && lf.leaderId === leader.id
+            );
+            
+            if (!alreadySent) {
+                appData.leaderEvaluationForms.push({
+                    id: Date.now() + Math.random(),
+                    formId: formId,
+                    leaderId: leader.id,
+                    sentToMembers: false,
+                    sentAt: new Date().toISOString(),
+                    formData: JSON.parse(JSON.stringify(form))
+                });
+                console.log(`✅ تم إرسال الفورم للقائد: ${leader.name}`);
+            }
+        }
+        
+        await saveAllDataToFirebase();
+        showToast(`✅ تم إرسال فورم التقييم إلى ${appData.leaders.length} قائد`);
+        
+        if (typeof renderEvaluationFormsPage === 'function') {
+            renderEvaluationFormsPage();
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('❌ خطأ:', error);
+        showToast('❌ حدث خطأ أثناء الإرسال', 'error');
+        return false;
+    }
+};
+
+console.log('✅ تم تحديث دوال إرسال فورمات التقييم');
 // استدعاء التطبيق
 startApp();
     </script>
