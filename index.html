@@ -4357,83 +4357,90 @@ function getSubBranchesCheckboxes(branchId, selectedSubBranchIds) {
 // ==================== UNIFIED FOOTER FOR ALL PAGES ====================
 function renderUnifiedFooter() {
     return `
-        <div class="unified-footer" style="background: linear-gradient(135deg, #0a2e1a, #0d2818); padding: 40px 20px 25px; text-align: center; border-top: 2px solid rgba(212,160,23,0.4); margin-top: auto;">
+        <div class="unified-footer" style="background: linear-gradient(135deg, #0a2e1a, #0d2818); padding: 30px 20px 20px; text-align: center; border-top: 2px solid rgba(212,160,23,0.4); margin-top: auto;">
             
-            <!-- قسم تواصل معنا (يظهر أعلى الفوتر) -->
-            <div style="margin-bottom: 35px;">
-                <h3 style="color: #d4a017; margin-bottom: 20px; font-size: 22px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                    <i class="fas fa-headset"></i>
-                    <span>📞 Contact us</span>
-                    <i class="fas fa-comments"></i>
-                </h3>
-                <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                    <!-- واتساب -->
-                    <a href="https://wa.me/201035636654" target="_blank" class="footer-btn" data-color="whatsapp">
-                        <button style="background: #25D366; border: none; padding: 12px 28px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; font-family: 'Cairo', sans-serif; font-weight: 600; color: white; font-size: 14px;">
-                            <i class="fab fa-whatsapp" style="font-size: 20px;"></i>
-                            <span>WhatsApp 01035636654</span>
-                        </button>
-                    </a>
-                    <!-- اتصال -->
-                    <a href="tel:01144100018" class="footer-btn" data-color="call">
-                        <button style="background: #3498db; border: none; padding: 12px 28px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; font-family: 'Cairo', sans-serif; font-weight: 600; color: white; font-size: 14px;">
-                            <i class="fas fa-phone-alt" style="font-size: 20px;"></i>
-                            <span> Contact us 01144100018</span>
-                        </button>
-                    </a>
-                    <!-- فيسبوك -->
-                    <a href="https://www.facebook.com/share/18oMJ3PRYG/" target="_blank" class="footer-btn" data-color="facebook">
-                        <button style="background: #1877f2; border: none; padding: 12px 28px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; font-family: 'Cairo', sans-serif; font-weight: 600; color: white; font-size: 14px;">
-                            <i class="fab fa-facebook-f" style="font-size: 20px;"></i>
-                            <span>FaceBook</span>
-                        </button>
-                    </a>
-                    <!-- تيك توك -->
-                    <a href="https://www.tiktok.com/@tecno.shark47?_r=1&_t=ZS-96lpm0BrDt7" target="_blank" class="footer-btn" data-color="tiktok">
-                        <button style="background: #000000; border: none; padding: 12px 28px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; font-family: 'Cairo', sans-serif; font-weight: 600; color: white; font-size: 14px;">
-                            <i class="fab fa-tiktok" style="font-size: 20px;"></i>
-                            <span>Tik Tok</span>
-                        </button>
-                    </a>
-                    <!-- الموقع الرسمي -->
-                    <a href="https://tecno-shark.vercel.app/" target="_blank" class="footer-btn" data-color="website">
-                        <button style="background: #d4a017; border: none; padding: 12px 28px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; font-family: 'Cairo', sans-serif; font-weight: 600; color: #1a472a; font-size: 14px;">
-                            <i class="fas fa-globe" style="font-size: 20px;"></i>
-                            <span>Website</span>
-                        </button>
-                    </a>
+            <!-- الشعار واسم الشركة -->
+            <div style="margin-bottom: 20px;">
+                <div style="display: inline-block; background: rgba(212,160,23,0.12); padding: 6px 20px; border-radius: 40px;">
+                    <i class="fas fa-laptop-code" style="color: #d4a017; font-size: 14px; margin-left: 8px;"></i>
+                    <span style="color: #d4a017; font-weight: 600; font-size: 13px;">Tecno Shark Company</span>
                 </div>
             </div>
 
-            <!-- شركة تكنو شارك -->
-            <div style="margin-bottom: 25px;">
-                <div style="display: inline-block; background: rgba(212,160,23,0.12); padding: 8px 25px; border-radius: 50px; margin-bottom: 15px;">
-                    <i class="fas fa-laptop-code" style="color: #d4a017; font-size: 18px;"></i>
-                    <span style="color: #d4a017; font-weight: 600; margin-right: 8px;">Developed by Tecno Shark Company</span>
+            <!-- المالكون - سطر أنيق واحد -->
+            <div style="display: flex; justify-content: center; align-items: center; gap: 25px; flex-wrap: wrap; margin-bottom: 25px;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <div style="width: 6px; height: 6px; background: #d4a017; border-radius: 50%;"></div>
+                    <span style="color: rgba(255,255,255,0.7); font-size: 12px;">
+                        <i class="fas fa-user-tie" style="color: #d4a017; margin-left: 5px; font-size: 11px;"></i>
+                        Abdalrhman Mohamed Sophy
+                        <span style="color: rgba(255,255,255,0.4);">(المالك)</span>
+                    </span>
                 </div>
-                <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 10px;">
-                    <div style="background: rgba(255,255,255,0.08); padding: 6px 16px; border-radius: 40px;">
-                        <i class="fas fa-user-tie" style="color: #d4a017; margin-left: 8px;"></i>
-                        <span style="color: #fff;"> Abdul Rahman Muhammad Sobhi </span>
-                        <span style="color: rgba(255,255,255,0.6); font-size: 12px; margin-right: 8px;">(Owner)</span>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.08); padding: 6px 16px; border-radius: 40px;">
-                        <i class="fas fa-handshake" style="color: #d4a017; margin-left: 8px;"></i>
-                        <span style="color: #fff;">Mohamed Emad Abdel-Ati</span>
-                        <span style="color: rgba(255,255,255,0.6); font-size: 12px; margin-right: 8px;">(Director and partner)</span>
-                    </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <div style="width: 6px; height: 6px; background: #d4a017; border-radius: 50%;"></div>
+                    <span style="color: rgba(255,255,255,0.7); font-size: 12px;">
+                        <i class="fas fa-handshake" style="color: #d4a017; margin-left: 5px; font-size: 11px;"></i>
+                        Mohamed Emad Abdalty
+                        <span style="color: rgba(255,255,255,0.4);">(مالك والشريك)</span>
+                    </span>
                 </div>
             </div>
+
+            <!-- الأزرار بشكل دائري أنيق -->
+            <div style="display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+                <!-- واتساب -->
+                <a href="https://wa.me/201035636654" target="_blank" style="text-decoration: none;">
+                    <div style="background: #25D366; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; cursor: pointer;">
+                        <i class="fab fa-whatsapp" style="font-size: 18px; color: white;"></i>
+                    </div>
+                </a>
+                <!-- اتصال -->
+                <a href="tel:01144100018" style="text-decoration: none;">
+                    <div style="background: #3498db; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; cursor: pointer;">
+                        <i class="fas fa-phone-alt" style="font-size: 16px; color: white;"></i>
+                    </div>
+                </a>
+                <!-- فيسبوك -->
+                <a href="https://www.facebook.com/share/18oMJ3PRYG/" target="_blank" style="text-decoration: none;">
+                    <div style="background: #1877f2; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; cursor: pointer;">
+                        <i class="fab fa-facebook-f" style="font-size: 18px; color: white;"></i>
+                    </div>
+                </a>
+                <!-- تيك توك -->
+                <a href="https://www.tiktok.com/@tecno.shark47?_r=1&_t=ZS-96lpm0BrDt7" target="_blank" style="text-decoration: none;">
+                    <div style="background: #000000; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; cursor: pointer;">
+                        <i class="fab fa-tiktok" style="font-size: 18px; color: white;"></i>
+                    </div>
+                </a>
+                <!-- الموقع -->
+                <a href="https://tecno-shark.vercel.app/" target="_blank" style="text-decoration: none;">
+                    <div style="background: #d4a017; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; cursor: pointer;">
+                        <i class="fas fa-globe" style="font-size: 18px; color: #1a472a;"></i>
+                    </div>
+                </a>
+            </div>
+
+            <!-- خط فاصل خفيف -->
+            <div style="width: 60px; height: 1px; background: rgba(212,160,23,0.2); margin: 15px auto;"></div>
 
             <!-- حقوق الملكية -->
-            <div style="border-top: 1px solid rgba(212,160,23,0.2); padding-top: 20px; margin-top: 10px;">
-                <p style="color: rgba(255,255,255,0.5); font-size: 12px; margin: 5px 0;">
+            <div>
+                <p style="color: rgba(255,255,255,0.3); font-size: 10px; margin: 0;">
                     <i class="far fa-copyright"></i> 2025 مجموعة كيان الكشفية البحرية | جميع الحقوق محفوظة
                 </p>
-                <p style="color: rgba(255,255,255,0.4); font-size: 11px; margin: 5px 0;">
-                    <i class="fas fa-code"></i> تم تصميم هذا المنتج | Developed by Tecno Shark Company
-                </p>
             </div>
+
+            <!-- تأثير hover للأزرار -->
+            <style>
+                .unified-footer a div:hover {
+                    transform: translateY(-3px);
+                    filter: brightness(1.05);
+                }
+                .unified-footer a div:active {
+                    transform: translateY(0);
+                }
+            </style>
         </div>
     `;
 }
@@ -9153,7 +9160,6 @@ function toggleThemeLanding() {
 
 
 
-// دالة عرض جدول الترتيب في صفحة الهبوط
 function renderLeaderboard() {
     const container = document.getElementById('leaderboardTableContainer');
     if (!container) return;
@@ -9167,11 +9173,23 @@ function renderLeaderboard() {
         filteredMembers = filteredMembers.filter(m => m.branchId === branchId);
     }
     
-    // فلتر النوع (يظهر فقط عند اختيار فرع معين)
-    if (currentBranchFilter !== 'all' && currentTypeFilter !== 'all') {
-        const squadIdsOfType = appData.squads
-            .filter(s => s.type === currentTypeFilter && s.branchId == currentBranchFilter)
-            .map(s => s.id);
+    // فلتر النوع (يعمل حتى مع اختيار جميع الفروع)
+    if (currentTypeFilter !== 'all') {
+        // جلب IDs الطلايع التي تطابق النوع المختار
+        let squadIdsOfType = [];
+        
+        if (currentBranchFilter !== 'all') {
+            // إذا كان فرع محدد، نجلب الطلايع من نفس الفرع
+            squadIdsOfType = appData.squads
+                .filter(s => s.type === currentTypeFilter && s.branchId == currentBranchFilter)
+                .map(s => s.id);
+        } else {
+            // إذا كان جميع الفروع، نجلب الطلايع من كل الفروع
+            squadIdsOfType = appData.squads
+                .filter(s => s.type === currentTypeFilter)
+                .map(s => s.id);
+        }
+        
         filteredMembers = filteredMembers.filter(m => squadIdsOfType.includes(m.squadId));
     }
     
@@ -9224,10 +9242,8 @@ function renderLeaderboard() {
         
         let locationText = '';
         if (currentBranchFilter !== 'all') {
-            // إذا كان مختار فرع معين، نعرض اسم الطليعة
             locationText = squad ? `${squad.name} ${squad.type ? `(${squad.type})` : ''}` : branch?.name || '-';
         } else {
-            // إذا كان الكل، نعرض المنطقة ثم الطليعة
             locationText = branch ? `${branch.name} - ${squad?.name || ''}` : squad?.name || '-';
         }
         
@@ -9253,7 +9269,6 @@ function renderLeaderboard() {
     container.innerHTML = tableHtml;
 }
 
-// دالة تحديث الفلاتر
 function updateLeaderboardFilters() {
     const branchSelect = document.getElementById('branchFilterLeaderboard');
     const typeSelect = document.getElementById('typeFilterLeaderboard');
@@ -9262,42 +9277,60 @@ function updateLeaderboardFilters() {
     
     currentBranchFilter = branchSelect.value;
     
-    // تفعيل/تعطيل فلتر النوع
-    if (currentBranchFilter !== 'all') {
-        typeSelect.disabled = false;
-        // تعبئة خيارات النوع بناءً على الفروع الموجودة في المنطقة المختارة
-        const branchId = parseInt(currentBranchFilter);
-        const availableTypes = [...new Set(
+    // تفعيل فلتر النوع دائماً (حتى عند اختيار جميع الفروع)
+    typeSelect.disabled = false;
+    
+    // جلب جميع أنواع الفرق من كل الفروع (عند اختيار "جميع الفروع")
+    let availableTypes = [];
+    
+    if (currentBranchFilter === 'all') {
+        // إذا كان الكل، نجلب جميع الأنواع من كل الفروع
+        availableTypes = [...new Set(
             appData.squads
-                .filter(s => s.branchId === branchId)
-                .map(s => s.type || 'الكشافة')
+                .filter(s => s.type)
+                .map(s => s.type)
         )];
-        
-        // حفظ القيمة الحالية مؤقتاً
-        const oldTypeValue = typeSelect.value;
-        
-        typeSelect.innerHTML = '<option value="all">🎯 جميع الأنواع</option>';
+    } else {
+        // إذا كان فرع محدد، نجلب الأنواع الموجودة في هذا الفرع فقط
+        const branchId = parseInt(currentBranchFilter);
+        availableTypes = [...new Set(
+            appData.squads
+                .filter(s => s.branchId === branchId && s.type)
+                .map(s => s.type)
+        )];
+    }
+    
+    // حفظ القيمة الحالية مؤقتاً
+    const oldTypeValue = typeSelect.value;
+    
+    // أسماء الأنواع المعروضة
+    const typeNames = {
+        'الكشافة': '⚜️ الكشافة',
+        'المرشدات': '🌸 المرشدات',
+        'الأشبال': '🦁 الأشبال',
+        'الزهرات': '🌺 الزهرات',
+        'البراعم': '🌱 البراعم'
+    };
+    
+    // بناء خيارات فلتر النوع
+    typeSelect.innerHTML = '<option value="all">🎯 جميع الأنواع</option>';
+    
+    if (availableTypes.length > 0) {
         availableTypes.forEach(type => {
-            const typeNames = {
-                'الكشافة': '⚜️ الكشافة',
-                'المرشدات': '🌸 المرشدات',
-                'الأشبال': '🦁 الأشبال',
-                'الزهرات': '🌺 الزهرات',
-                'البراعم': '🌱 البراعم'
-            };
             typeSelect.innerHTML += `<option value="${type}">${typeNames[type] || type}</option>`;
         });
-        
-        // استعادة القيمة إذا كانت لا تزال موجودة
-        if (availableTypes.includes(oldTypeValue)) {
-            typeSelect.value = oldTypeValue;
-            currentTypeFilter = oldTypeValue;
-        } else {
-            typeSelect.value = 'all';
-            currentTypeFilter = 'all';
-        }
     } else {
-        typeSelect.disabled = true;
+        // إذا لم تكن هناك أنواع، نضيف الخيارات الافتراضية
+        Object.entries(typeNames).forEach(([key, value]) => {
+            typeSelect.innerHTML += `<option value="${key}">${value}</option>`;
+        });
+    }
+    
+    // استعادة القيمة إذا كانت لا تزال موجودة
+    if (availableTypes.includes(oldTypeValue) || oldTypeValue === 'all') {
+        typeSelect.value = oldTypeValue;
+        currentTypeFilter = oldTypeValue;
+    } else {
         typeSelect.value = 'all';
         currentTypeFilter = 'all';
     }
@@ -9306,17 +9339,6 @@ function updateLeaderboardFilters() {
     renderLeaderboard();
 }
 
-// دالة تغيير فلتر النوع
-function onTypeFilterChange() {
-    const typeSelect = document.getElementById('typeFilterLeaderboard');
-    if (typeSelect) {
-        currentTypeFilter = typeSelect.value;
-        renderLeaderboard();
-    }
-}
-
-// دالة إضافة قسم الترتيب إلى صفحة الهبوط
-// دالة إضافة قسم الترتيب إلى صفحة الهبوط
 function addLeaderboardToLanding() {
     // البحث عن الحاوية المخصصة لقسم الترتيب
     const container = document.getElementById('leaderboardSectionContainer');
@@ -9347,9 +9369,14 @@ function addLeaderboardToLanding() {
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label><i class="fas fa-users"></i> اختر النوع (عند اختيار فرع)</label>
-                        <select id="typeFilterLeaderboard" onchange="onTypeFilterChange()" disabled>
+                        <label><i class="fas fa-users"></i> اختر النوع</label>
+                        <select id="typeFilterLeaderboard" onchange="updateLeaderboardFilters()">
                             <option value="all">🎯 جميع الأنواع</option>
+                            <option value="الكشافة">⚜️ الكشافة</option>
+                            <option value="المرشدات">🌸 المرشدات</option>
+                            <option value="الأشبال">🦁 الأشبال</option>
+                            <option value="الزهرات">🌺 الزهرات</option>
+                            <option value="البراعم">🌱 البراعم</option>
                         </select>
                     </div>
                 </div>
