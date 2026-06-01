@@ -5712,38 +5712,45 @@ function viewLeaderFormDetails(formId) {
     document.body.appendChild(modal);
 }
 
-// ========== دالة نافذة اختيار الوجهة - نسخة معدلة ==========
+// ========== دالة نافذة اختيار الوجهة - النسخة الصحيحة ==========
 function showSendFormDestinationModal(formId) {
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.style.display = 'flex';
     
-    // جلب بيانات الفورم
-    const form = appData.forms?.find(f => f.id === formId);
+    // البحث عن الفورم في leaderForms (لأنه مرسل للقائد)
+    const leaderForm = appData.leaderForms?.find(lf => lf.formId === formId && lf.leaderId === currentUser.id);
+    if (!leaderForm) {
+        showToast('❌ الفورم غير موجود في قائمة الفورمات المرسلة لك', 'error');
+        return;
+    }
+    
+    // جلب بيانات الفورم من leaderForm أو من forms
+    const form = leaderForm.formData || appData.forms?.find(f => f.id === formId);
     if (!form) {
-        showToast('❌ الفورم غير موجود', 'error');
+        showToast('❌ بيانات الفورم غير موجودة', 'error');
         return;
     }
     
     // جلب الفروع والطلايع المتاحة للقائد (فقط التي يتبعها)
     const mySubBranchIds = currentUser.subBranchIds || [];
     
-    // جلب المناطق التي يتبعها القائد (مناطق فريدة من الفروع المسؤول عنها)
+    // جلب المناطق التي يتبعها القائد
     const myBranchIds = [...new Set(appData.subBranches
         .filter(sb => mySubBranchIds.includes(sb.id))
         .map(sb => sb.branchId)
     )];
     
-    // جلب الفروع (subBranches) التي يتبعها القائد فقط
+    // جلب الفروع التي يتبعها القائد فقط
     const mySubBranches = appData.subBranches.filter(sb => mySubBranchIds.includes(sb.id));
     
-    // جلب الطلايع التي يتبعها القائد (من خلال الفروع المسؤول عنها)
+    // جلب الطلايع التي يتبعها القائد
     const mySquads = appData.squads.filter(s => myBranchIds.includes(s.branchId));
     
     // أنواع الفرق للفلتر
     const squadTypes = ['الكشافة', 'المرشدات', 'الأشبال', 'الزهرات', 'البراعم'];
     
-    // بناء خيارات المناطق (فقط التي يتبعها القائد)
+    // بناء خيارات المناطق
     let branchesOptions = '<option value="">-- اختر المنطقة --</option>';
     myBranchIds.forEach(branchId => {
         const branch = appData.branches.find(b => b.id === branchId);
@@ -5751,6 +5758,10 @@ function showSendFormDestinationModal(formId) {
             branchesOptions += `<option value="${branch.id}">🏢 ${branch.name}</option>`;
         }
     });
+    
+    if (myBranchIds.length === 0) {
+        branchesOptions = '<option value="" disabled>⚠️ لا توجد مناطق مسموح لك بها</option>';
+    }
     
     modal.innerHTML = `
         <div class="modal-content" style="max-width:500px;">
@@ -5814,7 +5825,6 @@ function showSendFormDestinationModal(formId) {
     function updateSubBranches() {
         const branchId = parseInt(branchSelect.value);
         if (branchId) {
-            // جلب الفروع التي يتبعها القائد فقط وتنتمي للمنطقة المختارة
             const mySubBranchesFiltered = mySubBranches.filter(sb => sb.branchId === branchId);
             subBranchSelect.innerHTML = '<option value="">-- اختر الفرع --</option>' +
                 mySubBranchesFiltered.map(sb => `<option value="${sb.id}">📍 ${sb.name}</option>`).join('');
@@ -5850,10 +5860,8 @@ function showSendFormDestinationModal(formId) {
         let targetMembers = [];
         
         if (branchId && subBranchId && squadId === 'all') {
-            // إرسال إلى جميع أعضاء الفرع المحدد
             targetMembers = appData.members.filter(m => m.subBranchId === subBranchId);
         } else if (branchId && subBranchId && squadId !== 'all') {
-            // إرسال إلى طليعة محددة
             targetMembers = appData.members.filter(m => m.squadId == squadId);
         }
         
@@ -5935,16 +5943,14 @@ function showSendFormDestinationModal(formId) {
         }
         
         // تحديث leaderForm بأنه تم الإرسال
-        const leaderForm = appData.leaderForms?.find(lf => lf.formId === formId && lf.leaderId === currentUser.id);
-        if (leaderForm) {
-            leaderForm.sentToMembers = true;
-            leaderForm.sentToMembersAt = new Date().toISOString();
+        const leaderFormData = appData.leaderForms?.find(lf => lf.formId === formId && lf.leaderId === currentUser.id);
+        if (leaderFormData) {
+            leaderFormData.sentToMembers = true;
+            leaderFormData.sentToMembersAt = new Date().toISOString();
         }
         
         // إنشاء نسخ من الفورم لكل عضو
         if (!appData.memberForms) appData.memberForms = [];
-        
-        const theForm = appData.forms.find(f => f.id === formId);
         
         targetMembers.forEach(member => {
             appData.memberForms.push({
@@ -5955,14 +5961,18 @@ function showSendFormDestinationModal(formId) {
                 sentAt: new Date().toISOString(),
                 isAnswered: false,
                 answers: [],
-                formData: { ...theForm }
+                formData: form
             });
         });
         
         await saveAllDataToFirebase();
-        showToast(`✅ تم إرسال الفورم "${theForm.title}" إلى ${targetMembers.length} عضو`);
+        showToast(`✅ تم إرسال الفورم "${form.title}" إلى ${targetMembers.length} عضو`);
         modal.remove();
-        renderLeaderFormsPage();
+        
+        // تحديث صفحة الفورمات للقائد
+        if (typeof renderLeaderFormsPage === 'function') {
+            renderLeaderFormsPage();
+        }
     });
 }
 
