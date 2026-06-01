@@ -4035,19 +4035,18 @@ body.light-mode .leaderboard-table th {
 
         // ==================== FIREBASE OPERATIONS ====================
         
-      // Save all data to Firebase
-async function saveAllDataToFirebase() {
+    async function saveAllDataToFirebase() {
     try {
         await database.ref('appData').set({
             branches: appData.branches,
-            subBranches: appData.subBranches,  // <-- أضف هذا السطر (كان مفقوداً)
+            subBranches: appData.subBranches,
             squads: appData.squads,
             members: appData.members,
             leaders: appData.leaders,   
-                forms: appData.forms,                    // ← الفورمات العادية
-        leaderForms: appData.leaderForms,        // ← الفورمات المرسلة للقادة
-        memberForms: appData.memberForms,        // ← الفورمات المرسلة للأعضاء
-        evaluationForms: appData.evaluationForms,       // <-- أضف هذا السطر
+            forms: appData.forms,                    // الفورمات العادية
+            leaderForms: appData.leaderForms,        // الفورمات المرسلة للقادة
+            memberForms: appData.memberForms,        // الفورمات المرسلة للأعضاء
+            evaluationForms: appData.evaluationForms, // فورمات التقييم
             tasks: appData.tasks,
             taskSubmissions: appData.taskSubmissions,
             messages: appData.messages,
@@ -4294,7 +4293,7 @@ function changeLeaderPage(page) {
     else if (page === 'community') renderLeaderCommunity();
     closeSidebar();
 }
-       async function loadAllDataFromFirebase() {
+      async function loadAllDataFromFirebase() {
     try {
         const snapshot = await database.ref('appData').once('value');
         const data = snapshot.val();
@@ -4304,20 +4303,15 @@ function changeLeaderPage(page) {
             appData.squads = data.squads || [];
             appData.members = data.members || [];
             appData.leaders = data.leaders || [];
+            appData.forms = data.forms || [];           // ← الفورمات
+            appData.leaderForms = data.leaderForms || []; // ← فورمات القادة
+            appData.memberForms = data.memberForms || []; // ← فورمات الأعضاء
+            appData.evaluationForms = data.evaluationForms || []; // ← فورمات التقييم
             appData.tasks = data.tasks || [];
             appData.taskSubmissions = data.taskSubmissions || [];
             appData.messages = data.messages || [];
             appData.joinRequests = data.joinRequests || [];
             console.log('✅ All data loaded from Firebase');
-            console.log('📊 البيانات المحملة:', {
-                branches: appData.branches.length,
-                subBranches: appData.subBranches.length,
-                squads: appData.squads.length,
-                members: appData.members.length,
-                leaders: appData.leaders.length,
-                tasks: appData.tasks.length,
-                joinRequests: appData.joinRequests.length
-            });
             return true;
         } else {
             console.log('⚠️ لا توجد بيانات في Firebase، جارٍ تهيئة البيانات الافتراضية...');
@@ -6398,30 +6392,44 @@ function renderUnifiedFooter() {
         </div>
     `;
 }
-        function listenForRealTimeUpdates() {
+       function listenForRealTimeUpdates() {
     database.ref('appData').on('value', (snapshot) => {
         const data = snapshot.val();
         if (data && currentUser) {
             const oldMembersLength = appData.members.length;
             const oldRequestsLength = appData.joinRequests.length;
+            
+            // تحميل جميع البيانات من Firebase
             appData.branches = data.branches || [];
-            appData.subBranches = data.subBranches || [];  // <-- أضف هذا
+            appData.subBranches = data.subBranches || [];
             appData.squads = data.squads || [];
             appData.members = data.members || [];
-            appData.leaders = data.leaders || [];          // <-- أضف هذا
+            appData.leaders = data.leaders || [];
             appData.tasks = data.tasks || [];
             appData.taskSubmissions = data.taskSubmissions || [];
             appData.messages = data.messages || [];
             appData.joinRequests = data.joinRequests || [];
             
+            // تحميل بيانات الفورمات
+            appData.forms = data.forms || [];
+            appData.leaderForms = data.leaderForms || [];
+            appData.memberForms = data.memberForms || [];
+            appData.evaluationForms = data.evaluationForms || [];
+            appData.leaderEvaluationForms = data.leaderEvaluationForms || [];
+            appData.memberEvaluationAnswers = data.memberEvaluationAnswers || [];
+            
+            // إشعار بوجود طلبات انضمام جديدة للقائد العام
             if (oldRequestsLength !== appData.joinRequests.length && isAdmin) {
                 updatePendingRequestsBadge();
                 showToast(`📋 يوجد ${appData.joinRequests.filter(r => r.status === 'pending').length} طلب انضمام جديد`, 'info');
             }
             
+            // تحديث جدول الأعضاء إذا تغير
             if (oldMembersLength !== appData.members.length && document.getElementById('membersTable')) {
                 renderMembersTable();
             }
+            
+            // تحديث الصفحات المفتوحة
             if (document.getElementById('adminPageContent')) {
                 refreshCurrentAdminPage();
             }
@@ -6431,6 +6439,7 @@ function renderUnifiedFooter() {
             if (document.getElementById('leaderPageContent')) {
                 refreshCurrentLeaderPage();
             }
+            
             showToast('تم تحديث البيانات', 'info');
         }
     });
