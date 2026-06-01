@@ -8462,17 +8462,14 @@ function renderLandingPage() {
     
     app.innerHTML = `
         <div class="landing-new-container">
-            <!-- Header مع الصورة في المنتصف -->
+            <!-- Header مع الصورة في المنتصف (تمت إزالة الصورة من هنا) -->
             <div class="landing-header-fixed" style="position: relative;">
                 <div class="header-logo-landing">
                     <img src="https://i.ibb.co/VfWPtdk/5794143090170859641.jpg" alt="شعار كيان">
                     <span>مجموعة كيان</span>
                 </div>
                 
-                <!-- الصورة الجديدة في منتصف الهيدر -->
-                <div class="header-center-image">
-                    <img src="https://i.ibb.co/d9sKxjZ/In-Shot-20260528-143153172.jpg" alt="صورة المجموعة" class="header-center-img">
-                </div>
+                <!-- تم حذف الصورة من الهيدر بناءً على طلب المستخدم -->
                 
                 <div class="header-buttons-landing">
                     <button class="btn-landing about-btn" onclick="renderAboutPage()">
@@ -8486,6 +8483,18 @@ function renderLandingPage() {
                     </button>
                 </div>
             </div>
+
+            <!-- الصورة الجديدة أسفل الهيدر (فقط في صفحة الهبوط) -->
+            <div style="text-align: center; padding: 20px 0 10px 0; background: linear-gradient(180deg, #ffffff 0%, #e8f5e9 100%);">
+                <img src="https://i.ibb.co/d9sKxjZ/In-Shot-20260528-143153172.jpg" alt="صورة المجموعة" style="height: 80px; width: auto; max-width: 90%; border-radius: 50px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); border: 2px solid #d4a017; animation: floatImage 3s ease-in-out infinite;">
+            </div>
+
+            <style>
+            @keyframes floatImage {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+            }
+            </style>
 
             <!-- Hero Section -->
             <div class="landing-new-hero">
