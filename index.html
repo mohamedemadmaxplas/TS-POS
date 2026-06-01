@@ -4368,9 +4368,847 @@ function changeLeaderPage(page) {
         messages: [],
         joinRequests: []
     };
+    // أضف هذه الأسطر داخل initializeDefaultData() بعد تعريف appData
+appData.forms = appData.forms || [];
+appData.leaderForms = appData.leaderForms || [];
+appData.memberForms = appData.memberForms || [];
     await saveAllDataToFirebase();
 }
+async function saveFormToFirebase(formData) {
+    try {
+        const newForm = {
+            id: Date.now(),
+            ...formData,
+            createdAt: new Date().toISOString(),
+            status: 'active'
+        };
+        
+        if (!appData.forms) appData.forms = [];
+        appData.forms.push(newForm);
+        
+        await saveAllDataToFirebase();
+        showToast('✅ تم حفظ الفورم بنجاح');
+        return newForm;
+    } catch (error) {
+        showToast('❌ حدث خطأ أثناء حفظ الفورم', 'error');
+        return null;
+    }
+}
 
+async function sendFormToAllLeaders(formId) {
+    try {
+        const form = appData.forms.find(f => f.id === formId);
+        if (!form) {
+            showToast('❌ الفورم غير موجود', 'error');
+            return false;
+        }
+        
+        form.status = 'sent_to_leaders';
+        
+        if (!appData.leaderForms) appData.leaderForms = [];
+        
+        appData.leaders.forEach(leader => {
+            const alreadySent = appData.leaderForms.some(lf => 
+                lf.formId === formId && lf.leaderId === leader.id
+            );
+            
+            if (!alreadySent) {
+                appData.leaderForms.push({
+                    id: Date.now() + Math.random(),
+                    formId: formId,
+                    leaderId: leader.id,
+                    sentToMembers: false,
+                    sentAt: new Date().toISOString(),
+                    formData: { ...form }
+                });
+            }
+        });
+        
+        await saveAllDataToFirebase();
+        showToast(`✅ تم إرسال الفورم إلى ${appData.leaders.length} قائد`);
+        return true;
+    } catch (error) {
+        showToast('❌ حدث خطأ أثناء الإرسال', 'error');
+        return false;
+    }
+}
+
+// ==================== 2. صفحة الفورم في لوحة القائد العام ====================
+
+function renderFormsPage() {
+    const container = document.getElementById('adminPageContent');
+    if (!container) return;
+    
+    const forms = appData.forms || [];
+    
+    container.innerHTML = `
+        <div class="card">
+            <h3><i class="fas fa-file-alt"></i> إدارة الفورمات (النماذج)</h3>
+            <button class="btn btn-primary" onclick="showCreateFormModal()" style="margin-bottom: 20px;">
+                <i class="fas fa-plus"></i> إنشاء فورم جديد
+            </button>
+            
+            <div id="formsListContainer">
+                ${forms.length === 0 ? 
+                    '<p style="text-align:center; color:#999;">لا توجد فورمات بعد. اضغط على "إنشاء فورم جديد" للبدء</p>' : 
+                    forms.map(form => `
+                        <div style="background:#f8f9fa; border-radius:15px; padding:15px; margin-bottom:15px; border-right:4px solid ${form.status === 'sent_to_leaders' ? '#2ecc71' : '#d4a017'}">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                                <div>
+                                    <strong><i class="fas fa-file-alt"></i> ${escapeHtml(form.title || 'فورم بدون عنوان')}</strong>
+                                    <br>
+                                    <small><i class="fas fa-tag"></i> نوع الفريق: ${form.squadType || 'الكل'}</small>
+                                    <br>
+                                    <small><i class="fas fa-calendar"></i> تاريخ الإنشاء: ${new Date(form.createdAt).toLocaleString('ar-EG')}</small>
+                                    <br>
+                                    <small><i class="fas fa-question-circle"></i> عدد الأسئلة: ${form.questions?.length || 0}</small>
+                                </div>
+                                <div style="display:flex; gap:8px; margin-top:10px;">
+                                    <button class="btn btn-sm btn-info" onclick="viewFormDetails(${form.id})">
+                                        <i class="fas fa-eye"></i> عرض
+                                    </button>
+                                    ${form.status !== 'sent_to_leaders' ? 
+                                        `<button class="btn btn-sm btn-success" onclick="confirmSendFormToLeaders(${form.id})">
+                                            <i class="fas fa-paper-plane"></i> إرسال للقادة
+                                        </button>` : 
+                                        `<span class="badge" style="background:#2ecc71;">✓ تم الإرسال للقادة</span>`
+                                    }
+                                    <button class="btn btn-sm btn-danger" onclick="deleteForm(${form.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')
+                }
+            </div>
+        </div>
+    `;
+}
+
+function showCreateFormModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:700px; max-height:85vh; overflow-y:auto;">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> إنشاء فورم جديد</h3>
+                <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            
+            <form id="createFormMainForm">
+                <div class="input-group">
+                    <label><i class="fas fa-heading"></i> عنوان الفورم</label>
+                    <input type="text" id="formTitle" placeholder="مثال: استبيان حول الأنشطة البحرية" required>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-tag"></i> نوع الفريق المستهدف</label>
+                    <select id="formSquadType" required>
+                        <option value="all">🎯 جميع الأنواع</option>
+                        <option value="الكشافة">⚜️ فريق الكشافة</option>
+                        <option value="المرشدات">🌸 فريق المرشدات</option>
+                        <option value="الأشبال">🦁 فريق الأشبال</option>
+                        <option value="الزهرات">🌺 فريق الزهرات</option>
+                        <option value="البراعم">🌱 فريق البراعم</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-align-left"></i> وصف الفورم (اختياري)</label>
+                    <textarea id="formDescription" rows="2" placeholder="وصف قصير للفورم..."></textarea>
+                </div>
+                
+                <hr style="margin: 20px 0;">
+                
+                <h4 style="color:#1a472a;"><i class="fas fa-question-circle"></i> الأسئلة</h4>
+                <div id="questionsContainer" style="margin-top:15px;"></div>
+                
+                <div style="margin: 15px 0;">
+                    <button type="button" class="btn btn-success" onclick="addNewQuestion()">
+                        <i class="fas fa-plus-circle"></i> إضافة سؤال جديد
+                    </button>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ الفورم</button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    addNewQuestion();
+    
+    document.getElementById('createFormMainForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const title = document.getElementById('formTitle').value.trim();
+        if (!title) {
+            showToast('الرجاء إدخال عنوان للفورم', 'error');
+            return;
+        }
+        
+        const questions = [];
+        const questionDivs = document.querySelectorAll('.question-item');
+        
+        for (let i = 0; i < questionDivs.length; i++) {
+            const div = questionDivs[i];
+            const questionText = div.querySelector('.question-text')?.value.trim();
+            if (!questionText) continue;
+            
+            const question = {
+                id: Date.now() + i,
+                text: questionText,
+                options: [],
+                correctAnswer: null
+            };
+            
+            const optionInputs = div.querySelectorAll('.option-input');
+            optionInputs.forEach((opt, optIdx) => {
+                const optText = opt.value.trim();
+                if (optText) {
+                    const isCorrect = div.querySelector(`.correct-option-${optIdx}`)?.checked || false;
+                    question.options.push({
+                        text: optText,
+                        isCorrect: isCorrect
+                    });
+                    if (isCorrect) {
+                        question.correctAnswer = optText;
+                    }
+                }
+            });
+            
+            if (question.options.length > 0) {
+                questions.push(question);
+            }
+        }
+        
+        if (questions.length === 0) {
+            showToast('الرجاء إضافة سؤال واحد على الأقل', 'error');
+            return;
+        }
+        
+        const newForm = {
+            title: title,
+            squadType: document.getElementById('formSquadType').value,
+            description: document.getElementById('formDescription').value,
+            questions: questions,
+            createdAt: new Date().toISOString(),
+            status: 'active'
+        };
+        
+        await saveFormToFirebase(newForm);
+        modal.remove();
+        renderFormsPage();
+    });
+}
+
+let questionCounter = 0;
+
+function addNewQuestion() {
+    const container = document.getElementById('questionsContainer');
+    questionCounter++;
+    const questionId = Date.now();
+    
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'question-item';
+    questionDiv.style.cssText = 'background:#f0f5f0; border-radius:15px; padding:15px; margin-bottom:15px; border-right:3px solid #d4a017;';
+    questionDiv.setAttribute('data-id', questionId);
+    
+    questionDiv.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong style="color:#1a472a;">السؤال ${questionCounter}</strong>
+            <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.question-item').remove(); updateQuestionNumbers();">
+                <i class="fas fa-trash"></i> حذف
+            </button>
+        </div>
+        
+        <div class="input-group">
+            <label>نص السؤال</label>
+            <input type="text" class="question-text" placeholder="أدخل نص السؤال..." style="width:100%;">
+        </div>
+        
+        <div style="margin-top:10px;">
+            <label><i class="fas fa-list"></i> الخيارات</label>
+            <div class="options-list" style="margin-top:8px;"></div>
+            <button type="button" class="btn btn-sm btn-info" onclick="addOptionToQuestion(this)" style="margin-top:10px;">
+                <i class="fas fa-plus"></i> إضافة اختيار إضافي
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(questionDiv);
+    
+    const optionsList = questionDiv.querySelector('.options-list');
+    addOptionRow(optionsList, 0, questionId);
+    addOptionRow(optionsList, 1, questionId);
+}
+
+function updateQuestionNumbers() {
+    const questions = document.querySelectorAll('.question-item');
+    questions.forEach((q, idx) => {
+        const strongTag = q.querySelector('strong');
+        if (strongTag) {
+            strongTag.textContent = `السؤال ${idx + 1}`;
+        }
+    });
+    questionCounter = questions.length;
+}
+
+function addOptionToQuestion(button) {
+    const questionDiv = button.closest('.question-item');
+    const optionsList = questionDiv.querySelector('.options-list');
+    const currentCount = optionsList.children.length;
+    const questionId = questionDiv.getAttribute('data-id');
+    addOptionRow(optionsList, currentCount, questionId);
+}
+
+function addOptionRow(container, index, questionId) {
+    const optionRow = document.createElement('div');
+    optionRow.className = 'option-row';
+    optionRow.style.cssText = 'display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;';
+    
+    optionRow.innerHTML = `
+        <input type="text" class="option-input" placeholder="أدخل نص الاختيار..." style="flex:2; min-width:150px; padding:8px; border-radius:8px; border:1px solid #ddd;">
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+            <input type="radio" name="correct_${questionId}" class="correct-option-${index}" value="${index}">
+            <span style="font-size:12px;">اختر كإجابة صحيحة</span>
+        </label>
+        <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.option-row').remove()" style="padding:4px 8px;">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    container.appendChild(optionRow);
+}
+
+function viewFormDetails(formId) {
+    const form = appData.forms?.find(f => f.id === formId);
+    if (!form) return;
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    
+    let questionsHtml = '';
+    form.questions?.forEach((q, idx) => {
+        questionsHtml += `
+            <div style="background:#f8f9fa; border-radius:12px; padding:12px; margin-bottom:12px;">
+                <strong>${idx + 1}. ${escapeHtml(q.text)}</strong>
+                <ul style="margin-top:8px; margin-right:20px;">
+                    ${q.options.map(opt => `
+                        <li style="${opt.isCorrect ? 'color:#2ecc71; font-weight:bold;' : ''}">
+                            ${escapeHtml(opt.text)} ${opt.isCorrect ? ' ✓ (الإجابة الصحيحة)' : ''}
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
+    });
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:600px; max-height:80vh; overflow-y:auto;">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> ${escapeHtml(form.title)}</h3>
+                <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <p><i class="fas fa-tag"></i> نوع الفريق: ${form.squadType || 'الكل'}</p>
+            ${form.description ? `<p>${escapeHtml(form.description)}</p>` : ''}
+            <hr>
+            <h4>الأسئلة:</h4>
+            ${questionsHtml || '<p>لا توجد أسئلة</p>'}
+            <div style="text-align:center; margin-top:20px;">
+                <button class="btn btn-primary" onclick="this.closest('.modal').remove()">إغلاق</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function confirmSendFormToLeaders(formId) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:400px; text-align:center;">
+            <div class="modal-header">
+                <h3><i class="fas fa-paper-plane"></i> تأكيد الإرسال</h3>
+                <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <p>هل أنت متأكد من إرسال هذا الفورم إلى جميع القادة؟</p>
+            <div style="display:flex; gap:15px; justify-content:center; margin-top:20px;">
+                <button class="btn btn-success" onclick="sendFormToAllLeaders(${formId}); this.closest('.modal').remove(); setTimeout(() => renderFormsPage(), 500);">
+                    <i class="fas fa-check"></i> نعم، إرسال
+                </button>
+                <button class="btn btn-danger" onclick="this.closest('.modal').remove()">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+async function deleteForm(formId) {
+    if (!confirm('هل أنت متأكد من حذف هذا الفورم؟')) return;
+    
+    appData.forms = appData.forms.filter(f => f.id !== formId);
+    appData.leaderForms = appData.leaderForms.filter(lf => lf.formId !== formId);
+    
+    await saveAllDataToFirebase();
+    showToast('تم حذف الفورم');
+    renderFormsPage();
+}
+
+// ==================== 3. دوال الفورم للقادة (مع نافذة اختيار الوجهة) ====================
+
+function renderLeaderFormsPage() {
+    const container = document.getElementById('leaderPageContent');
+    if (!container) return;
+    
+    const leaderForms = (appData.leaderForms || []).filter(lf => lf.leaderId === currentUser.id);
+    
+    container.innerHTML = `
+        <div class="card">
+            <h3><i class="fas fa-file-alt"></i> الفورمات المستلمة</h3>
+            <div id="leaderFormsList">
+                ${leaderForms.length === 0 ? 
+                    '<p style="text-align:center; color:#999;">لا توجد فورمات مستلمة بعد</p>' : 
+                    leaderForms.map(lf => {
+                        const form = appData.forms?.find(f => f.id === lf.formId);
+                        if (!form) return '';
+                        return `
+                            <div style="background:#f8f9fa; border-radius:15px; padding:15px; margin-bottom:15px; border-right:4px solid ${lf.sentToMembers ? '#2ecc71' : '#d4a017'}">
+                                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                                    <div>
+                                        <strong>${escapeHtml(form.title)}</strong>
+                                        <br>
+                                        <small><i class="fas fa-tag"></i> نوع الفريق: ${form.squadType || 'الكل'}</small>
+                                        <br>
+                                        <small><i class="fas fa-calendar"></i> تاريخ الاستلام: ${new Date(lf.sentAt).toLocaleString('ar-EG')}</small>
+                                    </div>
+                                    <div style="display:flex; gap:8px; margin-top:10px;">
+                                        <button class="btn btn-sm btn-info" onclick="viewLeaderFormDetails(${lf.formId})">
+                                            <i class="fas fa-eye"></i> عرض
+                                        </button>
+                                        ${!lf.sentToMembers ? 
+                                            `<button class="btn btn-sm btn-success" onclick="showSendFormDestinationModal(${lf.formId})">
+                                                <i class="fas fa-paper-plane"></i> إرسال للأعضاء
+                                            </button>` : 
+                                            `<span class="badge" style="background:#2ecc71;">✓ تم الإرسال للأعضاء</span>`
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')
+                }
+            </div>
+        </div>
+    `;
+}
+
+function viewLeaderFormDetails(formId) {
+    const form = appData.forms?.find(f => f.id === formId);
+    if (!form) return;
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    
+    let questionsHtml = '';
+    form.questions?.forEach((q, idx) => {
+        questionsHtml += `
+            <div style="background:#f8f9fa; border-radius:12px; padding:12px; margin-bottom:12px;">
+                <strong>${idx + 1}. ${escapeHtml(q.text)}</strong>
+                <ul style="margin-top:8px; margin-right:20px;">
+                    ${q.options.map(opt => `<li>${escapeHtml(opt.text)}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    });
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:600px; max-height:80vh; overflow-y:auto;">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> ${escapeHtml(form.title)}</h3>
+                <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <p><i class="fas fa-tag"></i> نوع الفريق: ${form.squadType || 'الكل'}</p>
+            ${form.description ? `<p>${escapeHtml(form.description)}</p>` : ''}
+            <hr>
+            <h4>الأسئلة:</h4>
+            ${questionsHtml}
+            <div style="text-align:center; margin-top:20px;">
+                <button class="btn btn-primary" onclick="this.closest('.modal').remove()">إغلاق</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// ========== الدالة الجديدة: نافذة اختيار الوجهة قبل الإرسال ==========
+function showSendFormDestinationModal(formId) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    
+    // جلب بيانات الفورم
+    const form = appData.forms?.find(f => f.id === formId);
+    if (!form) {
+        showToast('❌ الفورم غير موجود', 'error');
+        return;
+    }
+    
+    // جلب الفروع والطلايع المتاحة للقائد
+    const mySubBranchIds = currentUser.subBranchIds || [];
+    const availableSquads = appData.squads.filter(s => mySubBranchIds.includes(s.branchId));
+    
+    // أنواع الفرق للفلتر
+    const squadTypes = ['الكشافة', 'المرشدات', 'الأشبال', 'الزهرات', 'البراعم'];
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-paper-plane"></i> إرسال الفورم: ${escapeHtml(form.title)}</h3>
+                <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <form id="sendFormDestinationForm">
+                <div class="input-group">
+                    <label><i class="fas fa-map-marker-alt"></i> اختر المنطقة / الفرع</label>
+                    <select id="destinationBranch" required style="width:100%; padding:10px; border-radius:10px;">
+                        <option value="">-- اختر المنطقة --</option>
+                        ${appData.branches.map(b => {
+                            // هل هذا الفرع ضمن صلاحيات القائد؟
+                            const hasAccess = mySubBranchIds.includes(b.id);
+                            return `<option value="${b.id}" ${!hasAccess ? 'disabled style="color:#999;"' : ''}>
+                                ${b.name} ${!hasAccess ? '(غير مسموح)' : ''}
+                            </option>`;
+                        }).join('')}
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-flag"></i> اختر الطليعة</label>
+                    <select id="destinationSquad" required style="width:100%; padding:10px; border-radius:10px;">
+                        <option value="all">-- جميع الطلايع في هذا الفرع --</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-users"></i> اختر نوع الفريق</label>
+                    <select id="destinationType" style="width:100%; padding:10px; border-radius:10px;">
+                        <option value="all">🎯 جميع الأنواع</option>
+                        ${squadTypes.map(type => `<option value="${type}">${type === 'الكشافة' ? '⚜️' : type === 'المرشدات' ? '🌸' : type === 'الأشبال' ? '🦁' : type === 'الزهرات' ? '🌺' : '🌱'} ${type}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div class="input-group" id="selectedMembersCount" style="background:#e8f5e9; padding:10px; border-radius:10px; text-align:center;">
+                    <i class="fas fa-info-circle"></i> سيتم الإرسال إلى <span id="membersCount">0</span> عضو
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> إرسال
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // تحديث قائمة الطلايع عند تغيير الفرع
+    const branchSelect = document.getElementById('destinationBranch');
+    const squadSelect = document.getElementById('destinationSquad');
+    const typeSelect = document.getElementById('destinationType');
+    const membersCountSpan = document.getElementById('membersCount');
+    
+    function updateMembersCount() {
+        const branchId = parseInt(branchSelect.value);
+        const squadId = squadSelect.value;
+        const typeFilter = typeSelect.value;
+        
+        let targetMembers = [];
+        
+        if (branchId && squadId === 'all') {
+            // إرسال إلى جميع أعضاء الفرع
+            targetMembers = appData.members.filter(m => m.branchId === branchId);
+        } else if (branchId && squadId !== 'all') {
+            // إرسال إلى طليعة محددة
+            targetMembers = appData.members.filter(m => m.squadId == squadId);
+        }
+        
+        // فلتر حسب النوع
+        if (typeFilter !== 'all') {
+            const squadIdsOfType = appData.squads
+                .filter(s => s.type === typeFilter)
+                .map(s => s.id);
+            targetMembers = targetMembers.filter(m => squadIdsOfType.includes(m.squadId));
+        }
+        
+        // فلتر: عدم إرسال لمن أجاب بالفعل
+        const alreadySent = (appData.memberForms || []).filter(mf => mf.formId === formId).map(mf => mf.memberId);
+        targetMembers = targetMembers.filter(m => !alreadySent.includes(m.id));
+        
+        membersCountSpan.textContent = targetMembers.length;
+        membersCountSpan.style.fontWeight = 'bold';
+        membersCountSpan.style.color = targetMembers.length > 0 ? '#2ecc71' : '#e74c3c';
+    }
+    
+    function updateSquads() {
+        const branchId = parseInt(branchSelect.value);
+        if (branchId) {
+            const squads = appData.squads.filter(s => s.branchId === branchId);
+            squadSelect.innerHTML = '<option value="all">-- جميع الطلايع في هذا الفرع --</option>' +
+                squads.map(s => `<option value="${s.id}">🏴 ${s.name} (${s.type || 'كشافة'})</option>`).join('');
+        } else {
+            squadSelect.innerHTML = '<option value="all">-- اختر الفرع أولاً --</option>';
+        }
+        updateMembersCount();
+    }
+    
+    branchSelect.addEventListener('change', () => {
+        updateSquads();
+    });
+    
+    squadSelect.addEventListener('change', () => {
+        updateMembersCount();
+    });
+    
+    typeSelect.addEventListener('change', () => {
+        updateMembersCount();
+    });
+    
+    // تحديث أولي
+    updateSquads();
+    
+    document.getElementById('sendFormDestinationForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const branchId = parseInt(branchSelect.value);
+        const squadId = squadSelect.value;
+        const typeFilter = typeSelect.value;
+        
+        if (!branchId) {
+            showToast('الرجاء اختيار المنطقة', 'error');
+            return;
+        }
+        
+        // تحديد الأعضاء المستهدفين
+        let targetMembers = [];
+        
+        if (squadId === 'all') {
+            targetMembers = appData.members.filter(m => m.branchId === branchId);
+        } else {
+            targetMembers = appData.members.filter(m => m.squadId == squadId);
+        }
+        
+        // فلتر حسب النوع
+        if (typeFilter !== 'all') {
+            const squadIdsOfType = appData.squads
+                .filter(s => s.type === typeFilter)
+                .map(s => s.id);
+            targetMembers = targetMembers.filter(m => squadIdsOfType.includes(m.squadId));
+        }
+        
+        // فلتر: عدم إرسال لمن أجاب بالفعل
+        const alreadySent = (appData.memberForms || []).filter(mf => mf.formId === formId).map(mf => mf.memberId);
+        targetMembers = targetMembers.filter(m => !alreadySent.includes(m.id));
+        
+        if (targetMembers.length === 0) {
+            showToast('⚠️ لا يوجد أعضاء مستهدفين للإرسال', 'error');
+            return;
+        }
+        
+        // تحديث leaderForm بأنه تم الإرسال
+        const leaderForm = appData.leaderForms?.find(lf => lf.formId === formId && lf.leaderId === currentUser.id);
+        if (leaderForm) {
+            leaderForm.sentToMembers = true;
+            leaderForm.sentToMembersAt = new Date().toISOString();
+        }
+        
+        // إنشاء نسخ من الفورم لكل عضو
+        if (!appData.memberForms) appData.memberForms = [];
+        
+        const theForm = appData.forms.find(f => f.id === formId);
+        
+        targetMembers.forEach(member => {
+            appData.memberForms.push({
+                id: Date.now() + Math.random(),
+                formId: formId,
+                memberId: member.id,
+                leaderId: currentUser.id,
+                sentAt: new Date().toISOString(),
+                isAnswered: false,
+                answers: [],
+                formData: { ...theForm }
+            });
+        });
+        
+        await saveAllDataToFirebase();
+        showToast(`✅ تم إرسال الفورم "${theForm.title}" إلى ${targetMembers.length} عضو`);
+        modal.remove();
+        renderLeaderFormsPage();
+    });
+}
+
+// ==================== 4. دوال الفورم للأعضاء ====================
+
+function renderMemberFormsPage() {
+    const container = document.getElementById('memberPageContent');
+    if (!container) return;
+    
+    const memberForms = (appData.memberForms || []).filter(mf => mf.memberId === currentUser.id);
+    const pendingForms = memberForms.filter(mf => !mf.isAnswered);
+    const completedForms = memberForms.filter(mf => mf.isAnswered);
+    
+    container.innerHTML = `
+        <div class="card">
+            <h3><i class="fas fa-file-alt"></i> الفورمات المستلمة</h3>
+            
+            ${pendingForms.length > 0 ? `
+                <h4 style="color:#d4a017; margin:15px 0 10px;">📋 بانتظار الإجابة</h4>
+                ${pendingForms.map(mf => {
+                    const form = appData.forms?.find(f => f.id === mf.formId);
+                    if (!form) return '';
+                    return `
+                        <div style="background:#fff3cd; border-radius:15px; padding:15px; margin-bottom:15px; border-right:4px solid #f39c12;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                                <div>
+                                    <strong>${escapeHtml(form.title)}</strong>
+                                    <br>
+                                    <small>تاريخ الاستلام: ${new Date(mf.sentAt).toLocaleString('ar-EG')}</small>
+                                </div>
+                                <button class="btn btn-primary" onclick="answerMemberForm(${mf.formId})" style="margin-top:10px;">
+                                    <i class="fas fa-edit"></i> الإجابة
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            ` : ''}
+            
+            ${completedForms.length > 0 ? `
+                <h4 style="color:#2ecc71; margin:15px 0 10px;">✅ تم الإجابة عليها</h4>
+                ${completedForms.map(mf => {
+                    const form = appData.forms?.find(f => f.id === mf.formId);
+                    if (!form) return '';
+                    return `
+                        <div style="background:#e8f5e9; border-radius:15px; padding:15px; margin-bottom:15px; border-right:4px solid #2ecc71;">
+                            <div>
+                                <strong>${escapeHtml(form.title)}</strong>
+                                <br>
+                                <small>تمت الإجابة: ${new Date(mf.answeredAt).toLocaleString('ar-EG')}</small>
+                                ${mf.score !== undefined ? `<br><small>النتيجة: ${mf.score}%</small>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            ` : ''}
+            
+            ${pendingForms.length === 0 && completedForms.length === 0 ? 
+                '<p style="text-align:center; color:#999;">لا توجد فورمات مستلمة بعد</p>' : ''}
+        </div>
+    `;
+}
+
+function answerMemberForm(formId) {
+    const memberForm = appData.memberForms?.find(mf => mf.formId === formId && mf.memberId === currentUser.id);
+    if (!memberForm || memberForm.isAnswered) {
+        showToast('لا يمكن الإجابة على هذا الفورم', 'error');
+        return;
+    }
+    
+    const form = appData.forms?.find(f => f.id === formId);
+    if (!form) return;
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    
+    let questionsHtml = '';
+    form.questions?.forEach((q, idx) => {
+        questionsHtml += `
+            <div class="question-answer-item" data-q-idx="${idx}" style="background:#f8f9fa; border-radius:12px; padding:15px; margin-bottom:15px;">
+                <p><strong>${idx + 1}. ${escapeHtml(q.text)}</strong></p>
+                <div class="options-answer" style="margin-top:10px; margin-right:20px;">
+                    ${q.options.map((opt, optIdx) => `
+                        <label style="display:flex; align-items:center; gap:8px; margin-bottom:8px; cursor:pointer;">
+                            <input type="radio" name="q_${idx}" value="${escapeHtml(opt.text)}" class="answer-radio">
+                            <span>${escapeHtml(opt.text)}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    });
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:650px; max-height:85vh; overflow-y:auto;">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> ${escapeHtml(form.title)}</h3>
+                <span class="close-modal" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <p>يرجى الإجابة على الأسئلة التالية:</p>
+            <form id="answerForm">
+                ${questionsHtml}
+                <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">إرسال الإجابات</button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    document.getElementById('answerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const answers = [];
+        form.questions.forEach((q, idx) => {
+            const selectedRadio = document.querySelector(`input[name="q_${idx}"]:checked`);
+            if (selectedRadio) {
+                answers.push({
+                    questionId: q.id,
+                    questionText: q.text,
+                    answer: selectedRadio.value,
+                    isCorrect: q.correctAnswer === selectedRadio.value
+                });
+            } else {
+                showToast(`الرجاء الإجابة على السؤال ${idx + 1}`, 'error');
+                return;
+            }
+        });
+        
+        let score = 0;
+        answers.forEach(ans => {
+            if (ans.isCorrect) score++;
+        });
+        const totalScore = (score / form.questions.length) * 100;
+        
+        memberForm.isAnswered = true;
+        memberForm.answeredAt = new Date().toISOString();
+        memberForm.answers = answers;
+        memberForm.score = totalScore;
+        
+        // منح نقاط إذا حصل على 70% أو أكثر
+        if (totalScore >= 70) {
+            const pointsToAdd = Math.floor(form.questions.length * 10);
+            currentUser.points = (currentUser.points || 0) + pointsToAdd;
+            showToast(`🎉 أحسنت! حصلت على ${pointsToAdd} نقطة إضافية`, 'success');
+        }
+        
+        await saveAllDataToFirebase();
+        showToast('✅ تم إرسال إجاباتك بنجاح');
+        modal.remove();
+        renderMemberFormsPage();
+        if (typeof renderMemberDashboard === 'function') renderMemberDashboard();
+    });
+}
 // دالة عرض تفاصيل القائد
 function showLeaderDetails(leaderId) {
     const leader = appData.leaders.find(l => l.id === leaderId);
@@ -5629,6 +6467,7 @@ function renderAdminApp(container) {
                 <li data-page="leaders"><a onclick="changeAdminPage('leaders')"><i class="fas fa-user-tie"></i> إدارة القادة</a></li>
                 <li data-page="community"><a onclick="changeAdminPage('community')"><i class="fas fa-comments"></i> الكميونيتي</a></li>
                 <li data-page="tasks"><a onclick="changeAdminPage('tasks')"><i class="fas fa-tasks"></i> إدارة التكاليف</a></li>
+                <li data-page="forms"><a onclick="changeAdminPage('forms')"><i class="fas fa-file-alt"></i> الفورم</a></li>
                 <li data-page="settings"><a onclick="changeAdminPage('settings')"><i class="fas fa-cog"></i> الإعدادات</a></li>
                 <li style="margin-top: 20px; border-top: 1px solid rgba(212,160,23,0.3);">
                     <a onclick="logout()" style="color: #e74c3c;">
@@ -5674,7 +6513,8 @@ function renderAdminApp(container) {
     else if (page === 'leaders') showLeadersPage();
     else if (page === 'community') renderAdminCommunity();
     else if (page === 'tasks') renderAdminTasks();
-    else if (page === 'settings') renderAdminSettings();  // <-- أضف هذا السطر
+    else if (page === 'settings') renderAdminSettings();
+    else if (page === 'forms') renderFormsPage();  // <-- أضف هذا السطر
     closeSidebar();
 }
 
@@ -6473,6 +7313,7 @@ function renderLeaderApp(container) {
                 <li data-page="members"><a onclick="changeLeaderPage('members')"><i class="fas fa-users"></i> إدارة الأعضاء</a></li>
                 <li data-page="joinRequests"><a onclick="changeLeaderPage('joinRequests')"><i class="fas fa-user-plus"></i> طلبات الانضمام</a></li>
                 <li data-page="tasks"><a onclick="changeLeaderPage('tasks')"><i class="fas fa-tasks"></i> إدارة التكاليف</a></li>
+                <li data-page="forms"><a onclick="changeLeaderPage('forms')"><i class="fas fa-file-alt"></i> الفورم</a></li>
                 <li data-page="community"><a onclick="changeLeaderPage('community')"><i class="fas fa-comments"></i> الكميونيتي</a></li>
                 <li style="margin-top: 20px; border-top: 1px solid rgba(212,160,23,0.3);">
                     <a onclick="logout()" style="color: #e74c3c;">
@@ -6508,6 +7349,7 @@ function changeLeaderPage(page) {
     else if (page === 'members') renderLeaderMembers();
     else if (page === 'joinRequests') renderLeaderJoinRequests();
     else if (page === 'tasks') renderLeaderTasks();
+    else if (page === 'forms') renderLeaderFormsPage();
     else if (page === 'community') renderLeaderCommunity();
     closeSidebar();
 }
@@ -7863,15 +8705,16 @@ function addGlobalLogoToAllPages() {
                 <p>${squad?.name || 'طليعة'} | ${currentUser.rank || 'عضو'}</p>
             </div>
             <ul class="sidebar-menu">
-                <li class="active" data-page="dashboard"><a onclick="changeMemberPage('dashboard')"><i class="fas fa-chart-line"></i> لوحة التحكم</a></li>
-                <li data-page="community"><a onclick="changeMemberPage('community')"><i class="fas fa-comments"></i> الكميونيتي</a></li>
-                <li data-page="tasks"><a onclick="changeMemberPage('tasks')"><i class="fas fa-tasks"></i> التكاليف</a></li>
-                <li style="margin-top: 20px; border-top: 1px solid rgba(212,160,23,0.3);">
-                    <a onclick="logout()" style="color: #e74c3c;">
-                        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
-                    </a>
-                </li>
-            </ul>
+    <li class="active" data-page="dashboard"><a onclick="changeMemberPage('dashboard')"><i class="fas fa-chart-line"></i> لوحة التحكم</a></li>
+    <li data-page="community"><a onclick="changeMemberPage('community')"><i class="fas fa-comments"></i> الكميونيتي</a></li>
+    <li data-page="tasks"><a onclick="changeMemberPage('tasks')"><i class="fas fa-tasks"></i> التكاليف</a></li>
+    <li data-page="forms"><a onclick="changeMemberPage('forms')"><i class="fas fa-file-alt"></i> الفورم</a></li>  <!-- أضف هذا السطر -->
+    <li style="margin-top: 20px; border-top: 1px solid rgba(212,160,23,0.3);">
+        <a onclick="logout()" style="color: #e74c3c;">
+            <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+        </a>
+    </li>
+</ul>
         </div>
 
         <div class="header">
@@ -7895,6 +8738,7 @@ initTheme();
             if (page === 'dashboard') renderMemberDashboard();
             else if (page === 'community') renderMemberCommunity();
             else if (page === 'tasks') renderMemberTasks();
+            else if (page === 'forms') renderMemberFormsPage();
             closeSidebar();
         }
 
@@ -8303,6 +9147,17 @@ window.confirmDeleteBranch = confirmDeleteBranch;
 window.showJoinRequestModal = showJoinRequestModal;
 window.showJoinRequestsList = showJoinRequestsList;
 window.viewJoinRequestDetails = viewJoinRequestDetails;
+window.renderFormsPage = renderFormsPage;
+window.renderLeaderFormsPage = renderLeaderFormsPage;
+window.renderMemberFormsPage = renderMemberFormsPage;
+window.showSendFormDestinationModal = showSendFormDestinationModal;
+window.showCreateFormModal = showCreateFormModal;
+window.viewFormDetails = viewFormDetails;
+window.confirmSendFormToLeaders = confirmSendFormToLeaders;
+window.deleteForm = deleteForm;
+window.viewLeaderFormDetails = viewLeaderFormDetails;
+window.sendFormToMyMembers = sendFormToMyMembers;
+window.answerMemberForm = answerMemberForm;
 window.approveJoinRequest = approveJoinRequest;
 window.rejectJoinRequest = rejectJoinRequest;
 window.updatePendingRequestsBadge = updatePendingRequestsBadge;
@@ -8312,7 +9167,59 @@ window.updatePendingRequestsBadge = updatePendingRequestsBadge;
 // ==================== LANDING PAGE FUNCTIONS ====================
 
 
-
+// دالة إرسال فورم من القائد إلى أعضائه
+async function sendFormToMyMembers(formId) {
+    const leaderForm = appData.leaderForms?.find(lf => lf.formId === formId && lf.leaderId === currentUser.id);
+    if (!leaderForm) {
+        showToast('❌ الفورم غير موجود', 'error');
+        return;
+    }
+    
+    // جلب أعضاء القائد (حسب الفروع المسؤول عنها)
+    const mySubBranchIds = currentUser.subBranchIds || [];
+    const mySquads = appData.squads.filter(s => mySubBranchIds.includes(s.branchId));
+    const mySquadIds = mySquads.map(s => s.id);
+    const myMembers = appData.members.filter(m => mySquadIds.includes(m.squadId));
+    
+    if (myMembers.length === 0) {
+        showToast('⚠️ لا يوجد أعضاء في فروعك لإرسال الفورم إليهم', 'error');
+        return;
+    }
+    
+    const form = appData.forms.find(f => f.id === formId);
+    if (!form) return;
+    
+    // تحديث leaderForm بأنه تم الإرسال للأعضاء
+    leaderForm.sentToMembers = true;
+    leaderForm.sentToMembersAt = new Date().toISOString();
+    
+    // إنشاء نسخة من الفورم لكل عضو
+    if (!appData.memberForms) appData.memberForms = [];
+    
+    myMembers.forEach(member => {
+        const alreadySent = appData.memberForms?.some(mf => mf.formId === formId && mf.memberId === member.id);
+        if (!alreadySent) {
+            appData.memberForms.push({
+                id: Date.now() + Math.random(),
+                formId: formId,
+                memberId: member.id,
+                leaderId: currentUser.id,
+                sentAt: new Date().toISOString(),
+                isAnswered: false,
+                answers: [],
+                formData: { ...form }
+            });
+        }
+    });
+    
+    await saveAllDataToFirebase();
+    showToast(`✅ تم إرسال الفورم "${form.title}" إلى ${myMembers.length} عضو`);
+    
+    // تحديث واجهة القائد إذا كانت مفتوحة
+    if (typeof renderLeaderFormsPage === 'function') {
+        renderLeaderFormsPage();
+    }
+}
 // تحديث إحصائيات صفحة الهبوط
 function updateLandingStats() {
     const membersCount = document.getElementById('statMembers');
