@@ -4850,7 +4850,7 @@ function viewLeaderFormDetails(formId) {
     document.body.appendChild(modal);
 }
 
-// ========== الدالة الجديدة: نافذة اختيار الوجهة قبل الإرسال ==========
+// ========== دالة نافذة اختيار الوجهة - نسخة معدلة ==========
 function showSendFormDestinationModal(formId) {
     const modal = document.createElement('div');
     modal.className = 'modal';
@@ -4863,12 +4863,32 @@ function showSendFormDestinationModal(formId) {
         return;
     }
     
-    // جلب الفروع والطلايع المتاحة للقائد
+    // جلب الفروع والطلايع المتاحة للقائد (فقط التي يتبعها)
     const mySubBranchIds = currentUser.subBranchIds || [];
-    const availableSquads = appData.squads.filter(s => mySubBranchIds.includes(s.branchId));
+    
+    // جلب المناطق التي يتبعها القائد (مناطق فريدة من الفروع المسؤول عنها)
+    const myBranchIds = [...new Set(appData.subBranches
+        .filter(sb => mySubBranchIds.includes(sb.id))
+        .map(sb => sb.branchId)
+    )];
+    
+    // جلب الفروع (subBranches) التي يتبعها القائد فقط
+    const mySubBranches = appData.subBranches.filter(sb => mySubBranchIds.includes(sb.id));
+    
+    // جلب الطلايع التي يتبعها القائد (من خلال الفروع المسؤول عنها)
+    const mySquads = appData.squads.filter(s => myBranchIds.includes(s.branchId));
     
     // أنواع الفرق للفلتر
     const squadTypes = ['الكشافة', 'المرشدات', 'الأشبال', 'الزهرات', 'البراعم'];
+    
+    // بناء خيارات المناطق (فقط التي يتبعها القائد)
+    let branchesOptions = '<option value="">-- اختر المنطقة --</option>';
+    myBranchIds.forEach(branchId => {
+        const branch = appData.branches.find(b => b.id === branchId);
+        if (branch) {
+            branchesOptions += `<option value="${branch.id}">🏢 ${branch.name}</option>`;
+        }
+    });
     
     modal.innerHTML = `
         <div class="modal-content" style="max-width:500px;">
@@ -4878,16 +4898,16 @@ function showSendFormDestinationModal(formId) {
             </div>
             <form id="sendFormDestinationForm">
                 <div class="input-group">
-                    <label><i class="fas fa-map-marker-alt"></i> اختر المنطقة / الفرع</label>
+                    <label><i class="fas fa-map-marker-alt"></i> اختر المنطقة</label>
                     <select id="destinationBranch" required style="width:100%; padding:10px; border-radius:10px;">
-                        <option value="">-- اختر المنطقة --</option>
-                        ${appData.branches.map(b => {
-                            // هل هذا الفرع ضمن صلاحيات القائد؟
-                            const hasAccess = mySubBranchIds.includes(b.id);
-                            return `<option value="${b.id}" ${!hasAccess ? 'disabled style="color:#999;"' : ''}>
-                                ${b.name} ${!hasAccess ? '(غير مسموح)' : ''}
-                            </option>`;
-                        }).join('')}
+                        ${branchesOptions}
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-code-branch"></i> اختر الفرع</label>
+                    <select id="destinationSubBranch" required style="width:100%; padding:10px; border-radius:10px;">
+                        <option value="">-- اختر المنطقة أولاً --</option>
                     </select>
                 </div>
                 
@@ -4899,7 +4919,7 @@ function showSendFormDestinationModal(formId) {
                 </div>
                 
                 <div class="input-group">
-                    <label><i class="fas fa-users"></i> اختر نوع الفريق</label>
+                    <label><i class="fas fa-users"></i> اختر نوع الفريق (اختياري)</label>
                     <select id="destinationType" style="width:100%; padding:10px; border-radius:10px;">
                         <option value="all">🎯 جميع الأنواع</option>
                         ${squadTypes.map(type => `<option value="${type}">${type === 'الكشافة' ? '⚜️' : type === 'المرشدات' ? '🌸' : type === 'الأشبال' ? '🦁' : type === 'الزهرات' ? '🌺' : '🌱'} ${type}</option>`).join('')}
@@ -4921,23 +4941,56 @@ function showSendFormDestinationModal(formId) {
     `;
     document.body.appendChild(modal);
     
-    // تحديث قائمة الطلايع عند تغيير الفرع
+    // العناصر
     const branchSelect = document.getElementById('destinationBranch');
+    const subBranchSelect = document.getElementById('destinationSubBranch');
     const squadSelect = document.getElementById('destinationSquad');
     const typeSelect = document.getElementById('destinationType');
     const membersCountSpan = document.getElementById('membersCount');
     
+    // تحديث قائمة الفروع عند تغيير المنطقة
+    function updateSubBranches() {
+        const branchId = parseInt(branchSelect.value);
+        if (branchId) {
+            // جلب الفروع التي يتبعها القائد فقط وتنتمي للمنطقة المختارة
+            const mySubBranchesFiltered = mySubBranches.filter(sb => sb.branchId === branchId);
+            subBranchSelect.innerHTML = '<option value="">-- اختر الفرع --</option>' +
+                mySubBranchesFiltered.map(sb => `<option value="${sb.id}">📍 ${sb.name}</option>`).join('');
+            squadSelect.innerHTML = '<option value="all">-- جميع الطلايع في هذا الفرع --</option>';
+        } else {
+            subBranchSelect.innerHTML = '<option value="">-- اختر المنطقة أولاً --</option>';
+            squadSelect.innerHTML = '<option value="all">-- اختر الفرع أولاً --</option>';
+        }
+        updateMembersCount();
+    }
+    
+    // تحديث قائمة الطلايع عند تغيير الفرع
+    function updateSquads() {
+        const subBranchId = parseInt(subBranchSelect.value);
+        if (subBranchId) {
+            const selectedSubBranch = mySubBranches.find(sb => sb.id === subBranchId);
+            if (selectedSubBranch) {
+                const squads = mySquads.filter(s => s.branchId === selectedSubBranch.branchId);
+                squadSelect.innerHTML = '<option value="all">-- جميع الطلايع في هذا الفرع --</option>' +
+                    squads.map(s => `<option value="${s.id}">🏴 ${s.name} (${s.type || 'كشافة'})</option>`).join('');
+            }
+        }
+        updateMembersCount();
+    }
+    
+    // تحديث عدد الأعضاء المستهدفين
     function updateMembersCount() {
         const branchId = parseInt(branchSelect.value);
+        const subBranchId = parseInt(subBranchSelect.value);
         const squadId = squadSelect.value;
         const typeFilter = typeSelect.value;
         
         let targetMembers = [];
         
-        if (branchId && squadId === 'all') {
-            // إرسال إلى جميع أعضاء الفرع
-            targetMembers = appData.members.filter(m => m.branchId === branchId);
-        } else if (branchId && squadId !== 'all') {
+        if (branchId && subBranchId && squadId === 'all') {
+            // إرسال إلى جميع أعضاء الفرع المحدد
+            targetMembers = appData.members.filter(m => m.subBranchId === subBranchId);
+        } else if (branchId && subBranchId && squadId !== 'all') {
             // إرسال إلى طليعة محددة
             targetMembers = appData.members.filter(m => m.squadId == squadId);
         }
@@ -4959,19 +5012,12 @@ function showSendFormDestinationModal(formId) {
         membersCountSpan.style.color = targetMembers.length > 0 ? '#2ecc71' : '#e74c3c';
     }
     
-    function updateSquads() {
-        const branchId = parseInt(branchSelect.value);
-        if (branchId) {
-            const squads = appData.squads.filter(s => s.branchId === branchId);
-            squadSelect.innerHTML = '<option value="all">-- جميع الطلايع في هذا الفرع --</option>' +
-                squads.map(s => `<option value="${s.id}">🏴 ${s.name} (${s.type || 'كشافة'})</option>`).join('');
-        } else {
-            squadSelect.innerHTML = '<option value="all">-- اختر الفرع أولاً --</option>';
-        }
-        updateMembersCount();
-    }
-    
+    // ربط الأحداث
     branchSelect.addEventListener('change', () => {
+        updateSubBranches();
+    });
+    
+    subBranchSelect.addEventListener('change', () => {
         updateSquads();
     });
     
@@ -4984,17 +5030,19 @@ function showSendFormDestinationModal(formId) {
     });
     
     // تحديث أولي
-    updateSquads();
+    updateSubBranches();
     
+    // معالجة الإرسال
     document.getElementById('sendFormDestinationForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const branchId = parseInt(branchSelect.value);
+        const subBranchId = parseInt(subBranchSelect.value);
         const squadId = squadSelect.value;
         const typeFilter = typeSelect.value;
         
-        if (!branchId) {
-            showToast('الرجاء اختيار المنطقة', 'error');
+        if (!branchId || !subBranchId) {
+            showToast('الرجاء اختيار المنطقة والفرع', 'error');
             return;
         }
         
@@ -5002,7 +5050,7 @@ function showSendFormDestinationModal(formId) {
         let targetMembers = [];
         
         if (squadId === 'all') {
-            targetMembers = appData.members.filter(m => m.branchId === branchId);
+            targetMembers = appData.members.filter(m => m.subBranchId === subBranchId);
         } else {
             targetMembers = appData.members.filter(m => m.squadId == squadId);
         }
