@@ -3935,6 +3935,55 @@ body.light-mode .leaderboard-table th {
         font-size: 18px !important;
     }
 }
+/* ==================== SETTINGS PAGE STYLES ==================== */
+.settings-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.settings-card {
+    background: rgba(255,255,255,0.95);
+    border-radius: 25px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border-right: 4px solid #d4a017;
+}
+
+.settings-card h4 {
+    color: #1a472a;
+    margin-bottom: 20px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid #d4a017;
+    padding-bottom: 10px;
+}
+
+.settings-info {
+    background: #e8f5e9;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.settings-info i {
+    font-size: 50px;
+    color: #d4a017;
+    margin-bottom: 10px;
+}
+
+.settings-info h3 {
+    color: #1a472a;
+    margin-bottom: 5px;
+}
+
+.settings-info p {
+    color: #666;
+    font-size: 13px;
+}
     </style>
 </head>
 <body>
@@ -4030,18 +4079,19 @@ function renderLeaderApp(container) {
                 </div>
                 <p style="font-size: 10px; margin-top: 8px;"><i class="fas fa-code-branch"></i> ${subBranchesNames}</p>
             </div>
-            <ul class="sidebar-menu">
-                <li class="active" data-page="dashboard"><a onclick="changeLeaderPage('dashboard')"><i class="fas fa-chart-line"></i> لوحة التحكم</a></li>
-                <li data-page="members"><a onclick="changeLeaderPage('members')"><i class="fas fa-users"></i> إدارة الأعضاء</a></li>
-                <li data-page="joinRequests"><a onclick="changeLeaderPage('joinRequests')"><i class="fas fa-user-plus"></i> طلبات الانضمام</a></li>
-                <li data-page="tasks"><a onclick="changeLeaderPage('tasks')"><i class="fas fa-tasks"></i> إدارة التكاليف</a></li>
-                <li data-page="community"><a onclick="changeLeaderPage('community')"><i class="fas fa-comments"></i> الكميونيتي</a></li>
-                <li style="margin-top: 20px; border-top: 1px solid rgba(212,160,23,0.3);">
-                    <a onclick="logout()" style="color: #e74c3c;">
-                        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
-                    </a>
-                </li>
-            </ul>
+           <ul class="sidebar-menu">
+    <li class="active" data-page="dashboard"><a onclick="changeAdminPage('dashboard')"><i class="fas fa-chart-line"></i> لوحة التحكم</a></li>
+    <li data-page="members"><a onclick="changeAdminPage('members')"><i class="fas fa-users"></i> إدارة الأعضاء</a></li>
+    <li data-page="squads"><a onclick="changeAdminPage('squads')"><i class="fas fa-flag"></i> إدارة الطلايع</a></li>
+    <li data-page="leaders"><a onclick="changeAdminPage('leaders')"><i class="fas fa-user-tie"></i> إدارة القادة</a></li>
+    <li data-page="community"><a onclick="changeAdminPage('community')"><i class="fas fa-comments"></i> الكميونيتي</a></li>
+    <li data-page="tasks"><a onclick="changeAdminPage('tasks')"><i class="fas fa-tasks"></i> إدارة التكاليف</a></li>
+    <li style="margin-top: 20px; border-top: 1px solid rgba(212,160,23,0.3);">
+        <a onclick="logout()" style="color: #e74c3c;">
+            <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+        </a>
+    </li>
+</ul>
         </div>
 
         <div class="header">
@@ -4056,6 +4106,133 @@ function renderLeaderApp(container) {
         <div class="footer"><p>© 2025 نظام الكشاف - Tecno Shark Company</p></div>
     `;
     renderLeaderDashboard();
+}
+// ==================== إعدادات القائد العام ====================
+
+function renderAdminSettings() {
+    const container = document.getElementById('adminPageContent');
+    
+    container.innerHTML = `
+        <div class="settings-container">
+            <div class="settings-card">
+                <h4><i class="fas fa-user-shield"></i> إعدادات الحساب</h4>
+                
+                <div class="settings-info">
+                    <i class="fas fa-crown"></i>
+                    <h3>${currentUser.name}</h3>
+                    <p><i class="fas fa-user"></i> اسم المستخدم الحالي: <strong id="currentUsername">${currentUser.username || 'Kayan'}</strong></p>
+                </div>
+                
+                <form id="adminSettingsForm">
+                    <div class="input-group">
+                        <label><i class="fas fa-user"></i> اسم المستخدم الجديد</label>
+                        <input type="text" id="newUsername" placeholder="أدخل اسم المستخدم الجديد" value="${currentUser.username || 'Kayan'}">
+                        <small style="color: #999; display: block; margin-top: 5px;">اتركه كما هو إذا لم تريد تغييره</small>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label><i class="fas fa-lock"></i> كلمة المرور الحالية</label>
+                        <input type="password" id="currentPassword" placeholder="أدخل كلمة المرور الحالية" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label><i class="fas fa-key"></i> كلمة المرور الجديدة</label>
+                        <input type="password" id="newPassword" placeholder="أدخل كلمة المرور الجديدة">
+                        <small style="color: #999; display: block; margin-top: 5px;">اتركه فارغاً إذا لم تريد تغيير كلمة المرور</small>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label><i class="fas fa-check-circle"></i> تأكيد كلمة المرور الجديدة</label>
+                        <input type="password" id="confirmNewPassword" placeholder="أعد كتابة كلمة المرور الجديدة">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-save"></i> حفظ التغييرات
+                    </button>
+                </form>
+            </div>
+            
+            <div class="settings-card">
+                <h4><i class="fas fa-info-circle"></i> معلومات عن الحساب</h4>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee;">
+                        <span><i class="fas fa-id-badge"></i> نوع الحساب:</span>
+                        <span class="badge" style="background: #d4a017;">قائد عام</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee;">
+                        <span><i class="fas fa-database"></i> طريقة تسجيل الدخول:</span>
+                        <span><i class="fas fa-check-circle" style="color: #2ecc71;"></i> اسم المستخدم وكلمة المرور</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                        <span><i class="fas fa-calendar"></i> صلاحية الحساب:</span>
+                        <span class="badge" style="background: #2ecc71;">دائمة</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('adminSettingsForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newUsername = document.getElementById('newUsername').value.trim();
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+        
+        // التحقق من كلمة المرور الحالية
+        if (currentPassword !== 'Kayan123') {
+            showToast('❌ كلمة المرور الحالية غير صحيحة', 'error');
+            return;
+        }
+        
+        // التحقق من تطابق كلمة المرور الجديدة
+        if (newPassword && newPassword !== confirmNewPassword) {
+            showToast('❌ كلمة المرور الجديدة غير متطابقة', 'error');
+            return;
+        }
+        
+        // التحقق من عدم وجود اسم مستخدم مكرر
+        if (newUsername !== 'Kayan') {
+            if (appData.leaders.some(l => l.username === newUsername)) {
+                showToast('❌ اسم المستخدم موجود مسبقاً لدى قائد آخر', 'error');
+                return;
+            }
+            if (appData.members.some(m => m.username === newUsername)) {
+                showToast('❌ اسم المستخدم موجود مسبقاً لدى عضو', 'error');
+                return;
+            }
+        }
+        
+        // حفظ التغييرات
+        if (newUsername && newUsername !== 'Kayan') {
+            currentUser.username = newUsername;
+            currentUser.name = newUsername;
+        }
+        
+        if (newPassword) {
+            currentUser.password = newPassword;
+        }
+        
+        showToast('✅ تم تحديث بيانات الدخول بنجاح');
+        
+        // تحديث واجهة المستخدم
+        const headerUserSpan = document.querySelector('.user-info span');
+        if (headerUserSpan) {
+            headerUserSpan.textContent = currentUser.username || currentUser.name;
+        }
+        
+        // تحديث اسم المستخدم المعروض
+        const currentUsernameSpan = document.getElementById('currentUsername');
+        if (currentUsernameSpan) {
+            currentUsernameSpan.textContent = currentUser.username || 'Kayan';
+        }
+        
+        // تنظيف الحقول
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmNewPassword').value = '';
+    });
 }
 function changeLeaderPage(page) {
     document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
@@ -5337,6 +5514,7 @@ function renderAdminApp(container) {
                 <li data-page="leaders"><a onclick="changeAdminPage('leaders')"><i class="fas fa-user-tie"></i> إدارة القادة</a></li>
                 <li data-page="community"><a onclick="changeAdminPage('community')"><i class="fas fa-comments"></i> الكميونيتي</a></li>
                 <li data-page="tasks"><a onclick="changeAdminPage('tasks')"><i class="fas fa-tasks"></i> إدارة التكاليف</a></li>
+                <li data-page="settings"><a onclick="changeAdminPage('settings')"><i class="fas fa-cog"></i> الإعدادات</a></li>
                 <li style="margin-top: 20px; border-top: 1px solid rgba(212,160,23,0.3);">
                     <a onclick="logout()" style="color: #e74c3c;">
                         <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
@@ -5345,7 +5523,7 @@ function renderAdminApp(container) {
             </ul>
         </div>
 
-        <!-- الهيدر الجديد - منسق بشكل أفضل -->
+        <!-- الهيدر -->
         <div class="header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div class="logo" style="display: flex; align-items: center; gap: 8px;">
                 <i class="fas fa-campground" style="font-size: 24px; color: #d4a017;"></i>
@@ -5354,7 +5532,6 @@ function renderAdminApp(container) {
                 </div>
             </div>
             <div style="flex: 1;"></div>
-            <!-- هذا القسم سيحتوي على: اسم المستخدم + زر خروج + زر الوضع + زر المنزل -->
             <div class="user-info" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); padding: 5px 15px; border-radius: 40px;">
                 <i class="fas fa-user-shield" style="color: #d4a017;"></i>
                 <span style="font-weight: 600; color: #1a472a;">${currentUser.name}</span>
@@ -5373,7 +5550,7 @@ function renderAdminApp(container) {
     addHomeButton();
     initTheme();
 }
-        function changeAdminPage(page) {
+       function changeAdminPage(page) {
     document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
     document.querySelector(`.sidebar-menu li[data-page="${page}"]`).classList.add('active');
     if (page === 'dashboard') renderAdminDashboard();
@@ -5382,6 +5559,7 @@ function renderAdminApp(container) {
     else if (page === 'leaders') showLeadersPage();
     else if (page === 'community') renderAdminCommunity();
     else if (page === 'tasks') renderAdminTasks();
+    else if (page === 'settings') renderAdminSettings();  // <-- أضف هذا السطر
     closeSidebar();
 }
 
@@ -7969,6 +8147,7 @@ window.showLeadersPage = showLeadersPage;
 window.renderLeadersList = renderLeadersList;
 window.deleteLeader = deleteLeader;
 window.changeLeaderPage = changeLeaderPage;
+window.renderAdminSettings = renderAdminSettings;
 window.renderLeaderDashboard = renderLeaderDashboard;
 window.renderLeaderMembers = renderLeaderMembers;
 window.renderLeaderJoinRequests = renderLeaderJoinRequests;
