@@ -7,11 +7,21 @@
     <link rel="icon" href="https://i.ibb.co/8qSNmgQ/Favicon.png" type="image/png" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <!-- QRCodeStyling CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-styling/1.5.1/qr-code-styling.js">
     </script>
+    <!-- html5-qrcode -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js">
     </script>
+    <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    </script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js">
     </script>
     <style>
         * {
@@ -474,16 +484,117 @@
         .mb-8 {
             margin-bottom: 8px;
         }
-        /* required field indicator */
         .required::after {
             content: " *";
             color: #ff6b6b;
             font-weight: 700;
         }
-        .optional {
+        .optional-badge {
             color: var(--text-secondary);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 400;
+            margin-left: 6px;
+            background: var(--bg-secondary);
+            padding: 0 8px;
+            border-radius: 20px;
+            border: 1px solid var(--border-subtle);
+        }
+        .field-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        /* Phone input with country code */
+        .phone-input-wrapper {
+            display: flex;
+            gap: 0;
+            align-items: stretch;
+        }
+        .phone-input-wrapper .country-code-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-right: none;
+            border-radius: 12px 0 0 12px;
+            padding: 10px 12px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            min-width: 90px;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+        .phone-input-wrapper .country-code-btn:hover {
+            border-color: var(--purple);
+            background: rgba(155, 123, 242, 0.1);
+        }
+        .phone-input-wrapper .country-code-btn .flag {
+            font-size: 1.2rem;
+        }
+        .phone-input-wrapper .country-code-btn .arrow {
+            font-size: 0.7rem;
+            margin-left: 4px;
+            color: var(--text-secondary);
+        }
+        .phone-input-wrapper .form-control {
+            border-radius: 0 12px 12px 0;
+            border-left: none;
+        }
+        .phone-input-wrapper .form-control:focus {
+            border-left: none;
+        }
+        /* Country dropdown modal */
+        .country-search-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            color: white;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+        .country-search-input:focus {
+            border-color: var(--purple);
+            outline: none;
+        }
+        .country-list {
+            max-height: 300px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+        }
+        @media (max-width: 500px) {
+            .country-list {
+                grid-template-columns: 1fr;
+            }
+        }
+        .country-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.15s;
+            font-size: 0.85rem;
+        }
+        .country-item:hover {
+            background: rgba(155, 123, 242, 0.15);
+        }
+        .country-item .flag {
+            font-size: 1.2rem;
+        }
+        .country-item .code {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .country-item .name {
+            color: var(--text-primary);
         }
     </style>
 </head>
@@ -562,15 +673,11 @@
                     </div>
                 </div>
                 <div class="panel" style="max-height:600px;" id="formPanel">
-                    <h3>QR Data</h3>
+                    <h3>QR Data <span class="optional-badge">Required fields marked *</span></h3>
                     <div id="dynamicForm"></div>
                     <div class="form-group" style="margin-top:12px;">
                         <label><input type="checkbox" id="dynamicToggle" checked> Dynamic QR (editable)</label>
-                        <span class="optional"> — change destination anytime</span>
-                    </div>
-                    <div class="form-group">
-                        <label class="required">QR Name</label>
-                        <input class="form-control" id="qrNameInput" placeholder="Enter QR name" value="">
+                        <span class="optional-badge">change destination anytime</span>
                     </div>
                     <button class="btn-primary" id="generateBtn" style="width:100%;">Generate & Preview</button>
                 </div>
@@ -651,6 +758,18 @@
         </footer>
     </div>
 
+    <!-- Country Picker Modal -->
+    <div class="modal-overlay" id="countryModal">
+        <div class="modal-box" style="max-width:480px;">
+            <h2>Select Country <span style="font-size:0.8rem;font-weight:400;color:var(--text-secondary);">— search by name</span></h2>
+            <input class="country-search-input" id="countrySearch" placeholder="Search country..." />
+            <div class="country-list" id="countryList"></div>
+            <div class="modal-actions">
+                <button class="btn-outline" id="countryModalClose">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box" id="modalBox">
@@ -691,13 +810,109 @@
         } catch (e) { console.warn('Firebase not loaded'); }
 
         // ------------------------------------------------------------------
+        // COUNTRY DATA (with flags, codes, dial codes)
+        // ------------------------------------------------------------------
+        const countries = [
+            { name: "Egypt", flag: "🇪🇬", dial: "+20", code: "EG" },
+            { name: "United States", flag: "🇺🇸", dial: "+1", code: "US" },
+            { name: "United Kingdom", flag: "🇬🇧", dial: "+44", code: "GB" },
+            { name: "Saudi Arabia", flag: "🇸🇦", dial: "+966", code: "SA" },
+            { name: "United Arab Emirates", flag: "🇦🇪", dial: "+971", code: "AE" },
+            { name: "Kuwait", flag: "🇰🇼", dial: "+965", code: "KW" },
+            { name: "Qatar", flag: "🇶🇦", dial: "+974", code: "QA" },
+            { name: "Bahrain", flag: "🇧🇭", dial: "+973", code: "BH" },
+            { name: "Oman", flag: "🇴🇲", dial: "+968", code: "OM" },
+            { name: "Jordan", flag: "🇯🇴", dial: "+962", code: "JO" },
+            { name: "Lebanon", flag: "🇱🇧", dial: "+961", code: "LB" },
+            { name: "Palestine", flag: "🇵🇸", dial: "+970", code: "PS" },
+            { name: "Turkey", flag: "🇹🇷", dial: "+90", code: "TR" },
+            { name: "France", flag: "🇫🇷", dial: "+33", code: "FR" },
+            { name: "Germany", flag: "🇩🇪", dial: "+49", code: "DE" },
+            { name: "Canada", flag: "🇨🇦", dial: "+1", code: "CA" },
+            { name: "Australia", flag: "🇦🇺", dial: "+61", code: "AU" },
+            { name: "India", flag: "🇮🇳", dial: "+91", code: "IN" },
+            { name: "Pakistan", flag: "🇵🇰", dial: "+92", code: "PK" },
+            { name: "Nigeria", flag: "🇳🇬", dial: "+234", code: "NG" },
+            { name: "South Africa", flag: "🇿🇦", dial: "+27", code: "ZA" },
+            { name: "Kenya", flag: "🇰🇪", dial: "+254", code: "KE" },
+            { name: "Ghana", flag: "🇬🇭", dial: "+233", code: "GH" },
+            { name: "Morocco", flag: "🇲🇦", dial: "+212", code: "MA" },
+            { name: "Algeria", flag: "🇩🇿", dial: "+213", code: "DZ" },
+            { name: "Tunisia", flag: "🇹🇳", dial: "+216", code: "TN" },
+            { name: "Libya", flag: "🇱🇾", dial: "+218", code: "LY" },
+            { name: "Sudan", flag: "🇸🇩", dial: "+249", code: "SD" },
+            { name: "Iraq", flag: "🇮🇶", dial: "+964", code: "IQ" },
+            { name: "Syria", flag: "🇸🇾", dial: "+963", code: "SY" },
+            { name: "Yemen", flag: "🇾🇪", dial: "+967", code: "YE" },
+            { name: "China", flag: "🇨🇳", dial: "+86", code: "CN" },
+            { name: "Japan", flag: "🇯🇵", dial: "+81", code: "JP" },
+            { name: "South Korea", flag: "🇰🇷", dial: "+82", code: "KR" },
+            { name: "Russia", flag: "🇷🇺", dial: "+7", code: "RU" },
+            { name: "Brazil", flag: "🇧🇷", dial: "+55", code: "BR" },
+            { name: "Mexico", flag: "🇲🇽", dial: "+52", code: "MX" },
+            { name: "Spain", flag: "🇪🇸", dial: "+34", code: "ES" },
+            { name: "Italy", flag: "🇮🇹", dial: "+39", code: "IT" },
+            { name: "Netherlands", flag: "🇳🇱", dial: "+31", code: "NL" },
+            { name: "Sweden", flag: "🇸🇪", dial: "+46", code: "SE" },
+            { name: "Norway", flag: "🇳🇴", dial: "+47", code: "NO" },
+            { name: "Denmark", flag: "🇩🇰", dial: "+45", code: "DK" },
+            { name: "Finland", flag: "🇫🇮", dial: "+358", code: "FI" },
+            { name: "Portugal", flag: "🇵🇹", dial: "+351", code: "PT" },
+            { name: "Greece", flag: "🇬🇷", dial: "+30", code: "GR" },
+            { name: "Poland", flag: "🇵🇱", dial: "+48", code: "PL" },
+            { name: "Romania", flag: "🇷🇴", dial: "+40", code: "RO" },
+            { name: "Ukraine", flag: "🇺🇦", dial: "+380", code: "UA" },
+            { name: "Israel", flag: "🇮🇱", dial: "+972", code: "IL" },
+            { name: "Iran", flag: "🇮🇷", dial: "+98", code: "IR" },
+            { name: "Afghanistan", flag: "🇦🇫", dial: "+93", code: "AF" },
+            { name: "Thailand", flag: "🇹🇭", dial: "+66", code: "TH" },
+            { name: "Vietnam", flag: "🇻🇳", dial: "+84", code: "VN" },
+            { name: "Malaysia", flag: "🇲🇾", dial: "+60", code: "MY" },
+            { name: "Singapore", flag: "🇸🇬", dial: "+65", code: "SG" },
+            { name: "Indonesia", flag: "🇮🇩", dial: "+62", code: "ID" },
+            { name: "Philippines", flag: "🇵🇭", dial: "+63", code: "PH" },
+            { name: "New Zealand", flag: "🇳🇿", dial: "+64", code: "NZ" },
+            { name: "Argentina", flag: "🇦🇷", dial: "+54", code: "AR" },
+            { name: "Chile", flag: "🇨🇱", dial: "+56", code: "CL" },
+            { name: "Colombia", flag: "🇨🇴", dial: "+57", code: "CO" },
+            { name: "Peru", flag: "🇵🇪", dial: "+51", code: "PE" },
+            { name: "Venezuela", flag: "🇻🇪", dial: "+58", code: "VE" },
+        ];
+
+        // Sort countries by name
+        countries.sort((a, b) => a.name.localeCompare(b.name));
+
+        // Detect country by IP (using free API)
+        let detectedCountry = null;
+
+        async function detectCountryByIP() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                if (data && data.country_code) {
+                    const found = countries.find(c => c.code === data.country_code);
+                    if (found) {
+                        detectedCountry = found;
+                        return found;
+                    }
+                }
+            } catch (e) {
+                console.log('IP detection failed, using default');
+            }
+            // Default to Egypt if detection fails
+            const defaultCountry = countries.find(c => c.code === 'EG') || countries[0];
+            detectedCountry = defaultCountry;
+            return defaultCountry;
+        }
+
+        // ------------------------------------------------------------------
         // STATE
         // ------------------------------------------------------------------
         let currentType = 'url';
         let qrInstance = null;
         let currentQRData = '';
         let currentQRId = null;
-        let previewContainer = null;
+        let selectedCountry = null;
 
         const $ = id => document.getElementById(id);
         const heroQR = $('heroQR');
@@ -711,6 +926,10 @@
         const modalBody = $('modalBody');
         const modalClose = $('modalClose');
         const modalConfirm = $('modalConfirm');
+        const countryModal = $('countryModal');
+        const countryList = $('countryList');
+        const countrySearch = $('countrySearch');
+        const countryModalClose = $('countryModalClose');
 
         // ------------------------------------------------------------------
         // UTILITY
@@ -738,18 +957,78 @@
 
         function genId() { return Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6); }
 
+        // Country picker
+        function openCountryPicker() {
+            countryModal.classList.add('open');
+            renderCountryList(countries);
+            countrySearch.value = '';
+            countrySearch.focus();
+        }
+
+        function closeCountryPicker() {
+            countryModal.classList.remove('open');
+        }
+
+        function renderCountryList(filtered) {
+            countryList.innerHTML = '';
+            filtered.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'country-item';
+                div.innerHTML = `<span class="flag">${c.flag}</span><span class="name">${c.name}</span><span class="code">${c.dial}</span>`;
+                div.onclick = () => {
+                    selectCountry(c);
+                    closeCountryPicker();
+                };
+                countryList.appendChild(div);
+            });
+        }
+
+        countrySearch.oninput = function() {
+            const query = this.value.toLowerCase();
+            const filtered = countries.filter(c =>
+                c.name.toLowerCase().includes(query) ||
+                c.dial.includes(query) ||
+                c.code.toLowerCase().includes(query)
+            );
+            renderCountryList(filtered);
+        };
+
+        countryModalClose.onclick = closeCountryPicker;
+        window.onclick = e => { if (e.target === countryModal) closeCountryPicker(); };
+
+        function selectCountry(country) {
+            selectedCountry = country;
+            const btn = document.querySelector('.country-code-btn');
+            if (btn) {
+                btn.innerHTML = `<span class="flag">${country.flag}</span> ${country.dial} <span class="arrow">▼</span>`;
+                btn.dataset.dial = country.dial;
+                // Update phone number in the form if exists
+                const phoneInput = document.getElementById('smsPhone') || document.getElementById('phoneNum');
+                if (phoneInput) {
+                    // Remove any existing dial code from the input
+                    let val = phoneInput.value;
+                    // Remove any +XXX pattern at start
+                    val = val.replace(/^\+[\d]+\s*/, '');
+                    phoneInput.value = val;
+                }
+                refreshQR();
+            }
+        }
+
         // ------------------------------------------------------------------
-        // QR TYPE FORM BUILDER (all fields empty, required/optional labels)
+        // QR TYPE FORM BUILDER (with country picker for phone/sms)
         // ------------------------------------------------------------------
         function buildForm(type) {
             let html = '';
-            // Common QR Name (required)
             const common = `<div class="form-group"><label class="required">QR Name</label><input class="form-control" id="qrName" placeholder="Enter name" value=""></div>`;
+
+            // Get selected dial code
+            const dial = selectedCountry ? selectedCountry.dial : '+20';
 
             switch (type) {
                 case 'url':
                     html =
-                        `<div class="form-group"><label class="required">Destination URL</label><input class="form-control" id="destUrl" placeholder="https://example.com" value="https://tisgrip.vercel.app/"></div>${common}`;
+                        `<div class="form-group"><label class="required">Destination URL</label><input class="form-control" id="destUrl" placeholder="https://example.com" value=""></div>${common}`;
                     break;
                 case 'text':
                     html =
@@ -765,15 +1044,42 @@
                     break;
                 case 'phone':
                     html =
-                        `<div class="form-group"><label class="required">Phone</label><input class="form-control" id="phoneNum" placeholder="+1234567890" value=""></div>${common}`;
+                        `<div class="form-group"><label class="required">Phone Number</label>
+                            <div class="phone-input-wrapper">
+                                <button class="country-code-btn" id="phoneCountryBtn" onclick="openCountryPicker()">
+                                    <span class="flag">${selectedCountry ? selectedCountry.flag : '🇪🇬'}</span> ${selectedCountry ? selectedCountry.dial : '+20'} <span class="arrow">▼</span>
+                                </button>
+                                <input class="form-control" id="phoneNum" placeholder="123456789" value="">
+                            </div>
+                            <div class="field-hint">Enter number without the country code</div>
+                        </div>${common}`;
                     break;
                 case 'sms':
                     html =
-                        `<div class="form-group"><label class="required">Phone</label><input class="form-control" id="smsPhone" placeholder="+1234567890" value=""></div><div class="form-group"><label>Message</label><input class="form-control" id="smsMsg" placeholder="Message" value=""></div>${common}`;
+                        `<div class="form-group"><label class="required">Phone Number</label>
+                            <div class="phone-input-wrapper">
+                                <button class="country-code-btn" id="smsCountryBtn" onclick="openCountryPicker()">
+                                    <span class="flag">${selectedCountry ? selectedCountry.flag : '🇪🇬'}</span> ${selectedCountry ? selectedCountry.dial : '+20'} <span class="arrow">▼</span>
+                                </button>
+                                <input class="form-control" id="smsPhone" placeholder="123456789" value="">
+                            </div>
+                            <div class="field-hint">Enter number without the country code</div>
+                        </div>
+                        <div class="form-group"><label>Message</label><input class="form-control" id="smsMsg" placeholder="Message" value=""></div>${common}`;
                     break;
                 case 'vcard':
                     html =
-                        `<div class="row"><div class="form-group"><label class="required">First</label><input class="form-control" id="vcFname" placeholder="First name" value=""></div><div class="form-group"><label class="required">Last</label><input class="form-control" id="vcLname" placeholder="Last name" value=""></div></div><div class="form-group"><label>Phone</label><input class="form-control" id="vcPhone" placeholder="Phone" value=""></div><div class="form-group"><label>Email</label><input class="form-control" id="vcEmail" placeholder="Email" value=""></div><div class="form-group"><label>Company</label><input class="form-control" id="vcCompany" placeholder="Company" value=""></div>${common}`;
+                        `<div class="row"><div class="form-group"><label class="required">First</label><input class="form-control" id="vcFname" placeholder="First name" value=""></div><div class="form-group"><label class="required">Last</label><input class="form-control" id="vcLname" placeholder="Last name" value=""></div></div>
+                            <div class="form-group"><label>Phone</label>
+                                <div class="phone-input-wrapper">
+                                    <button class="country-code-btn" id="vcCountryBtn" onclick="openCountryPicker()">
+                                        <span class="flag">${selectedCountry ? selectedCountry.flag : '🇪🇬'}</span> ${selectedCountry ? selectedCountry.dial : '+20'} <span class="arrow">▼</span>
+                                    </button>
+                                    <input class="form-control" id="vcPhone" placeholder="123456789" value="">
+                                </div>
+                            </div>
+                            <div class="form-group"><label>Email</label><input class="form-control" id="vcEmail" placeholder="Email" value=""></div>
+                            <div class="form-group"><label>Company</label><input class="form-control" id="vcCompany" placeholder="Company" value=""></div>${common}`;
                     break;
                 case 'location':
                     html =
@@ -788,9 +1094,22 @@
                 case 'whatsapp':
                     const label = type === 'instagram' ? 'Instagram URL' : type === 'youtube' ? 'YouTube URL' :
                         'WhatsApp Number';
-                    const placeholder = type === 'whatsapp' ? '+1234567890' : 'https://...';
-                    html =
-                        `<div class="form-group"><label class="required">${label}</label><input class="form-control" id="socialUrl" placeholder="${placeholder}" value=""></div>${common}`;
+                    const placeholder = type === 'whatsapp' ? '123456789' : 'https://...';
+                    if (type === 'whatsapp') {
+                        html =
+                            `<div class="form-group"><label class="required">WhatsApp Number</label>
+                                <div class="phone-input-wrapper">
+                                    <button class="country-code-btn" id="waCountryBtn" onclick="openCountryPicker()">
+                                        <span class="flag">${selectedCountry ? selectedCountry.flag : '🇪🇬'}</span> ${selectedCountry ? selectedCountry.dial : '+20'} <span class="arrow">▼</span>
+                                    </button>
+                                    <input class="form-control" id="socialUrl" placeholder="123456789" value="">
+                                </div>
+                                <div class="field-hint">Enter number without the country code</div>
+                            </div>${common}`;
+                    } else {
+                        html =
+                            `<div class="form-group"><label class="required">${label}</label><input class="form-control" id="socialUrl" placeholder="${placeholder}" value=""></div>${common}`;
+                    }
                     break;
                 default:
                     html =
@@ -800,13 +1119,24 @@
         }
 
         // ------------------------------------------------------------------
-        // GENERATE QR DATA STRING
+        // GENERATE QR DATA STRING (with country code handling)
         // ------------------------------------------------------------------
         function getQRDataString(type) {
             const v = id => document.getElementById(id)?.value || '';
+            const dial = selectedCountry ? selectedCountry.dial : '+20';
+
+            // Helper to clean phone number: remove leading zeros after dial code
+            function cleanPhoneNumber(num) {
+                // Remove any leading + and digits (dial code) if present
+                let cleaned = num.replace(/^\+[\d]+\s*/, '');
+                // Remove leading zeros (they are not needed after dial code)
+                cleaned = cleaned.replace(/^0+/, '');
+                return cleaned;
+            }
+
             switch (type) {
                 case 'url':
-                    return v('destUrl') || 'https://tisgrip.vercel.app/';
+                    return v('destUrl') || 'https://example.com';
                 case 'text':
                     return v('textContent') || 'TISGRIP';
                 case 'wifi': {
@@ -821,17 +1151,25 @@
                         body = v('emailMsg');
                     return `mailto:${to}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
                 }
-                case 'phone':
-                    return `tel:${v('phoneNum')}`;
-                case 'sms':
-                    return `sms:${v('smsPhone')}?body=${encodeURIComponent(v('smsMsg'))}`;
+                case 'phone': {
+                    const num = v('phoneNum');
+                    const cleaned = cleanPhoneNumber(num);
+                    return `tel:${dial}${cleaned}`;
+                }
+                case 'sms': {
+                    const num = v('smsPhone');
+                    const cleaned = cleanPhoneNumber(num);
+                    const msg = v('smsMsg');
+                    return `sms:${dial}${cleaned}?body=${encodeURIComponent(msg)}`;
+                }
                 case 'vcard': {
                     const fn = v('vcFname'),
                         ln = v('vcLname'),
                         ph = v('vcPhone'),
                         em = v('vcEmail'),
                         comp = v('vcCompany');
-                    return `BEGIN:VCARD\nVERSION:3.0\nFN:${fn} ${ln}\nN:${ln};${fn};;;\nTEL:${ph}\nEMAIL:${em}\nORG:${comp}\nEND:VCARD`;
+                    const cleaned = cleanPhoneNumber(ph);
+                    return `BEGIN:VCARD\nVERSION:3.0\nFN:${fn} ${ln}\nN:${ln};${fn};;;\nTEL:${dial}${cleaned}\nEMAIL:${em}\nORG:${comp}\nEND:VCARD`;
                 }
                 case 'location': {
                     const lat = v('locLat') || '40.7128',
@@ -849,19 +1187,21 @@
                     return `https://instagram.com/${v('socialUrl') || 'tisgrip'}`;
                 case 'youtube':
                     return v('socialUrl') || 'https://youtube.com/@tisgrip';
-                case 'whatsapp':
-                    return `https://wa.me/${v('socialUrl') || '1234567890'}`;
+                case 'whatsapp': {
+                    const num = v('socialUrl');
+                    const cleaned = cleanPhoneNumber(num);
+                    return `https://wa.me/${dial}${cleaned}`;
+                }
                 default:
                     return v('genericData') || 'TISGRIP';
             }
         }
 
         // ------------------------------------------------------------------
-        // QR GENERATION (using qr-code-styling) — FIXED LIVE PREVIEW
+        // QR GENERATION
         // ------------------------------------------------------------------
         function generateQR(data, container, options = {}) {
             if (!container) return;
-            // Clear container before appending new QR
             container.innerHTML = '';
 
             const dot = document.querySelector('#dotStyle .active')?.dataset.dot || 'square';
@@ -885,19 +1225,16 @@
                 ...options
             };
 
-            // Create new instance each time to avoid container issues
             const instance = new QRCodeStyling(opts);
             instance.append(container);
             qrInstance = instance;
             currentQRData = data;
-
-            // Store reference for downloads
             window._qrInstance = instance;
             return instance;
         }
 
         // ------------------------------------------------------------------
-        // REFRESH QR PREVIEW (LIVE) — called on every change
+        // REFRESH QR PREVIEW (LIVE)
         // ------------------------------------------------------------------
         function refreshQR() {
             const type = currentType;
@@ -913,15 +1250,12 @@
                 currentQRId = null;
             }
 
-            // Update preview
             generateQR(finalData, qrPreview);
 
-            // Update hero if visible
             if (document.getElementById('page-home').classList.contains('active')) {
                 generateQR(finalData, heroQR);
             }
 
-            // Show success in console
             console.log('✅ QR Preview updated:', finalData);
         }
 
@@ -967,14 +1301,14 @@
                 snap.forEach(doc => {
                     const d = doc.data();
                     html += `<div class="qr-card">
-                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><rect width='200' height='200' fill='white'/><text x='20' y='120' font-size='14'>${d.name || 'QR'}</text></svg>">
-                        <h4>${d.name || 'Unnamed'}</h4>
-                        <div class="meta"><span>${d.type}</span><span>👁️ ${d.scanCount || 0}</span></div>
-                        <div class="actions">
-                            <button onclick="editQR('${doc.id}')">✏️ Edit</button>
-                            <button onclick="deleteQR('${doc.id}')">🗑️</button>
-                        </div>
-                    </div>`;
+                            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><rect width='200' height='200' fill='white'/><text x='20' y='120' font-size='14'>${d.name || 'QR'}</text></svg>">
+                            <h4>${d.name || 'Unnamed'}</h4>
+                            <div class="meta"><span>${d.type}</span><span>👁️ ${d.scanCount || 0}</span></div>
+                            <div class="actions">
+                                <button onclick="editQR('${doc.id}')">✏️ Edit</button>
+                                <button onclick="deleteQR('${doc.id}')">🗑️</button>
+                            </div>
+                        </div>`;
                 });
                 dashboardGrid.innerHTML = html;
             }).catch(e => dashboardGrid.innerHTML = '<div class="empty-state">Error loading</div>');
@@ -986,9 +1320,9 @@
                 if (!doc.exists) return;
                 const d = doc.data();
                 openModal('Edit Destination', `
-                    <div class="form-group"><label class="required">New Destination URL</label>
-                    <input class="form-control" id="editDest" placeholder="New URL" value="${d.destinationUrl || ''}"></div>
-                `, () => {
+                        <div class="form-group"><label class="required">New Destination URL</label>
+                        <input class="form-control" id="editDest" placeholder="New URL" value="${d.destinationUrl || ''}"></div>
+                    `, () => {
                     const newDest = document.getElementById('editDest').value;
                     if (newDest) {
                         db.collection('qrCodes').doc(id).update({
@@ -1040,8 +1374,8 @@
             scannerInstance.start({ facingMode: "environment" }, { fps: 15, qrbox: 280 },
                 (decoded) => {
                     document.getElementById('scanResult').innerHTML = `<div><strong>Scanned:</strong> ${decoded}</div>
-                        <button class="btn-primary" onclick="window.open('${decoded}','_blank')">Open</button>
-                        <button class="btn-outline" onclick="navigator.clipboard.writeText('${decoded}'); showToast('Copied')">Copy</button>`;
+                            <button class="btn-primary" onclick="window.open('${decoded}','_blank')">Open</button>
+                            <button class="btn-outline" onclick="navigator.clipboard.writeText('${decoded}'); showToast('Copied')">Copy</button>`;
                     stopScanner();
                 },
                 (err) => {}
@@ -1065,7 +1399,7 @@
                 if (target) target.classList.add('active');
                 document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
                 document.querySelectorAll('.nav-links a[data-page="' + page + '"]').forEach(a => a.classList.add(
-                'active'));
+                    'active'));
                 if (page === 'dashboard') loadDashboard();
                 if (page === 'home') refreshQR();
                 document.getElementById('navLinks').classList.remove('open');
@@ -1074,10 +1408,9 @@
         document.getElementById('hamburger').onclick = () => document.getElementById('navLinks').classList.toggle('open');
 
         // ------------------------------------------------------------------
-        // EVENT BINDING — LIVE PREVIEW ON EVERY CHANGE
+        // EVENT BINDING
         // ------------------------------------------------------------------
         function bindLiveEvents() {
-            // All inputs in dynamicForm
             document.querySelectorAll('#dynamicForm input, #dynamicForm textarea, #dynamicForm select').forEach(el => {
                 el.removeEventListener('input', refreshQR);
                 el.removeEventListener('change', refreshQR);
@@ -1086,22 +1419,23 @@
             });
         }
 
-        // Type buttons
         document.querySelectorAll('.qr-type-btn').forEach(btn => {
             btn.onclick = () => {
                 document.querySelectorAll('.qr-type-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 currentType = btn.dataset.type;
                 dynamicForm.innerHTML = buildForm(currentType);
+                // Re-bind country button if exists
+                const countryBtn = document.querySelector('.country-code-btn');
+                if (countryBtn) {
+                    countryBtn.onclick = openCountryPicker;
+                }
                 bindLiveEvents();
                 refreshQR();
             };
         });
 
-        // Generate button also triggers refresh (fallback)
         generateBtn.onclick = refreshQR;
-
-        // Save
         saveQRBtn.onclick = saveQRToFirebase;
 
         // Downloads
@@ -1140,51 +1474,76 @@
         document.getElementById('errCorrection').onchange = refreshQR;
         document.getElementById('dynamicToggle').onchange = refreshQR;
 
-        // Templates
-        document.querySelectorAll('[data-template] .btn-outline').forEach(btn => {
-            btn.onclick = function(e) {
-                e.stopPropagation();
-                const template = this.closest('[data-template]').dataset.template;
-                document.querySelector('[data-page="create"]')?.click();
-                const typeMap = { business: 'url', restaurant: 'url', social: 'instagram', event: 'event',
-                    payment: 'url', wifi: 'wifi' };
-                const qtype = typeMap[template] || 'url';
-                document.querySelectorAll('.qr-type-btn').forEach(b => { b.classList.toggle('active', b.dataset
-                        .type === qtype); });
-                currentType = qtype;
-                dynamicForm.innerHTML = buildForm(currentType);
-                bindLiveEvents();
-                refreshQR();
-                showToast('Template applied: ' + template);
-            };
-        });
-
         // ------------------------------------------------------------------
         // INIT
         // ------------------------------------------------------------------
-        dynamicForm.innerHTML = buildForm('url');
-        bindLiveEvents();
+        async function init() {
+            // Detect country by IP
+            const detected = await detectCountryByIP();
+            if (detected) {
+                selectedCountry = detected;
+                console.log('📍 Detected country:', detected.name, detected.dial);
+            } else {
+                // Fallback to Egypt
+                selectedCountry = countries.find(c => c.code === 'EG') || countries[0];
+            }
 
-        // Initial render with default data
-        setTimeout(() => {
-            refreshQR();
-            // Also set hero
-            generateQR('https://tisgrip.vercel.app/', heroQR);
-        }, 100);
+            // Build initial form
+            dynamicForm.innerHTML = buildForm('url');
+            bindLiveEvents();
 
-        updateAuthUI();
+            // Update country button if exists
+            const countryBtn = document.querySelector('.country-code-btn');
+            if (countryBtn) {
+                countryBtn.innerHTML =
+                    `<span class="flag">${selectedCountry.flag}</span> ${selectedCountry.dial} <span class="arrow">▼</span>`;
+                countryBtn.onclick = openCountryPicker;
+            }
 
-        if (auth) {
-            auth.onAuthStateChanged(user => {
-                currentUser = user;
-                updateAuthUI();
-                if (user) loadDashboard();
-            });
+            // Make openCountryPicker globally accessible
+            window.openCountryPicker = openCountryPicker;
+
+            setTimeout(() => {
+                refreshQR();
+                generateQR('https://tisgrip.vercel.app/', heroQR);
+            }, 100);
+
+            updateAuthUI();
+
+            if (auth) {
+                auth.onAuthStateChanged(user => {
+                    currentUser = user;
+                    updateAuthUI();
+                    if (user) loadDashboard();
+                });
+            }
+
+            console.log('🚀 TISGRIP ready — Country detection active, phone numbers with country codes');
+            console.log('📍 Selected country:', selectedCountry.name, selectedCountry.dial);
+            console.log('📌 Phone numbers: leading zeros are automatically removed after dial code');
         }
 
-        console.log('🚀 TISGRIP ready — LIVE preview active, all fields empty, required/optional marked');
-        console.log('📌 Required fields are marked with *');
-        console.log('📌 Any change updates QR instantly');
+        // Handle country selection from picker
+        window.selectCountry = function(country) {
+            selectedCountry = country;
+            // Update all country buttons in the form
+            document.querySelectorAll('.country-code-btn').forEach(btn => {
+                btn.innerHTML =
+                    `<span class="flag">${country.flag}</span> ${country.dial} <span class="arrow">▼</span>`;
+                btn.dataset.dial = country.dial;
+            });
+            // Clean phone inputs: remove any existing dial code
+            document.querySelectorAll('.phone-input-wrapper .form-control').forEach(input => {
+                let val = input.value;
+                val = val.replace(/^\+[\d]+\s*/, '');
+                input.value = val;
+            });
+            refreshQR();
+            showToast(`🌍 Country set to ${country.name} (${country.dial})`);
+            closeCountryPicker();
+        };
+
+        init();
     </script>
 </body>
 </html>
