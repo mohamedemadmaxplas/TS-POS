@@ -2406,7 +2406,7 @@ function renderLandingPage() {
                 flex-wrap: wrap;
                 gap: 6px;
             ">
-                <!-- ===== الأزرار في الناحية اليمنى (لأن الموقع RTL) ===== -->
+                <!-- ===== الأزرار في الناحية اليمنى ===== -->
                 <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap; order: 2;">
                     <button onclick="toggleTheme()" 
                             style="
@@ -2723,8 +2723,7 @@ function renderLandingPage() {
 
             <!-- ===== FOOTER ===== -->
             <footer style="
-                padding: 18px 15px 12px;
-                text-align: center;
+                padding: 15px 20px 12px;
                 position: relative;
                 z-index: 1;
                 background: ${isLightMode ? 'rgba(255,255,255,0.95)' : 'rgba(10,22,40,0.95)'};
@@ -2732,90 +2731,133 @@ function renderLandingPage() {
             ">
                 <div style="
                     display: flex;
-                    flex-direction: column;
+                    justify-content: space-between;
                     align-items: center;
-                    gap: 6px;
-                    margin-bottom: 10px;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                    max-width: 1200px;
+                    margin: 0 auto;
                 ">
+                    <!-- ===== الجهة اليمنى: الأكاديمية ===== -->
                     <div style="
                         display: flex;
-                        align-items: center;
-                        gap: 8px;
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 3px;
                     ">
                         <span style="
-                            font-size: 18px;
+                            font-size: 16px;
+                            font-weight: 700;
+                            color: #e8b931;
+                        ">
+                            The Best Academy
+                        </span>
+                        <span style="
+                            font-size: 12px;
+                            color: ${isLightMode ? '#666' : 'rgba(255,255,255,0.5)'};
+                        ">
+                             <i class="fas fa-chalkboard-teacher" style="color: #e8b931;"></i> 
+                            Ms: Amira Sobhy
+                        </span>
+                        <span style="
+                            font-size: 12px;
+                            color: ${isLightMode ? '#666' : 'rgba(255,255,255,0.5)'};
+                            direction: ltr;
+                        ">
+                            <i class="fas fa-phone" style="color: #2ecc71;"></i> 
+                            01026463211
+                        </span>
+                        <!-- ===== زر فيسبوك تحت الرقم ===== -->
+                        <a href="https://www.facebook.com/share/p/19KmTnMPSK/" 
+                           target="_blank"
+                           style="
+                               background: linear-gradient(135deg, #1877f2, #0d65d9);
+                               color: white;
+                               padding: 5px 14px;
+                               border-radius: 20px;
+                               text-decoration: none;
+                               font-family: 'Cairo', sans-serif;
+                               font-weight: 600;
+                               font-size: 11px;
+                               transition: all 0.3s ease;
+                               display: inline-flex;
+                               align-items: center;
+                               gap: 6px;
+                               margin-top: 4px;
+                               box-shadow: 0 3px 12px rgba(24, 119, 242, 0.25);
+                           "
+                           onmouseover="this.style.transform='translateY(-2px) scale(1.03)'; this.style.boxShadow='0 6px 20px rgba(24, 119, 242, 0.4)'"
+                           onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 3px 12px rgba(24, 119, 242, 0.25)'">
+                            <i class="fab fa-facebook-f" style="font-size: 12px;"></i> 
+                            فيسبوك
+                        </a>
+                    </div>
+
+                    <!-- ===== الجهة اليسرى: Tecno Shark ===== -->
+                    <div style="
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-end;
+                        gap: 4px;
+                    ">
+                        <span style="
+                            font-size: 15px;
                             font-weight: 700;
                             color: ${isLightMode ? '#1a1a2e' : '#fff'};
                         ">
                             <span style="color: #e8b931;">Tecno</span> 
                             <span style="color: ${isLightMode ? '#1a1a2e' : '#fff'};">Shark</span>
-                            <span style="color: #e8b931; font-size: 12px;">™</span>
+                            <span style="color: #e8b931; font-size: 10px;">™</span>
                         </span>
-                    </div>
-                    
-                    <div style="
-                        display: flex;
-                        align-items: center;
-                        gap: 12px;
-                        flex-wrap: wrap;
-                        justify-content: center;
-                    ">
-                        <span style="
-                            color: ${isLightMode ? '#666' : 'rgba(255,255,255,0.5)'};
-                            font-size: 12px;
-                            display: flex;
-                            align-items: center;
-                            gap: 5px;
-                        ">
-                            <i class="fas fa-phone" style="color: #e8b931;"></i> 
-                            01144100018
-                        </span>
-                        
                         <a href="https://tecno-shark.vercel.app" 
                            target="_blank"
                            style="
                                background: linear-gradient(135deg, #e8b931, #d4a017);
                                color: #0a1628;
-                               padding: 5px 16px;
-                               border-radius: 30px;
+                               padding: 4px 14px;
+                               border-radius: 20px;
                                text-decoration: none;
                                font-family: 'Cairo', sans-serif;
                                font-weight: 600;
-                               font-size: 12px;
+                               font-size: 11px;
                                transition: all 0.3s ease;
                                display: inline-flex;
                                align-items: center;
-                               gap: 6px;
+                               gap: 5px;
+                               box-shadow: 0 3px 12px rgba(232,185,49,0.2);
                            "
-                           onmouseover="this.style.transform='translateY(-2px) scale(1.03)'; this.style.boxShadow='0 5px 20px rgba(232,185,49,0.4)'"
-                           onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='none'">
-                            <i class="fas fa-globe"></i> 
+                           onmouseover="this.style.transform='translateY(-2px) scale(1.03)'; this.style.boxShadow='0 6px 20px rgba(232,185,49,0.35)'"
+                           onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 3px 12px rgba(232,185,49,0.2)'">
+                            <i class="fas fa-globe" style="font-size: 12px;"></i> 
                             موقع الشركة
                         </a>
+                        <span style="
+                            color: ${isLightMode ? '#bbb' : 'rgba(255,255,255,0.15)'};
+                            font-size: 9px;
+                        ">
+                            <i class="fas fa-code" style="color: #e8b931;"></i> 
+                            Developed by Tecno Shark
+                        </span>
                     </div>
                 </div>
-                
+
+                <!-- ===== خط فاصل سفلي ===== -->
                 <div style="
                     height: 1px;
-                    background: linear-gradient(90deg, transparent, rgba(232,185,49,0.2), transparent);
-                    margin: 8px 0 10px;
+                    background: linear-gradient(90deg, transparent, rgba(232,185,49,0.12), transparent);
+                    margin: 10px auto 8px;
+                    max-width: 90%;
                 "></div>
                 
+                <!-- ===== حقوق النشر ===== -->
                 <div style="
-                    color: ${isLightMode ? '#999' : 'rgba(255,255,255,0.3)'};
-                    font-size: 10px;
+                    text-align: center;
+                    color: ${isLightMode ? '#bbb' : 'rgba(255,255,255,0.12)'};
+                    font-size: 9px;
                 ">
-                    <p>© 2025 
+                    <p>© 2025 جميع الحقوق محفوظة | 
                         <span style="color: #e8b931; font-weight: 600;">The Best Academy</span> 
-                        | <span style="color: ${isLightMode ? '#666' : 'rgba(255,255,255,0.4)'};">Ms: Amira Sobhy</span>
-                    </p>
-                    <p style="
-                        margin-top: 2px;
-                        color: ${isLightMode ? '#bbb' : 'rgba(255,255,255,0.12)'};
-                        font-size: 9px;
-                    ">
-                        Developed by <span style="color: #e8b931;">Tecno Shark</span> 
-                        <i class="fas fa-heart" style="color: #e74c3c; font-size: 9px;"></i>
+                        | <span style="color: ${isLightMode ? '#999' : 'rgba(255,255,255,0.25)'};">Ms: Amira Sobhy</span>
                     </p>
                 </div>
             </footer>
