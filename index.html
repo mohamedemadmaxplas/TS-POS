@@ -2176,7 +2176,9 @@ let appData = {
     homeworkForms: [],     // الواجبات
     homeworkAnswers: [],   // إجابات الواجبات
     meetings: [],          // الاجتماعات
-    meetingAttendance: []  // حضور الاجتماعات
+    meetingAttendance: [],
+     exams: [],           // <-- أضف هذا
+    examAttendance: []   // حضور الاجتماعات
 };
 
         // ==================== TOAST NOTIFICATION ====================
@@ -2208,20 +2210,29 @@ let appData = {
             return div.innerHTML;
         }
 
-        // ==================== FIREBASE OPERATIONS ====================
-        async function saveAllDataToFirebase() {
-            try {
-                await database.ref('appData').set(appData);
-                console.log('✅ All data saved to Firebase');
-                return true;
-            } catch (error) {
-                console.error('❌ Error saving:', error);
-                showToast('خطأ في حفظ البيانات', 'error');
-                return false;
-            }
-        }
+       // ==================== FIREBASE OPERATIONS ====================
+async function saveAllDataToFirebase() {
+    try {
+        await database.ref('appData').set({
+            classes: appData.classes || [],
+            students: appData.students || [],
+            homeworkForms: appData.homeworkForms || [],
+            homeworkAnswers: appData.homeworkAnswers || [],
+            meetings: appData.meetings || [],
+            meetingAttendance: appData.meetingAttendance || [],
+            exams: appData.exams || [],
+            examAttendance: appData.examAttendance || []
+        });
+        console.log('✅ All data saved to Firebase');
+        return true;
+    } catch (error) {
+        console.error('❌ Error saving:', error);
+        showToast('خطأ في حفظ البيانات', 'error');
+        return false;
+    }
+}
 
-      async function loadAllDataFromFirebase() {
+async function loadAllDataFromFirebase() {
     try {
         const snapshot = await database.ref('appData').once('value');
         const data = snapshot.val();
@@ -2232,6 +2243,8 @@ let appData = {
             appData.homeworkAnswers = data.homeworkAnswers || [];
             appData.meetings = data.meetings || [];
             appData.meetingAttendance = data.meetingAttendance || [];
+            appData.exams = data.exams || [];
+            appData.examAttendance = data.examAttendance || [];
             console.log('✅ All data loaded from Firebase');
             return true;
         } else {
@@ -2246,14 +2259,16 @@ let appData = {
     }
 }
 
-      async function initializeDefaultData() {
+async function initializeDefaultData() {
     appData = {
         classes: [],
         students: [],
         homeworkForms: [],
         homeworkAnswers: [],
         meetings: [],
-        meetingAttendance: []
+        meetingAttendance: [],
+        exams: [],
+        examAttendance: []
     };
     await saveAllDataToFirebase();
 }
@@ -3886,6 +3901,9 @@ function filterHomeworkDetails(filter, homeworkId) {
                 <li data-page="classes"><a onclick="changeAdminPage('classes')" style="display:flex; align-items:center; gap:12px; padding:12px 20px; color:rgba(255,255,255,0.7); text-decoration:none; cursor:pointer;"><i class="fas fa-layer-group" style="color:#e8b931;"></i> إدارة الفصول</a></li>
                 <li data-page="meetings"><a onclick="changeAdminPage('meetings')"><i class="fas fa-calendar-alt"></i> الاجتماعات</a></li>
                 <li data-page="homework"><a onclick="changeAdminPage('homework')" style="display:flex; align-items:center; gap:12px; padding:12px 20px; color:rgba(255,255,255,0.7); text-decoration:none; cursor:pointer;"><i class="fas fa-file-alt" style="color:#e8b931;"></i> الواجبات</a></li>
+                <li data-page="exams"><a onclick="changeAdminPage('exams')" style="display:flex; align-items:center; gap:12px; padding:12px 20px; color:rgba(255,255,255,0.7); text-decoration:none; cursor:pointer;">
+    <i class="fas fa-pencil-alt" style="color:#e8b931;"></i> الاختبارات
+</a></li>
                 <li data-page="results"><a onclick="changeAdminPage('results')" style="display:flex; align-items:center; gap:12px; padding:12px 20px; color:rgba(255,255,255,0.7); text-decoration:none; cursor:pointer;"><i class="fas fa-chart-bar" style="color:#e8b931;"></i> النتائج</a></li>
                 <li style="margin-top:20px; border-top:1px solid rgba(232,185,49,0.1);">
                     <a onclick="logout()" style="display:flex; align-items:center; gap:12px; padding:12px 20px; color:#e74c3c; text-decoration:none; cursor:pointer;"><i class="fas fa-sign-out-alt" style="color:#e74c3c;"></i> تسجيل الخروج</a>
@@ -3959,6 +3977,578 @@ function filterHomeworkDetails(filter, homeworkId) {
     initTheme();
 }
 
+// ==================== ADMIN - EXAMS ====================
+function renderAdminExams() {
+    const container = document.getElementById('adminPageContent');
+    container.innerHTML = `
+        <div class="card" style="background:rgba(255,255,255,0.03); backdrop-filter:blur(10px); border-radius:20px; padding:20px; margin-bottom:25px; border:1px solid rgba(232,185,49,0.08);">
+            <h3 style="color:#e8b931; margin-bottom:18px; font-size:18px; font-weight:700; display:flex; align-items:center; gap:10px; border-bottom:2px solid rgba(232,185,49,0.1); padding-bottom:10px;">
+                <i class="fas fa-pencil-alt"></i> إدارة الاختبارات
+            </h3>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+                <button class="btn btn-primary" onclick="showAddExamModal()" style="background:#e8b931; color:#0a1628;">
+                    <i class="fas fa-plus"></i> إضافة اختبار
+                </button>
+                <select id="examClassFilter" onchange="renderAdminExamsList()" style="padding:10px; border-radius:30px; border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.05); color:white;">
+                    <option value="all">كل الفصول</option>
+                    ${appData.classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                </select>
+                <select id="examStatusFilter" onchange="renderAdminExamsList()" style="padding:10px; border-radius:30px; border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.05); color:white;">
+                    <option value="all">كل الاختبارات</option>
+                    <option value="active">🟢 نشط</option>
+                    <option value="stopped">🔴 متوقف</option>
+                </select>
+            </div>
+            <div id="adminExamsList"></div>
+        </div>
+    `;
+    renderAdminExamsList();
+}
+
+function renderAdminExamsList() {
+    const container = document.getElementById('adminExamsList');
+    if (!container) return;
+
+    const classFilter = document.getElementById('examClassFilter')?.value || 'all';
+    const statusFilter = document.getElementById('examStatusFilter')?.value || 'all';
+
+    let filtered = [...appData.exams];
+    if (classFilter !== 'all') {
+        filtered = filtered.filter(e => e.classId == classFilter);
+    }
+    if (statusFilter !== 'all') {
+        filtered = filtered.filter(e => e.status === statusFilter);
+    }
+
+    filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    if (filtered.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:rgba(255,255,255,0.3); padding:30px;">📝 لا توجد اختبارات</p>';
+        return;
+    }
+
+    let html = '';
+    filtered.forEach(exam => {
+        const cls = appData.classes.find(c => c.id === exam.classId);
+        const attendance = appData.examAttendance.filter(a => a.examId === exam.id);
+        const attendedCount = attendance.length;
+        const totalStudents = appData.students.filter(s => s.classId === exam.classId && s.status === 'active').length;
+
+        const isStopped = exam.status === 'stopped';
+        const statusColor = isStopped ? '#e74c3c' : '#2ecc71';
+        const statusText = isStopped ? '🔴 متوقف' : '🟢 نشط';
+
+        html += `
+            <div style="background:rgba(255,255,255,0.03); border-radius:15px; padding:15px; margin-bottom:15px; border-right:4px solid ${statusColor};">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+                    <div style="flex:1;">
+                        <strong style="color:#e8b931; font-size:16px;">
+                            <i class="fas fa-pencil-alt"></i> ${escapeHtml(exam.title)}
+                        </strong>
+                        ${exam.description ? `<br><small style="color:rgba(255,255,255,0.4);">${escapeHtml(exam.description)}</small>` : ''}
+                        <br>
+                        <small style="color:rgba(255,255,255,0.3);">
+                            📚 ${cls?.name || '-'} | 👨‍🎓 ${attendedCount}/${totalStudents} دخلوا
+                        </small>
+                        <br>
+                        <span style="display:inline-block; margin-top:5px; background:${statusColor}20; color:${statusColor}; padding:2px 12px; border-radius:20px; font-size:12px;">
+                            ${statusText}
+                        </span>
+                        ${exam.link ? `<br><small style="color:rgba(255,255,255,0.2);">🔗 ${escapeHtml(exam.link)}</small>` : ''}
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn btn-sm btn-info" onclick="showExamDetails(${exam.id})" style="background:#3498db; color:white; padding:6px 14px; border:none; border-radius:20px; cursor:pointer; font-family:'Cairo'; font-weight:600; transition:0.3s;">
+                            <i class="fas fa-eye"></i> تفاصيل
+                        </button>
+                        ${!isStopped ? `
+                            <button class="btn btn-sm btn-warning" onclick="stopExam(${exam.id})" style="background:#f39c12; color:#0a1628; padding:6px 14px; border:none; border-radius:20px; cursor:pointer; font-family:'Cairo'; font-weight:600; transition:0.3s;">
+                                <i class="fas fa-stop"></i> إيقاف
+                            </button>
+                        ` : `
+                            <button class="btn btn-sm btn-success" onclick="activateExam(${exam.id})" style="background:#2ecc71; color:#0a1628; padding:6px 14px; border:none; border-radius:20px; cursor:pointer; font-family:'Cairo'; font-weight:600; transition:0.3s;">
+                                <i class="fas fa-play"></i> تفعيل
+                            </button>
+                        `}
+                        <button class="btn btn-sm btn-danger" onclick="deleteExam(${exam.id})" style="background:#e74c3c; color:white; padding:6px 14px; border:none; border-radius:20px; cursor:pointer; font-family:'Cairo'; font-weight:600; transition:0.3s;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+// ==================== SHOW ADD EXAM MODAL ====================
+function showAddExamModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.background = 'rgba(0,0,0,0.8)';
+    modal.style.backdropFilter = 'blur(10px)';
+    modal.style.zIndex = '3000';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+
+    modal.innerHTML = `
+        <div style="background: #0a1628; border-radius: 30px; padding: 30px; max-width: 550px; width: 95%; border: 1px solid rgba(232,185,49,0.15); max-height: 90vh; overflow-y: auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom: 2px solid rgba(232,185,49,0.1); padding-bottom:15px;">
+                <h3 style="color:#e8b931; margin:0; font-size:22px;">
+                    <i class="fas fa-pencil-alt"></i> إضافة اختبار جديد
+                </h3>
+                <span onclick="this.closest('.modal').remove()" style="cursor:pointer; font-size:30px; color:rgba(255,255,255,0.3); transition:0.3s;">&times;</span>
+            </div>
+
+            <form id="addExamForm">
+                <div class="input-group" style="margin-bottom:15px;">
+                    <label style="color:rgba(255,255,255,0.7); display:block; margin-bottom:5px;">
+                        <i class="fas fa-tag"></i> اسم الاختبار
+                    </label>
+                    <input type="text" id="examTitle" placeholder="مثال: اختبار الفصل الأول" required style="width:100%; padding:12px; border-radius:12px; border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.05); color:white;">
+                </div>
+
+                <div class="input-group" style="margin-bottom:15px;">
+                    <label style="color:rgba(255,255,255,0.7); display:block; margin-bottom:5px;">
+                        <i class="fas fa-align-left"></i> وصف الاختبار
+                    </label>
+                    <textarea id="examDescription" rows="2" placeholder="أدخل وصف الاختبار..." style="width:100%; padding:12px; border-radius:12px; border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.05); color:white;"></textarea>
+                </div>
+
+                <div class="input-group" style="margin-bottom:15px;">
+                    <label style="color:rgba(255,255,255,0.7); display:block; margin-bottom:5px;">
+                        <i class="fas fa-users"></i> الفصل
+                    </label>
+                    <select id="examClass" required style="width:100%; padding:12px; border-radius:12px; border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.05); color:white;">
+                        <option value="">-- اختر الفصل --</option>
+                        ${appData.classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                    </select>
+                </div>
+
+                <div class="input-group" style="margin-bottom:15px;">
+                    <label style="color:rgba(255,255,255,0.7); display:block; margin-bottom:5px;">
+                        <i class="fas fa-link"></i> لينك الاختبار
+                    </label>
+                    <input type="url" id="examLink" placeholder="https://forms.google.com/..." required style="width:100%; padding:12px; border-radius:12px; border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.05); color:white;">
+                    <small style="color:rgba(255,255,255,0.3); display:block; margin-top:5px;">
+                        <i class="fas fa-info-circle"></i> الرابط اللي هيتنقل عليه الطالب
+                    </small>
+                </div>
+
+                <button type="submit" style="width:100%; padding:14px; background:linear-gradient(135deg, #e8b931, #d4a017); color:#0a1628; border:none; border-radius:30px; cursor:pointer; font-family:'Cairo'; font-weight:700; font-size:16px; transition:0.3s;">
+                    <i class="fas fa-save"></i> إضافة الاختبار
+                </button>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('addExamForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const classId = parseInt(document.getElementById('examClass').value);
+        const title = document.getElementById('examTitle').value.trim();
+        const description = document.getElementById('examDescription').value.trim();
+        const link = document.getElementById('examLink').value.trim();
+
+        if (!classId || !title || !link) {
+            showToast('الرجاء ملء جميع البيانات المطلوبة', 'error');
+            return;
+        }
+
+        const newExam = {
+            id: Date.now(),
+            classId: classId,
+            title: title,
+            description: description,
+            link: link,
+            status: 'active', // active / stopped
+            createdAt: new Date().toISOString()
+        };
+
+        appData.exams.push(newExam);
+        await saveAllDataToFirebase();
+
+        showToast('✅ تم إضافة الاختبار بنجاح');
+        modal.remove();
+        renderAdminExams();
+    });
+}
+
+// ==================== EXAM ACTIONS ====================
+async function stopExam(examId) {
+    if (!confirm('هل أنت متأكد من إيقاف هذا الاختبار؟ الطلاب لن يتمكنوا من الدخول')) return;
+    const exam = appData.exams.find(e => e.id === examId);
+    if (exam) {
+        exam.status = 'stopped';
+        await saveAllDataToFirebase();
+        showToast('⛔ تم إيقاف الاختبار');
+        renderAdminExams();
+    }
+}
+
+async function activateExam(examId) {
+    const exam = appData.exams.find(e => e.id === examId);
+    if (exam) {
+        exam.status = 'active';
+        await saveAllDataToFirebase();
+        showToast('✅ تم تفعيل الاختبار');
+        renderAdminExams();
+    }
+}
+
+async function deleteExam(examId) {
+    if (!confirm('هل أنت متأكد من حذف هذا الاختبار؟')) return;
+    appData.exams = appData.exams.filter(e => e.id !== examId);
+    appData.examAttendance = appData.examAttendance.filter(a => a.examId !== examId);
+    await saveAllDataToFirebase();
+    showToast('تم حذف الاختبار');
+    renderAdminExams();
+}
+
+// ==================== SHOW EXAM DETAILS (ADMIN) ====================
+function showExamDetails(examId) {
+    const exam = appData.exams.find(e => e.id === examId);
+    if (!exam) {
+        showToast('الاختبار غير موجود', 'error');
+        return;
+    }
+
+    const cls = appData.classes.find(c => c.id === exam.classId);
+    const attendance = appData.examAttendance.filter(a => a.examId === examId);
+    const classStudents = appData.students.filter(s => s.classId === exam.classId && s.status === 'active');
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.background = 'rgba(0,0,0,0.85)';
+    modal.style.backdropFilter = 'blur(10px)';
+    modal.style.zIndex = '3000';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+
+    modal.innerHTML = `
+        <div style="background: #0a1628; border-radius: 30px; padding: 30px; max-width: 800px; width: 95%; border: 1px solid rgba(232,185,49,0.15); max-height: 90vh; overflow-y: auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom: 2px solid rgba(232,185,49,0.1); padding-bottom:15px;">
+                <div>
+                    <h3 style="color:#e8b931; margin:0; font-size:20px;">
+                        <i class="fas fa-pencil-alt"></i> تفاصيل الاختبار: ${escapeHtml(exam.title)}
+                    </h3>
+                    <p style="color:rgba(255,255,255,0.3); margin:5px 0 0;">
+                        📚 ${cls?.name || '-'} | ${exam.description ? `📝 ${escapeHtml(exam.description)}` : ''}
+                    </p>
+                </div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button onclick="exportExamDetailsToPDF(${examId})" style="background:#e74c3c; color:white; padding:8px 18px; border:none; border-radius:30px; cursor:pointer; font-family:'Cairo'; font-weight:600; transition:0.3s; font-size:13px;">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                    <span onclick="this.closest('.modal').remove()" style="cursor:pointer; font-size:30px; color:rgba(255,255,255,0.3); transition:0.3s;">&times;</span>
+                </div>
+            </div>
+
+            <!-- إحصائيات -->
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:15px; margin-bottom:25px;">
+                <div style="background:rgba(255,255,255,0.03); border-radius:15px; padding:15px; text-align:center; border:1px solid rgba(232,185,49,0.05);">
+                    <div style="font-size:28px; font-weight:bold; color:#e8b931;">${classStudents.length}</div>
+                    <div style="color:rgba(255,255,255,0.3); font-size:12px;">👨‍🎓 إجمالي الطلاب</div>
+                </div>
+                <div style="background:rgba(46,204,113,0.05); border-radius:15px; padding:15px; text-align:center; border:1px solid rgba(46,204,113,0.15);">
+                    <div style="font-size:28px; font-weight:bold; color:#2ecc71;">${attendance.length}</div>
+                    <div style="color:rgba(255,255,255,0.3); font-size:12px;">✅ دخلوا الاختبار</div>
+                </div>
+                <div style="background:rgba(231,76,60,0.05); border-radius:15px; padding:15px; text-align:center; border:1px solid rgba(231,76,60,0.15);">
+                    <div style="font-size:28px; font-weight:bold; color:#e74c3c;">${classStudents.length - attendance.length}</div>
+                    <div style="color:rgba(255,255,255,0.3); font-size:12px;">❌ لم يدخلوا</div>
+                </div>
+                <div style="background:rgba(243,156,18,0.05); border-radius:15px; padding:15px; text-align:center; border:1px solid rgba(243,156,18,0.15);">
+                    <div style="font-size:28px; font-weight:bold; color:#f39c12;">${classStudents.length > 0 ? Math.round((attendance.length / classStudents.length) * 100) : 0}%</div>
+                    <div style="color:rgba(255,255,255,0.3); font-size:12px;">📊 نسبة الحضور</div>
+                </div>
+            </div>
+
+            <!-- جدول الطلاب -->
+            <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:14px;">
+                    <thead>
+                        <tr style="background:rgba(232,185,49,0.05);">
+                            <th style="padding:12px; text-align:right; border-bottom:2px solid rgba(232,185,49,0.1); color:rgba(255,255,255,0.7);">#</th>
+                            <th style="padding:12px; text-align:right; border-bottom:2px solid rgba(232,185,49,0.1); color:rgba(255,255,255,0.7);">اسم الطالب</th>
+                            <th style="padding:12px; text-align:center; border-bottom:2px solid rgba(232,185,49,0.1); color:rgba(255,255,255,0.7);">الحالة</th>
+                            <th style="padding:12px; text-align:center; border-bottom:2px solid rgba(232,185,49,0.1); color:rgba(255,255,255,0.7);">وقت الدخول</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${classStudents.map((student, idx) => {
+                            const att = attendance.find(a => a.studentId === student.id);
+                            const isAttended = !!att;
+                            return `
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                                    <td style="padding:12px; color:rgba(255,255,255,0.3);">${idx + 1}</td>
+                                    <td style="padding:12px; color:rgba(255,255,255,0.8);"><strong>${escapeHtml(student.name)}</strong></td>
+                                    <td style="padding:12px; text-align:center;">
+                                        <span style="color:${isAttended ? '#2ecc71' : '#e74c3c'};">
+                                            ${isAttended ? '✅ دخل' : '❌ لم يدخل'}
+                                        </span>
+                                    </td>
+                                    <td style="padding:12px; text-align:center; color:rgba(255,255,255,0.3); font-size:12px;">
+                                        ${isAttended ? new Date(att.enteredAt).toLocaleString('ar-EG') : '-'}
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="text-align:center; margin-top:20px;">
+                <button onclick="this.closest('.modal').remove()" style="background:#4a6a8a; color:white; padding:10px 30px; border:none; border-radius:30px; cursor:pointer; font-family:'Cairo'; font-weight:600;">
+                    <i class="fas fa-times"></i> إغلاق
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// ==================== EXPORT EXAM DETAILS TO PDF ====================
+function exportExamDetailsToPDF(examId) {
+    const exam = appData.exams.find(e => e.id === examId);
+    if (!exam) {
+        showToast('الاختبار غير موجود', 'error');
+        return;
+    }
+
+    const cls = appData.classes.find(c => c.id === exam.classId);
+    const attendance = appData.examAttendance.filter(a => a.examId === examId);
+    const classStudents = appData.students.filter(s => s.classId === exam.classId && s.status === 'active');
+
+    const printWindow = window.open('', '_blank', 'width=1200,height=800,toolbar=yes,scrollbars=yes,resizable=yes');
+    if (!printWindow) {
+        showToast('الرجاء السماح للنوافذ المنبثقة', 'error');
+        return;
+    }
+
+    let tableRows = '';
+    classStudents.forEach((student, idx) => {
+        const att = attendance.find(a => a.studentId === student.id);
+        const isAttended = !!att;
+        tableRows += `
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${idx + 1}</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(student.name)}</td>
+                <td style="padding: 10px; border: 1px solid #ddd; text-align: center; color: ${isAttended ? '#2ecc71' : '#e74c3c'};">${isAttended ? '✅ دخل' : '❌ لم يدخل'}</td>
+                <td style="padding: 10px; border: 1px solid #ddd; text-align: center; font-size: 12px; color: #666;">${isAttended ? new Date(att.enteredAt).toLocaleString('ar-EG') : '-'}</td>
+            </tr>
+        `;
+    });
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html dir="rtl" lang="ar">
+        <head>
+            <meta charset="UTF-8">
+            <title>تقرير الاختبار - ${escapeHtml(exam.title)}</title>
+            <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Cairo', sans-serif;
+                    background: #f5f5f5;
+                    padding: 30px;
+                    direction: rtl;
+                }
+                .report-container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    background: white;
+                    border-radius: 20px;
+                    padding: 30px;
+                    box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    padding-bottom: 20px;
+                    border-bottom: 3px solid #e8b931;
+                }
+                .header img {
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    margin-bottom: 10px;
+                }
+                .header h1 {
+                    color: #0a1628;
+                    font-size: 24px;
+                    margin-bottom: 5px;
+                }
+                .header h1 span { color: #e8b931; }
+                .header .subtitle {
+                    color: #666;
+                    font-size: 14px;
+                }
+                .info-bar {
+                    display: flex;
+                    justify-content: space-between;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                    margin-bottom: 25px;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                }
+                .info-bar .info-item { text-align: center; }
+                .info-bar .info-item .label { font-size: 12px; color: #999; }
+                .info-bar .info-item .value { font-size: 18px; font-weight: bold; color: #0a1628; }
+                .info-bar .info-item .value.gold { color: #e8b931; }
+                .info-bar .info-item .value.green { color: #2ecc71; }
+                .info-bar .info-item .value.red { color: #e74c3c; }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 14px;
+                    margin-top: 15px;
+                }
+                th {
+                    background: #0a1628;
+                    color: white;
+                    padding: 12px 10px;
+                    text-align: center;
+                    font-weight: 600;
+                }
+                td {
+                    padding: 10px;
+                    border-bottom: 1px solid #eee;
+                    text-align: center;
+                }
+                tr:hover { background: #f8f9fa; }
+                .footer {
+                    margin-top: 30px;
+                    text-align: center;
+                    padding-top: 20px;
+                    border-top: 1px solid #ddd;
+                    color: #999;
+                    font-size: 11px;
+                }
+                .buttons-bar {
+                    text-align: center;
+                    margin-bottom: 20px;
+                    padding: 15px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    display: flex;
+                    gap: 15px;
+                    justify-content: center;
+                }
+                .btn-print {
+                    padding: 10px 25px;
+                    border: none;
+                    border-radius: 30px;
+                    font-family: 'Cairo', sans-serif;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: 0.3s;
+                    background: #3498db;
+                    color: white;
+                }
+                .btn-print:hover { transform: translateY(-2px); opacity: 0.9; }
+                .btn-close {
+                    padding: 10px 25px;
+                    border: none;
+                    border-radius: 30px;
+                    font-family: 'Cairo', sans-serif;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: 0.3s;
+                    background: #95a5a6;
+                    color: white;
+                }
+                .btn-close:hover { transform: translateY(-2px); opacity: 0.9; }
+                @media print {
+                    .buttons-bar { display: none; }
+                    body { padding: 10px; background: white; }
+                    .report-container { box-shadow: none; padding: 15px; }
+                    .info-bar { background: #f8f9fa; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="report-container">
+                <div class="header">
+                    <img src="https://i.ibb.co/SX9y9f5m/Chat-GPT-Image-Aug-31-2026-09-29-15-AM.png" alt="The Best Academy">
+                    <h1>The Best <span>Academy</span></h1>
+                    <p class="subtitle">🏆 Ms: Amira Sobhy</p>
+                    <h2 style="color:#0a1628; margin-top:10px; font-size:20px;">
+                        📋 تقرير الاختبار: ${escapeHtml(exam.title)}
+                    </h2>
+                    <p style="color:#666; font-size:14px;">📚 الفصل: ${cls?.name || '-'}</p>
+                    ${exam.description ? `<p style="color:#999; font-size:12px;">📝 ${escapeHtml(exam.description)}</p>` : ''}
+                </div>
+
+                <div class="info-bar">
+                    <div class="info-item">
+                        <div class="label">👨‍🎓 إجمالي الطلاب</div>
+                        <div class="value">${classStudents.length}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">✅ دخلوا</div>
+                        <div class="value green">${attendance.length}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">❌ لم يدخلوا</div>
+                        <div class="value red">${classStudents.length - attendance.length}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">📊 نسبة الحضور</div>
+                        <div class="value gold">${classStudents.length > 0 ? Math.round((attendance.length / classStudents.length) * 100) : 0}%</div>
+                    </div>
+                </div>
+
+                <div class="buttons-bar">
+                    <button class="btn-print" onclick="window.print()">
+                        <i class="fas fa-print"></i> طباعة / حفظ PDF
+                    </button>
+                    <button class="btn-close" onclick="window.close()">
+                        <i class="fas fa-times"></i> إغلاق
+                    </button>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>اسم الطالب</th>
+                                <th>الحالة</th>
+                                <th>وقت الدخول</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows || '<tr><td colspan="4" style="text-align:center; color:#999; padding:20px;">لا توجد بيانات لعرضها</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="footer">
+                    <p>© 2025 The Best Academy | Ms: Amira Sobhy | جميع الحقوق محفوظة</p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
         function renderAdminRanking() {
             const container = document.getElementById('adminRankingList');
             if (!container) return;
@@ -3990,22 +4580,20 @@ function filterHomeworkDetails(filter, homeworkId) {
             container.innerHTML = html;
         }
 
-    function changeAdminPage(page) {
-    // تحديث القائمة النشطة
+   function changeAdminPage(page) {
     document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
     const activeLi = document.querySelector(`.sidebar-menu li[data-page="${page}"]`);
     if (activeLi) activeLi.classList.add('active');
     
-    // وقف تحديث العدادات قبل تغيير الصفحة
     stopAdminMeetingCountdown();
     
-    // تغيير المحتوى
     if (page === 'dashboard') renderAdminDashboard();
     else if (page === 'students') renderAdminStudents();
     else if (page === 'classes') renderAdminClasses();
     else if (page === 'homework') renderAdminHomework();
     else if (page === 'results') renderAdminResults();
     else if (page === 'meetings') renderAdminMeetings();
+    else if (page === 'exams') renderAdminExams();  // <-- أضف هذا
     
     closeSidebar();
 }
@@ -4037,6 +4625,92 @@ function filterHomeworkDetails(filter, homeworkId) {
             `;
             renderStudentsTable();
         }
+
+        // ==================== STUDENT - EXAMS ====================
+function renderStudentExams() {
+    const container = document.getElementById('studentPageContent');
+    if (!container) return;
+
+    const student = currentUser;
+    const classExams = appData.exams.filter(e => e.classId === student.classId);
+    classExams.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // جلب حضور الطالب في الاختبارات
+    const myAttendance = appData.examAttendance.filter(a => a.studentId === student.id);
+
+    container.innerHTML = `
+        <div class="card" style="background:rgba(255,255,255,0.03); backdrop-filter:blur(10px); border-radius:20px; padding:20px; margin-bottom:25px; border:1px solid rgba(232,185,49,0.08);">
+            <h3 style="color:#e8b931; margin-bottom:18px; font-size:18px; font-weight:700; display:flex; align-items:center; gap:10px; border-bottom:2px solid rgba(232,185,49,0.1); padding-bottom:10px;">
+                <i class="fas fa-pencil-alt"></i> الاختبارات
+            </h3>
+            <div id="studentExamsList">
+                ${classExams.length === 0 ? 
+                    '<p style="text-align:center; color:rgba(255,255,255,0.3); padding:30px;">📝 لا توجد اختبارات</p>' :
+                    classExams.map(exam => {
+                        const isAttended = myAttendance.some(a => a.examId === exam.id);
+                        const isStopped = exam.status === 'stopped';
+                        
+                        return `
+                            <div style="background:rgba(255,255,255,0.03); border-radius:15px; padding:15px; margin-bottom:15px; border-right:4px solid ${isStopped ? '#e74c3c' : isAttended ? '#2ecc71' : '#3498db'};">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+                                    <div style="flex:1;">
+                                        <strong style="color:#e8b931; font-size:16px;">
+                                            <i class="fas fa-pencil-alt"></i> ${escapeHtml(exam.title)}
+                                        </strong>
+                                        ${exam.description ? `<br><small style="color:rgba(255,255,255,0.4);">${escapeHtml(exam.description)}</small>` : ''}
+                                        <br>
+                                        <small style="color:rgba(255,255,255,0.3);">
+                                            ${isAttended ? '✅ تم الدخول' : isStopped ? '⛔ متوقف' : '📝 لم تدخل بعد'}
+                                        </small>
+                                        ${isAttended ? `<br><small style="color:rgba(255,255,255,0.2);">⏱️ ${new Date(myAttendance.find(a => a.examId === exam.id)?.enteredAt).toLocaleString('ar-EG')}</small>` : ''}
+                                    </div>
+                                    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                                        ${isStopped ? `
+                                            <span style="background:#e74c3c20; color:#e74c3c; padding:8px 20px; border-radius:30px; font-size:14px; font-weight:600;">
+                                                ⛔ متوقف
+                                            </span>
+                                        ` : isAttended ? `
+                                            <span style="background:#2ecc7120; color:#2ecc71; padding:8px 20px; border-radius:30px; font-size:14px; font-weight:600;">
+                                                ✅ تم الدخول
+                                            </span>
+                                        ` : `
+                                            <a href="${exam.link}" target="_blank" 
+                                               style="background:linear-gradient(135deg, #e8b931, #d4a017); color:#0a1628; padding:10px 25px; border:none; border-radius:30px; cursor:pointer; font-family:'Cairo'; font-weight:700; text-decoration:none; display:inline-block; transition:0.3s;"
+                                               onclick="markExamAttendance(${exam.id})">
+                                                <i class="fas fa-play"></i> بدء الاختبار
+                                            </a>
+                                        `}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')
+                }
+            </div>
+        </div>
+    `;
+}
+
+// ==================== MARK EXAM ATTENDANCE ====================
+async function markExamAttendance(examId) {
+    // التحقق من عدم تسجيل الدخول مسبقاً
+    const existing = appData.examAttendance.find(a => 
+        a.examId === examId && a.studentId === currentUser.id
+    );
+    if (existing) return;
+
+    const attendance = {
+        id: Date.now(),
+        examId: examId,
+        studentId: currentUser.id,
+        studentName: currentUser.name,
+        enteredAt: new Date().toISOString()
+    };
+
+    appData.examAttendance.push(attendance);
+    await saveAllDataToFirebase();
+    console.log('✅ تم تسجيل دخول الطالب للاختبار');
+}
 
         function renderStudentsTable() {
             const search = document.getElementById('studentSearch')?.value?.toLowerCase() || '';
@@ -5044,6 +5718,11 @@ function exportHomeworkDetailsToPDF(homeworkId, filter = 'all') {
                         <i class="fas fa-file-alt"></i> الواجبات
                     </a>
                 </li>
+                <li data-page="exams">
+    <a onclick="changeStudentPage('exams')">
+        <i class="fas fa-pencil-alt"></i> الاختبارات
+    </a>
+</li>
                 <li data-page="meetings">
                     <a onclick="changeStudentPage('meetings')">
                         <i class="fas fa-calendar-alt"></i> الاجتماعات
@@ -5383,19 +6062,17 @@ function renderStudentUpcomingMeetings() {
             `;
         }
 
-      function changeStudentPage(page) {
-    // تحديث القائمة النشطة
+     function changeStudentPage(page) {
     document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
     const activeLi = document.querySelector(`.sidebar-menu li[data-page="${page}"]`);
     if (activeLi) activeLi.classList.add('active');
     
-    // تغيير المحتوى
     if (page === 'dashboard') renderStudentDashboard();
     else if (page === 'homework') renderStudentHomeworks();
     else if (page === 'results') renderStudentResults();
     else if (page === 'meetings') renderStudentMeetings();
+    else if (page === 'exams') renderStudentExams();  // <-- أضف هذا
     
-    // إغلاق السايدبار بعد الضغط (للموبايل)
     closeSidebar();
 }
 
@@ -5688,6 +6365,16 @@ window.filterMeetingDetails = filterMeetingDetails;
 window.deleteMeeting = deleteMeeting;
 window.markAttendance = markAttendance;
 window.endMeeting = endMeeting;
+window.renderAdminExams = renderAdminExams;
+window.renderStudentExams = renderStudentExams;
+window.showAddExamModal = showAddExamModal;
+window.showExamDetails = showExamDetails;
+window.stopExam = stopExam;
+window.activateExam = activateExam;
+window.deleteExam = deleteExam;
+window.markExamAttendance = markExamAttendance;
+window.exportExamDetailsToPDF = exportExamDetailsToPDF;
+window.renderAdminExamsList = renderAdminExamsList;
 
         // Start the app
         startApp();
