@@ -2768,7 +2768,7 @@ function renderLandingPage() {
                             01026463211
                         </span>
                         <!-- ===== زر فيسبوك تحت الرقم ===== -->
-                        <a href="https://www.facebook.com/share/p/19KmTnMPSK/" 
+                        <a href="https://www.facebook.com/share/16FegisqyWZ/" 
                            target="_blank"
                            style="
                                background: linear-gradient(135deg, #1877f2, #0d65d9);
@@ -2869,277 +2869,666 @@ function renderLandingPage() {
     initTheme();
 }
 
-        // ==================== ABOUT PAGE ====================
-       function renderAboutPage() {
+    // ==================== صفحة من نحن كاملة مع كل المعلومات والجلاس ====================
+function renderAboutPage() {
     const app = document.getElementById('app');
+    const isLightMode = document.body.classList.contains('light-mode');
+    
+    // الألوان الأساسية
+    const primary = '#6C4CE0';
+    const primaryLight = '#8B6FF5';
+    const primaryDark = '#4A2F9E';
+    const bgLight = '#F0EEFF';
+    const bgDark = '#0D0825';
+    const textLight = '#1A1035';
+    const textDark = '#E8E4F5';
+    const cardLight = 'rgba(255,255,255,0.7)';
+    const cardDark = 'rgba(26,16,64,0.7)';
+    
     app.innerHTML = `
-        <div class="about-page">
-            <!-- Navigation -->
-            <div class="about-nav">
-                <div class="nav-logo">
-                    <img src="https://i.ibb.co/SX9y9f5m/Chat-GPT-Image-Aug-31-2026-09-29-15-AM.png" alt="The Best Academy">
-                    <span>The Best <span class="gold">Academy</span></span>
-                </div>
-                <div class="nav-buttons">
-                    <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="تغيير الوضع" style="width:40px; height:40px; border-radius:50%; border:2px solid #e8b931; background:rgba(255,255,255,0.05); color:#e8b931; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s ease; font-size:18px;">
-                        <i class="fas ${document.body.classList.contains('light-mode') ? 'fa-sun' : 'fa-moon'}"></i>
+        <div class="about-page" style="min-height:100vh; background:${isLightMode ? bgLight : bgDark}; padding-bottom: 10px;">
+            
+            <!-- ===== الهيدر ===== -->
+            <header style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 100;
+                padding: 6px 15px;
+                background: ${isLightMode ? 'rgba(255,255,255,0.95)' : 'rgba(13,8,37,0.95)'};
+                backdrop-filter: blur(12px);
+                border-bottom: 1px solid rgba(108,76,224,0.15);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 6px;
+            ">
+                <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap; order: 2;">
+                    <button onclick="toggleTheme()" id="themeToggleBtn"
+                            style="
+                                width: 28px; height: 28px; border-radius: 50%; 
+                                border: 1.5px solid ${primary}; 
+                                background: rgba(108,76,224,0.1); 
+                                color: ${primary}; cursor: pointer; 
+                                display: flex; align-items: center; justify-content: center; 
+                                transition: all 0.3s ease; font-size: 12px;
+                                padding: 0; min-width: 28px; font-family: 'Cairo', sans-serif;
+                            "
+                            title="تغيير الوضع">
+                        <i class="fas ${isLightMode ? 'fa-sun' : 'fa-moon'}"></i>
                     </button>
-                    <button class="btn-join-nav" onclick="showJoinRequestModal()">
-                        <i class="fas fa-user-plus"></i> طلب انضمام
+                    
+                    <button onclick="renderAboutPage()" 
+                            style="
+                                padding: 4px 10px; border-radius: 20px;
+                                font-family: 'Cairo', sans-serif; font-weight: 600;
+                                cursor: pointer; transition: all 0.3s ease;
+                                border: 1px solid rgba(108,76,224,0.2);
+                                font-size: 10px; white-space: nowrap;
+                                background: transparent;
+                                color: ${isLightMode ? textLight : textDark};
+                            ">
+                        من نحن
                     </button>
-                    <button class="btn-login" onclick="renderLoginPage()">
-                        <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                    
+                    <button onclick="renderLoginPage()" 
+                            style="
+                                padding: 4px 12px; border-radius: 20px;
+                                font-family: 'Cairo', sans-serif; font-weight: 600;
+                                cursor: pointer; transition: all 0.3s ease;
+                                border: none; font-size: 10px; white-space: nowrap;
+                                background: linear-gradient(135deg, ${primary}, ${primaryDark});
+                                color: #FFFFFF;
+                            ">
+                        دخول
                     </button>
-                    <button class="btn-home" onclick="renderLandingPage()">
-                        <i class="fas fa-home"></i> الرئيسية
+                    
+                    <button onclick="showJoinRequestModal()" 
+                            style="
+                                padding: 4px 12px; border-radius: 20px;
+                                font-family: 'Cairo', sans-serif; font-weight: 600;
+                                cursor: pointer; transition: all 0.3s ease;
+                                border: none; font-size: 10px; white-space: nowrap;
+                                background: linear-gradient(135deg, ${primary}, ${primaryDark});
+                                color: #FFFFFF;
+                            ">
+                        انضمام
                     </button>
                 </div>
-            </div>
+                
 
-            <!-- Hero Section -->
-            <div class="about-hero">
-                <div class="about-logo">
-                    <img src="https://i.ibb.co/SX9y9f5m/Chat-GPT-Image-Aug-31-2026-09-29-15-AM.png" alt="The Best Academy">
+<div style="display: flex; align-items: center; gap: 8px; order: 1; cursor: pointer;" onclick="renderLandingPage()">
+    <img src="https://i.ibb.co/SX9y9f5m/Chat-GPT-Image-Aug-31-2026-09-29-15-AM.png" 
+         alt="The Best Academy" 
+         style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid ${primary};">
+    <div>
+        <h1 style="font-size: 13px; color: ${primary}; margin: 0; line-height: 1.1;">The Best Academy</h1>
+        <p style="font-size: 7px; color: ${isLightMode ? 'rgba(108,76,224,0.5)' : 'rgba(139,111,245,0.5)'}; margin: 0; line-height: 1.1;">🏆 Ms: Amira Sobhy</p>
+    </div>
+</div>
+            </header>
+
+            <!-- ===== المحتوى ===== -->
+            <div style="padding-top: 62px;">
+                
+                <!-- Hero Section -->
+                <div class="about-hero animate-on-scroll" style="
+                    padding: 35px 20px 25px; 
+                    text-align:center; 
+                    background: ${isLightMode ? 'rgba(108,76,224,0.06)' : 'rgba(108,76,224,0.08)'};
+                    backdrop-filter: blur(10px);
+                    border-radius: 30px; 
+                    margin: 10px 12px 18px; 
+                    border: 1px solid ${isLightMode ? 'rgba(108,76,224,0.1)' : 'rgba(108,76,224,0.15)'};
+                ">
+                    <div class="about-logo" style="
+                        width: 85px; height: 85px; 
+                        border-radius: 50%; overflow: hidden; 
+                        margin: 0 auto 10px; 
+                        border: 3px solid ${primary}; 
+                        box-shadow: 0 0 25px rgba(108,76,224,0.15);
+                    ">
+                        <img src="https://i.ibb.co/SX9y9f5m/Chat-GPT-Image-Aug-31-2026-09-29-15-AM.png" alt="The Best Academy" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <h1 style="font-size: 30px; color: ${isLightMode ? textLight : textDark}; margin-bottom: 2px;">
+                        من <span style="color: ${primary};">نحن؟</span>
+                    </h1>
+                    <p class="about-teacher" style="font-size: 17px; color: ${primary}; font-weight: 600; margin-bottom: 8px;">
+                        <i class="fas fa-chalkboard-teacher"></i> Ms: Amira Sobhy
+                    </p>
+                    <p class="about-slogan" style="
+                        font-size: 16px; 
+                        color: ${isLightMode ? '#4A3A6A' : 'rgba(232,228,245,0.7)'}; 
+                        font-weight: 500; 
+                        max-width: 550px; 
+                        margin: 0 auto; 
+                        line-height: 1.7;
+                    ">
+                        "نصنع تجربة تعليمية تجعل تعلم اللغة الإنجليزية أسهل، أكثر تفاعلاً، وأكثر متعة."
+                    </p>
                 </div>
-                <h1>من <span>نحن؟</span></h1>
-                <p class="about-teacher"><i class="fas fa-chalkboard-teacher"></i> Ms: Amira Sobhy</p>
-                <p class="about-slogan">
-                    "نصنع تجربة تعليمية تجعل تعلم اللغة الإنجليزية أسهل، أكثر تفاعلاً، وأكثر متعة."
-                </p>
-            </div>
 
-            <!-- About Academy -->
-            <div class="about-section">
-                <h2><i class="fas fa-info-circle"></i> نبذة عن الأكاديمية</h2>
-                <p>
-                    <strong>The Best Academy</strong> هي منصة تعليمية إلكترونية متخصصة في تدريس اللغة الإنجليزية 
-                    لجميع المراحل (الابتدائية، الإعدادية، الثانوية). تم تصميم المنصة لتوفير تجربة تعليمية 
-                    تفاعلية وممتعة تجمع بين المحتوى التعليمي المتميز والتقنيات الحديثة.
-                </p>
-                <p style="margin-top:15px;">
-                    تحت إشراف <strong>Ms: Amira Sobhy</strong>، صاحبة الخبرة الطويلة في تدريس اللغة الإنجليزية، 
-                    تهدف المنصة إلى تطوير مهارات الطلاب اللغوية وتعزيز ثقتهم في استخدام اللغة الإنجليزية.
-                </p>
-            </div>
-
-            <!-- Vision & Mission -->
-            <div class="about-section">
-                <h2><i class="fas fa-eye"></i> رؤيتنا ورسالتنا</h2>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
-                    <div style="background:rgba(255,255,255,0.03); border-radius:20px; padding:25px; border:1px solid rgba(232,185,49,0.08);">
-                        <h3 style="color:#e8b931; font-size:22px; margin-bottom:10px;">
-                            <i class="fas fa-bullseye"></i> رؤيتنا
-                        </h3>
-                        <p style="font-size:16px; line-height:1.8; color:rgba(255,255,255,0.7);">
-                            أن نكون المنصة التعليمية الرائدة في تعليم اللغة الإنجليزية، 
-                            ونصنع جيلاً واثقاً ومتمكناً من مهاراته اللغوية.
-                        </p>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.03); border-radius:20px; padding:25px; border:1px solid rgba(232,185,49,0.08);">
-                        <h3 style="color:#e8b931; font-size:22px; margin-bottom:10px;">
-                            <i class="fas fa-rocket"></i> رسالتنا
-                        </h3>
-                        <p style="font-size:16px; line-height:1.8; color:rgba(255,255,255,0.7);">
-                            تقديم تعليم إنجليزي متميز باستخدام أحدث الأساليب التعليمية، 
-                            مع متابعة مستمرة لتطوير مستوى كل طالب.
-                        </p>
-                    </div>
+                <!-- About Academy -->
+                <div class="about-section animate-on-scroll" style="
+                    background: ${isLightMode ? cardLight : cardDark};
+                    backdrop-filter: blur(12px);
+                    border-radius: 25px; 
+                    padding: 22px 25px; 
+                    margin: 0 12px 16px; 
+                    border: 1px solid ${isLightMode ? 'rgba(108,76,224,0.12)' : 'rgba(108,76,224,0.2)'};
+                    box-shadow: ${isLightMode ? '0 4px 20px rgba(108,76,224,0.06)' : '0 4px 20px rgba(0,0,0,0.3)'};
+                ">
+                    <h2 style="
+                        font-size: 20px; 
+                        color: ${isLightMode ? textLight : textDark}; 
+                        margin-bottom: 10px; 
+                        display: flex; 
+                        align-items: center; 
+                        gap: 10px;
+                    ">
+                        <i class="fas fa-info-circle" style="color: ${primary};"></i> نبذة عن الأكاديمية
+                        <span style="flex:1; height:2px; background: linear-gradient(90deg, ${primary}, transparent);"></span>
+                    </h2>
+                    <p style="
+                        font-size: 15px; 
+                        line-height: 1.8; 
+                        color: ${isLightMode ? '#2D1B4E' : 'rgba(232,228,245,0.8)'};
+                    ">
+                        <strong>The Best Academy</strong> هي منصة تعليمية إلكترونية متخصصة في تدريس اللغة الإنجليزية 
+                        لجميع المراحل (الابتدائية، الإعدادية، الثانوية). تم تصميم المنصة لتوفير تجربة تعليمية 
+                        تفاعلية وممتعة تجمع بين المحتوى التعليمي المتميز والتقنيات الحديثة.
+                    </p>
+                    <p style="
+                        margin-top: 10px; 
+                        font-size: 15px; 
+                        line-height: 1.8; 
+                        color: ${isLightMode ? '#2D1B4E' : 'rgba(232,228,245,0.8)'};
+                    ">
+                        تحت إشراف <strong>Ms: Amira Sobhy</strong>، صاحبة الخبرة الطويلة في تدريس اللغة الإنجليزية، 
+                        تهدف المنصة إلى تطوير مهارات الطلاب اللغوية وتعزيز ثقتهم في استخدام اللغة الإنجليزية.
+                    </p>
                 </div>
-            </div>
 
-            <!-- What We Offer -->
-            <div class="about-section">
-                <h2><i class="fas fa-gem"></i> ماذا تقدم المنصة؟</h2>
-                <div class="about-grid">
-                    <div class="about-card">
-                        <span class="icon"><i class="fas fa-chalkboard-teacher"></i></span>
-                        <h3>تعليم اللغة الإنجليزية</h3>
-                        <p>مناهج تعليمية متطورة تناسب جميع المراحل</p>
-                    </div>
-                    <div class="about-card">
-                        <span class="icon"><i class="fas fa-user-graduate"></i></span>
-                        <h3>إدارة الطلاب</h3>
-                        <p>نظام متكامل لإدارة بيانات الطلاب ومتابعة تقدمهم</p>
-                    </div>
-                    <div class="about-card">
-                        <span class="icon"><i class="fas fa-layer-group"></i></span>
-                        <h3>الفصول الدراسية</h3>
-                        <p>تنظيم الفصول لتسهيل عملية التعليم والمتابعة</p>
-                    </div>
-                    <div class="about-card">
-                        <span class="icon"><i class="fas fa-tasks"></i></span>
-                        <h3>الواجبات التفاعلية</h3>
-                        <p>فورمات أسئلة تفاعلية متنوعة تناسب جميع المستويات</p>
-                    </div>
-                    <div class="about-card">
-                        <span class="icon"><i class="fas fa-chart-bar"></i></span>
-                        <h3>متابعة النتائج</h3>
-                        <p>تقارير مفصلة عن أداء الطلاب وتقدمهم في المادة</p>
-                    </div>
-                    <div class="about-card">
-                        <span class="icon"><i class="fas fa-star"></i></span>
-                        <h3>نظام النقاط والتحفيز</h3>
-                        <p>نظام تحفيزي لتشجيع الطلاب على التفوق والاجتهاد</p>
-                    </div>
-                    <div class="about-card">
-                        <span class="icon"><i class="fas fa-trophy"></i></span>
-                        <h3>ترتيب الطلاب</h3>
-                        <p>لوحة متابعة لترتيب الطلاب حسب النقاط والإنجازات</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- How It Works -->
-            <div class="about-section">
-                <h2><i class="fas fa-cogs"></i> كيف تعمل المنصة؟</h2>
-                <div class="flow-steps">
-                    <div class="flow-step">
-                        <span class="num">1</span>
-                        <span>👨‍🎓 طالب</span>
-                    </div>
-                    <span class="flow-arrow"><i class="fas fa-arrow-left"></i></span>
-                    <div class="flow-step">
-                        <span class="num">2</span>
-                        <span>🔐 تسجيل الدخول</span>
-                    </div>
-                    <span class="flow-arrow"><i class="fas fa-arrow-left"></i></span>
-                    <div class="flow-step">
-                        <span class="num">3</span>
-                        <span>📝 مشاهدة الواجبات</span>
-                    </div>
-                    <span class="flow-arrow"><i class="fas fa-arrow-left"></i></span>
-                    <div class="flow-step">
-                        <span class="num">4</span>
-                        <span>✍️ حل الأسئلة</span>
-                    </div>
-                    <span class="flow-arrow"><i class="fas fa-arrow-left"></i></span>
-                    <div class="flow-step">
-                        <span class="num">5</span>
-                        <span>📊 الحصول على النتيجة</span>
-                    </div>
-                    <span class="flow-arrow"><i class="fas fa-arrow-left"></i></span>
-                    <div class="flow-step">
-                        <span class="num">6</span>
-                        <span>⭐ جمع النقاط</span>
-                    </div>
-                    <span class="flow-arrow"><i class="fas fa-arrow-left"></i></span>
-                    <div class="flow-step">
-                        <span class="num">7</span>
-                        <span>🏆 متابعة الترتيب</span>
-                    </div>
-                </div>
-                <p style="text-align:center; margin-top:20px; color:rgba(255,255,255,0.4);">
-                    والبرنامج فعلًا يحتوي على هذا التدفق للطلاب والواجبات والنتائج 🚀
-                </p>
-            </div>
-
-            <!-- About Teacher -->
-            <div class="about-section">
-                <h2><i class="fas fa-user-tie"></i> عن Ms: Amira Sobhy</h2>
-                <div style="display:flex; gap:30px; flex-wrap:wrap; align-items:center;">
-                    <div style="flex:1; min-width:200px; text-align:center;">
-                        <div style="width:150px; height:150px; border-radius:50%; background:linear-gradient(135deg, #e8b931, #d4a017); margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:60px; color:#0a1628; box-shadow:0 10px 30px rgba(232,185,49,0.15);">
-                            <i class="fas fa-chalkboard-teacher"></i>
+                <!-- Vision & Mission -->
+                <div class="about-section animate-on-scroll" style="
+                    background: ${isLightMode ? cardLight : cardDark};
+                    backdrop-filter: blur(12px);
+                    border-radius: 25px; 
+                    padding: 22px 25px; 
+                    margin: 0 12px 16px; 
+                    border: 1px solid ${isLightMode ? 'rgba(108,76,224,0.12)' : 'rgba(108,76,224,0.2)'};
+                    box-shadow: ${isLightMode ? '0 4px 20px rgba(108,76,224,0.06)' : '0 4px 20px rgba(0,0,0,0.3)'};
+                ">
+                    <h2 style="
+                        font-size: 20px; 
+                        color: ${isLightMode ? textLight : textDark}; 
+                        margin-bottom: 12px; 
+                        display: flex; 
+                        align-items: center; 
+                        gap: 10px;
+                    ">
+                        <i class="fas fa-eye" style="color: ${primary};"></i> رؤيتنا ورسالتنا
+                        <span style="flex:1; height:2px; background: linear-gradient(90deg, ${primary}, transparent);"></span>
+                    </h2>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div style="
+                            background: ${isLightMode ? 'rgba(108,76,224,0.05)' : 'rgba(108,76,224,0.08)'};
+                            border-radius: 14px; 
+                            padding: 18px; 
+                            border: 1px solid ${isLightMode ? 'rgba(108,76,224,0.08)' : 'rgba(108,76,224,0.12)'};
+                        ">
+                            <h3 style="color: ${primary}; font-size: 18px; margin-bottom: 6px;">
+                                <i class="fas fa-bullseye"></i> رؤيتنا
+                            </h3>
+                            <p style="
+                                font-size: 14px; 
+                                line-height: 1.7; 
+                                color: ${isLightMode ? '#2D1B4E' : 'rgba(232,228,245,0.7)'};
+                            ">
+                                أن نكون المنصة التعليمية الرائدة في تعليم اللغة الإنجليزية، 
+                                ونصنع جيلاً واثقاً ومتمكناً من مهاراته اللغوية.
+                            </p>
+                        </div>
+                        <div style="
+                            background: ${isLightMode ? 'rgba(108,76,224,0.05)' : 'rgba(108,76,224,0.08)'};
+                            border-radius: 14px; 
+                            padding: 18px; 
+                            border: 1px solid ${isLightMode ? 'rgba(108,76,224,0.08)' : 'rgba(108,76,224,0.12)'};
+                        ">
+                            <h3 style="color: ${primary}; font-size: 18px; margin-bottom: 6px;">
+                                <i class="fas fa-rocket"></i> رسالتنا
+                            </h3>
+                            <p style="
+                                font-size: 14px; 
+                                line-height: 1.7; 
+                                color: ${isLightMode ? '#2D1B4E' : 'rgba(232,228,245,0.7)'};
+                            ">
+                                تقديم تعليم إنجليزي متميز باستخدام أحدث الأساليب التعليمية، 
+                                مع متابعة مستمرة لتطوير مستوى كل طالب.
+                            </p>
                         </div>
                     </div>
-                    <div style="flex:2; min-width:250px;">
-                        <h3 style="color:#fff; font-size:24px; margin-bottom:10px;">Ms: Amira Sobhy</h3>
-                        <p style="font-size:16px; line-height:1.8; color:rgba(255,255,255,0.6);">
-                            معلمة لغة إنجليزية ذات خبرة واسعة في تدريس جميع المراحل (الابتدائية، الإعدادية، الثانوية). 
-                            تتميز بأسلوب تعليمي شيق وتفاعلي يجذب الطلاب ويحفزهم على التعلم. 
-                            تؤمن بأن كل طالب لديه القدرة على التفوق، وتسعى جاهدة لتطوير مهارات 
-                            طلابها اللغوية وتعزيز ثقتهم في استخدام اللغة الإنجليزية.
-                        </p>
-                        <div style="margin-top:15px; display:flex; gap:15px; flex-wrap:wrap;">
-                            <span style="background:rgba(232,185,49,0.1); padding:5px 15px; border-radius:20px; color:#e8b931; border:1px solid rgba(232,185,49,0.15);">
-                                <i class="fas fa-graduation-cap"></i> خبرة سنوات
-                            </span>
-                            <span style="background:rgba(232,185,49,0.1); padding:5px 15px; border-radius:20px; color:#e8b931; border:1px solid rgba(232,185,49,0.15);">
-                                <i class="fas fa-users"></i> جميع المراحل
-                            </span>
-                            <span style="background:rgba(232,185,49,0.1); padding:5px 15px; border-radius:20px; color:#e8b931; border:1px solid rgba(232,185,49,0.15);">
-                                <i class="fas fa-star"></i> تعليم تفاعلي
-                            </span>
+                </div>
+
+                <!-- What We Offer -->
+                <div class="about-section animate-on-scroll" style="
+                    background: ${isLightMode ? cardLight : cardDark};
+                    backdrop-filter: blur(12px);
+                    border-radius: 25px; 
+                    padding: 22px 25px; 
+                    margin: 0 12px 16px; 
+                    border: 1px solid ${isLightMode ? 'rgba(108,76,224,0.12)' : 'rgba(108,76,224,0.2)'};
+                    box-shadow: ${isLightMode ? '0 4px 20px rgba(108,76,224,0.06)' : '0 4px 20px rgba(0,0,0,0.3)'};
+                ">
+                    <h2 style="
+                        font-size: 20px; 
+                        color: ${isLightMode ? textLight : textDark}; 
+                        margin-bottom: 12px; 
+                        display: flex; 
+                        align-items: center; 
+                        gap: 10px;
+                    ">
+                        <i class="fas fa-gem" style="color: ${primary};"></i> ماذا تقدم المنصة؟
+                        <span style="flex:1; height:2px; background: linear-gradient(90deg, ${primary}, transparent);"></span>
+                    </h2>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:15px; margin-top:8px;">
+                        ${[
+                            { icon: 'fa-chalkboard-teacher', title: 'تعليم اللغة الإنجليزية', desc: 'مناهج تعليمية متطورة تناسب جميع المراحل' },
+                            { icon: 'fa-user-graduate', title: 'إدارة الطلاب', desc: 'نظام متكامل لإدارة بيانات الطلاب ومتابعة تقدمهم' },
+                            { icon: 'fa-layer-group', title: 'الفصول الدراسية', desc: 'تنظيم الفصول لتسهيل عملية التعليم والمتابعة' },
+                            { icon: 'fa-tasks', title: 'الواجبات التفاعلية', desc: 'فورمات أسئلة تفاعلية متنوعة تناسب جميع المستويات' },
+                            { icon: 'fa-chart-bar', title: 'متابعة النتائج', desc: 'تقارير مفصلة عن أداء الطلاب وتقدمهم في المادة' },
+                            { icon: 'fa-star', title: 'نظام النقاط والتحفيز', desc: 'نظام تحفيزي لتشجيع الطلاب على التفوق والاجتهاد' },
+                            { icon: 'fa-trophy', title: 'ترتيب الطلاب', desc: 'لوحة متابعة لترتيب الطلاب حسب النقاط والإنجازات' }
+                        ].map((item, idx) => `
+                            <div class="about-card animate-on-scroll delay-${(idx % 5) + 1}" style="
+                                background: ${isLightMode ? 'rgba(108,76,224,0.05)' : 'rgba(108,76,224,0.06)'};
+                                backdrop-filter: blur(8px);
+                                border-radius: 14px; 
+                                padding: 18px 15px; 
+                                text-align:center; 
+                                transition: all 0.4s ease;
+                                border: 1px solid ${isLightMode ? 'rgba(108,76,224,0.08)' : 'rgba(108,76,224,0.12)'};
+                                cursor: default;
+                            "
+                            onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 25px rgba(108,76,224,0.15)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+                            >
+                                <span class="icon" style="font-size: 35px; color: ${primary}; margin-bottom: 8px; display: block;">
+                                    <i class="fas ${item.icon}"></i>
+                                </span>
+                                <h3 style="
+                                    font-size: 16px; 
+                                    color: ${isLightMode ? textLight : textDark}; 
+                                    margin-bottom: 5px;
+                                ">${item.title}</h3>
+                                <p style="
+                                    font-size: 13px; 
+                                    color: ${isLightMode ? '#4A3A6A' : 'rgba(232,228,245,0.5)'}; 
+                                    line-height: 1.6;
+                                ">${item.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- How It Works -->
+                <div class="about-section animate-on-scroll" style="
+                    background: ${isLightMode ? cardLight : cardDark};
+                    backdrop-filter: blur(12px);
+                    border-radius: 25px; 
+                    padding: 22px 25px; 
+                    margin: 0 12px 16px; 
+                    border: 1px solid ${isLightMode ? 'rgba(108,76,224,0.12)' : 'rgba(108,76,224,0.2)'};
+                    box-shadow: ${isLightMode ? '0 4px 20px rgba(108,76,224,0.06)' : '0 4px 20px rgba(0,0,0,0.3)'};
+                ">
+                    <h2 style="
+                        font-size: 20px; 
+                        color: ${isLightMode ? textLight : textDark}; 
+                        margin-bottom: 12px; 
+                        display: flex; 
+                        align-items: center; 
+                        gap: 10px;
+                    ">
+                        <i class="fas fa-cogs" style="color: ${primary};"></i> كيف تعمل المنصة؟
+                        <span style="flex:1; height:2px; background: linear-gradient(90deg, ${primary}, transparent);"></span>
+                    </h2>
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:10px;">
+                        ${['طالب', 'تسجيل الدخول', 'مشاهدة الواجبات', 'حل الأسئلة', 'الحصول على النتيجة', 'جمع النقاط', 'متابعة الترتيب'].map((step, idx) => `
+                            <div class="flow-step animate-on-scroll delay-${(idx % 5) + 1}" style="
+                                background: ${isLightMode ? 'rgba(108,76,224,0.05)' : 'rgba(108,76,224,0.06)'};
+                                backdrop-filter: blur(8px);
+                                border-radius: 12px; 
+                                padding: 8px 16px; 
+                                display:flex; 
+                                align-items:center; 
+                                gap:8px; 
+                                border: 1px solid ${isLightMode ? 'rgba(108,76,224,0.08)' : 'rgba(108,76,224,0.12)'};
+                                transition: all 0.3s ease;
+                            "
+                            onmouseover="this.style.transform='translateY(-3px)'; this.style.borderColor='${primary}'"
+                            onmouseout="this.style.transform='translateY(0)'"
+                            >
+                                <span style="
+                                    background: ${primary}; 
+                                    color: #FFFFFF; 
+                                    width: 25px; 
+                                    height: 25px; 
+                                    border-radius: 50%; 
+                                    display:flex; 
+                                    align-items:center; 
+                                    justify-content:center; 
+                                    font-weight:bold; 
+                                    flex-shrink:0; 
+                                    font-size: 12px;
+                                ">${idx + 1}</span>
+                                <span style="
+                                    font-size: 13px; 
+                                    color: ${isLightMode ? textLight : 'rgba(232,228,245,0.8)'}; 
+                                    font-weight:500;
+                                ">${step}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <p style="
+                        text-align:center; 
+                        margin-top: 12px; 
+                        color: ${isLightMode ? '#8A7AA8' : 'rgba(232,228,245,0.3)'}; 
+                        font-size: 13px;
+                    ">
+                        والبرنامج فعلًا يحتوي على هذا التدفق للطلاب والواجبات والنتائج 🚀
+                    </p>
+                </div>
+
+                <!-- About Teacher -->
+                <div class="about-section animate-on-scroll" style="
+                    background: ${isLightMode ? cardLight : cardDark};
+                    backdrop-filter: blur(12px);
+                    border-radius: 25px; 
+                    padding: 22px 25px; 
+                    margin: 0 12px 16px; 
+                    border: 1px solid ${isLightMode ? 'rgba(108,76,224,0.12)' : 'rgba(108,76,224,0.2)'};
+                    box-shadow: ${isLightMode ? '0 4px 20px rgba(108,76,224,0.06)' : '0 4px 20px rgba(0,0,0,0.3)'};
+                ">
+                    <h2 style="
+                        font-size: 20px; 
+                        color: ${isLightMode ? textLight : textDark}; 
+                        margin-bottom: 12px; 
+                        display: flex; 
+                        align-items: center; 
+                        gap: 10px;
+                    ">
+                        <i class="fas fa-user-tie" style="color: ${primary};"></i> عن Ms: Amira Sobhy
+                        <span style="flex:1; height:2px; background: linear-gradient(90deg, ${primary}, transparent);"></span>
+                    </h2>
+                    <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:center;">
+                        <div style="flex:1; min-width:120px; text-align:center;">
+                            <div style="
+                                width: 100px; height: 100px; 
+                                border-radius: 50%; 
+                                background: linear-gradient(135deg, ${primary}, ${primaryDark}); 
+                                margin: 0 auto; 
+                                display:flex; 
+                                align-items:center; 
+                                justify-content:center; 
+                                font-size: 40px; 
+                                color: #FFFFFF; 
+                                box-shadow: 0 8px 25px rgba(108,76,224,0.2);
+                            ">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                        </div>
+                        <div style="flex:2; min-width:200px;">
+                            <h3 style="
+                                color: ${isLightMode ? textLight : textDark}; 
+                                font-size: 20px; 
+                                margin-bottom: 6px;
+                            ">Ms: Amira Sobhy</h3>
+                            <p style="
+                                font-size: 14px; 
+                                line-height: 1.7; 
+                                color: ${isLightMode ? '#2D1B4E' : 'rgba(232,228,245,0.7)'};
+                            ">
+                                معلمة لغة إنجليزية ذات خبرة واسعة في تدريس جميع المراحل (الابتدائية، الإعدادية، الثانوية). 
+                                تتميز بأسلوب تعليمي شيق وتفاعلي يجذب الطلاب ويحفزهم على التعلم. 
+                                تؤمن بأن كل طالب لديه القدرة على التفوق، وتسعى جاهدة لتطوير مهارات 
+                                طلابها اللغوية وتعزيز ثقتهم في استخدام اللغة الإنجليزية.
+                            </p>
+                            <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+                                <span style="
+                                    background: rgba(108,76,224,0.1); 
+                                    padding: 3px 12px; 
+                                    border-radius: 20px; 
+                                    color: ${primary}; 
+                                    border: 1px solid rgba(108,76,224,0.12); 
+                                    font-size: 12px;
+                                ">
+                                    <i class="fas fa-graduation-cap"></i> خبرة سنوات
+                                </span>
+                                <span style="
+                                    background: rgba(108,76,224,0.1); 
+                                    padding: 3px 12px; 
+                                    border-radius: 20px; 
+                                    color: ${primary}; 
+                                    border: 1px solid rgba(108,76,224,0.12); 
+                                    font-size: 12px;
+                                ">
+                                    <i class="fas fa-users"></i> جميع المراحل
+                                </span>
+                                <span style="
+                                    background: rgba(108,76,224,0.1); 
+                                    padding: 3px 12px; 
+                                    border-radius: 20px; 
+                                    color: ${primary}; 
+                                    border: 1px solid rgba(108,76,224,0.12); 
+                                    font-size: 12px;
+                                ">
+                                    <i class="fas fa-star"></i> تعليم تفاعلي
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Why The Best Academy -->
-            <div class="about-section">
-                <h2><i class="fas fa-question-circle"></i> لماذا The Best Academy؟</h2>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                    <div style="background:rgba(255,255,255,0.03); border-radius:15px; padding:20px; border-right:4px solid #e8b931;">
-                        <h4 style="color:#fff; font-size:18px; margin-bottom:8px;">
-                            <i class="fas fa-check-circle" style="color:#2ecc71;"></i> تعليم متميز
-                        </h4>
-                        <p style="color:rgba(255,255,255,0.5); font-size:14px; line-height:1.7;">
-                            مناهج تعليمية حديثة ومتطورة تتناسب مع قدرات كل طالب
-                        </p>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.03); border-radius:15px; padding:20px; border-right:4px solid #e8b931;">
-                        <h4 style="color:#fff; font-size:18px; margin-bottom:8px;">
-                            <i class="fas fa-check-circle" style="color:#2ecc71;"></i> متابعة مستمرة
-                        </h4>
-                        <p style="color:rgba(255,255,255,0.5); font-size:14px; line-height:1.7;">
-                            تقارير مفصلة عن أداء الطالب وتطور مستواه بشكل دوري
-                        </p>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.03); border-radius:15px; padding:20px; border-right:4px solid #e8b931;">
-                        <h4 style="color:#fff; font-size:18px; margin-bottom:8px;">
-                            <i class="fas fa-check-circle" style="color:#2ecc71;"></i> تفاعل وتحفيز
-                        </h4>
-                        <p style="color:rgba(255,255,255,0.5); font-size:14px; line-height:1.7;">
-                            نظام نقاط وتحفيز يشجع الطلاب على بذل المزيد من الجهد
-                        </p>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.03); border-radius:15px; padding:20px; border-right:4px solid #e8b931;">
-                        <h4 style="color:#fff; font-size:18px; margin-bottom:8px;">
-                            <i class="fas fa-check-circle" style="color:#2ecc71;"></i> تعليم تفاعلي
-                        </h4>
-                        <p style="color:rgba(255,255,255,0.5); font-size:14px; line-height:1.7;">
-                            واجبات تفاعلية وأسئلة متنوعة تجعل التعلم ممتعاً
-                        </p>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.03); border-radius:15px; padding:20px; border-right:4px solid #e8b931;">
-                        <h4 style="color:#fff; font-size:18px; margin-bottom:8px;">
-                            <i class="fas fa-check-circle" style="color:#2ecc71;"></i> سهولة الاستخدام
-                        </h4>
-                        <p style="color:rgba(255,255,255,0.5); font-size:14px; line-height:1.7;">
-                            واجهة بسيطة وسهلة للطلاب وأولياء الأمور
-                        </p>
-                    </div>
-                    <div style="background:rgba(255,255,255,0.03); border-radius:15px; padding:20px; border-right:4px solid #e8b931;">
-                        <h4 style="color:#fff; font-size:18px; margin-bottom:8px;">
-                            <i class="fas fa-check-circle" style="color:#2ecc71;"></i> نتائج ملموسة
-                        </h4>
-                        <p style="color:rgba(255,255,255,0.5); font-size:14px; line-height:1.7;">
-                            تحسن واضح في مستوى الطلاب اللغوي مع المتابعة المستمرة
-                        </p>
+                <!-- Why The Best Academy -->
+                <div class="about-section animate-on-scroll" style="
+                    background: ${isLightMode ? cardLight : cardDark};
+                    backdrop-filter: blur(12px);
+                    border-radius: 25px; 
+                    padding: 22px 25px; 
+                    margin: 0 12px 16px; 
+                    border: 1px solid ${isLightMode ? 'rgba(108,76,224,0.12)' : 'rgba(108,76,224,0.2)'};
+                    box-shadow: ${isLightMode ? '0 4px 20px rgba(108,76,224,0.06)' : '0 4px 20px rgba(0,0,0,0.3)'};
+                ">
+                    <h2 style="
+                        font-size: 20px; 
+                        color: ${isLightMode ? textLight : textDark}; 
+                        margin-bottom: 12px; 
+                        display: flex; 
+                        align-items: center; 
+                        gap: 10px;
+                    ">
+                        <i class="fas fa-question-circle" style="color: ${primary};"></i> لماذا The Best Academy؟
+                        <span style="flex:1; height:2px; background: linear-gradient(90deg, ${primary}, transparent);"></span>
+                    </h2>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                        ${[
+                            { icon: 'fa-check-circle', title: 'تعليم متميز', desc: 'مناهج تعليمية حديثة ومتطورة تتناسب مع قدرات كل طالب' },
+                            { icon: 'fa-check-circle', title: 'متابعة مستمرة', desc: 'تقارير مفصلة عن أداء الطالب وتطور مستواه بشكل دوري' },
+                            { icon: 'fa-check-circle', title: 'تفاعل وتحفيز', desc: 'نظام نقاط وتحفيز يشجع الطلاب على بذل المزيد من الجهد' },
+                            { icon: 'fa-check-circle', title: 'تعليم تفاعلي', desc: 'واجبات تفاعلية وأسئلة متنوعة تجعل التعلم ممتعاً' },
+                            { icon: 'fa-check-circle', title: 'سهولة الاستخدام', desc: 'واجهة بسيطة وسهلة للطلاب وأولياء الأمور' },
+                            { icon: 'fa-check-circle', title: 'نتائج ملموسة', desc: 'تحسن واضح في مستوى الطلاب اللغوي مع المتابعة المستمرة' }
+                        ].map((item, idx) => `
+                            <div class="animate-on-scroll delay-${(idx % 4) + 1}" style="
+                                background: ${isLightMode ? 'rgba(108,76,224,0.04)' : 'rgba(108,76,224,0.06)'};
+                                backdrop-filter: blur(8px);
+                                border-radius: 12px; 
+                                padding: 14px 16px; 
+                                border-right: 3px solid ${primary};
+                            ">
+                                <h4 style="
+                                    color: ${isLightMode ? textLight : textDark}; 
+                                    font-size: 15px; 
+                                    margin-bottom: 4px;
+                                ">
+                                    <i class="fas ${item.icon}" style="color: #2ecc71;"></i> ${item.title}
+                                </h4>
+                                <p style="
+                                    color: ${isLightMode ? '#4A3A6A' : 'rgba(232,228,245,0.5)'}; 
+                                    font-size: 13px; 
+                                    line-height: 1.6;
+                                ">${item.desc}</p>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
+
+                <!-- CTA Section -->
+                <div class="cta-section animate-on-scroll" style="
+                    text-align:center; 
+                    padding: 30px 20px; 
+                    background: linear-gradient(135deg, ${primary}, ${primaryDark}); 
+                    border-radius: 30px; 
+                    margin: 0 12px 20px;
+                    box-shadow: 0 8px 30px rgba(108,76,224,0.2);
+                ">
+                    <h2 style="font-size: 28px; color: #FFFFFF; margin-bottom: 8px;">🚀 ابدأ رحلتك في تعلم الإنجليزية اليوم</h2>
+                    <p style="font-size: 16px; color: rgba(255,255,255,0.85); margin-bottom: 15px;">انضم إلى The Best Academy واستمتع بتجربة تعليمية مختلفة</p>
+                    <button onclick="renderLoginPage()" style="
+                        background: #FFFFFF; 
+                        color: ${primary}; 
+                        padding: 12px 35px; 
+                        border: none; 
+                        border-radius: 30px; 
+                        cursor: pointer; 
+                        font-family: 'Cairo', sans-serif; 
+                        font-weight: 700; 
+                        font-size: 16px; 
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                    " onmouseover="this.style.transform='translateY(-3px) scale(1.02)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.2)'" 
+                    onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.15)'">
+                        <i class="fas fa-rocket"></i> ابدأ الآن
+                    </button>
+                </div>
+
             </div>
 
-            <!-- CTA Section -->
-            <div class="cta-section">
-                <h2>🚀 ابدأ رحلتك في تعلم الإنجليزية اليوم</h2>
-                <p>انضم إلى The Best Academy واستمتع بتجربة تعليمية مختلفة</p>
-                <button class="btn" onclick="renderLoginPage()">
-                    <i class="fas fa-rocket"></i> ابدأ الآن
-                </button>
-            </div>
+            <!-- ===== الفوتر المضغوط ===== -->
+            <footer style="
+                padding: 8px 15px 6px;
+                position: relative;
+                z-index: 1;
+                background: ${isLightMode ? 'rgba(255,255,255,0.95)' : 'rgba(13,8,37,0.95)'};
+                backdrop-filter: blur(10px);
+                border-top: 1px solid rgba(108,76,224,0.08);
+                margin-top: 5px;
+            ">
+                <div style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: 6px;
+                    max-width: 1200px;
+                    margin: 0 auto;
+                ">
+                    <!-- الجهة اليمنى -->
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 1px;">
+                        <span style="font-size: 13px; font-weight: 700; color: ${primary};">The Best Academy</span>
+                        <span style="font-size: 10px; color: ${isLightMode ? '#666' : 'rgba(255,255,255,0.4)'};">
+                            <i class="fas fa-chalkboard-teacher" style="color: ${primary};"></i> Ms: Amira Sobhy
+                        </span>
+                        <span style="font-size: 10px; color: ${isLightMode ? '#666' : 'rgba(255,255,255,0.4)'}; direction: ltr;">
+                            <i class="fas fa-phone" style="color: #2ecc71;"></i> 01026463211
+                        </span>
+                        <a href="https://www.facebook.com/share/p/19KmTnMPSK/" target="_blank"
+                           style="
+                               background: linear-gradient(135deg, #1877f2, #0d65d9); 
+                               color: white;
+                               padding: 3px 10px; 
+                               border-radius: 20px; 
+                               text-decoration: none;
+                               font-family: 'Cairo', sans-serif; 
+                               font-weight: 600; 
+                               font-size: 9px;
+                               transition: all 0.3s ease; 
+                               display: inline-flex; 
+                               align-items: center; 
+                               gap: 4px;
+                               margin-top: 2px; 
+                               box-shadow: 0 3px 10px rgba(24, 119, 242, 0.2);
+                           "
+                           onmouseover="this.style.transform='translateY(-2px) scale(1.03)'"
+                           onmouseout="this.style.transform='translateY(0) scale(1)'">
+                            <i class="fab fa-facebook-f" style="font-size: 10px;"></i> فيسبوك
+                        </a>
+                    </div>
 
-            <!-- Footer -->
-            <div style="text-align:center; padding:30px 20px 10px; color:rgba(255,255,255,0.2); font-size:13px; border-top:1px solid rgba(232,185,49,0.05); margin-top:30px;">
-                <p>© 2025 <span style="color:#e8b931;">The Best Academy</span> | Ms: Amira Sobhy | جميع الحقوق محفوظة</p>
-            </div>
+                    <!-- الجهة اليسرى -->
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+                        <span style="font-size: 12px; font-weight: 700; color: ${isLightMode ? textLight : textDark};">
+                            <span style="color: ${primary};">Tecno</span> 
+                            <span style="color: ${isLightMode ? textLight : textDark};">Shark</span>
+                            <span style="color: ${primary}; font-size: 8px;">™</span>
+                        </span>
+                        <a href="https://tecno-shark.vercel.app" target="_blank"
+                           style="
+                               background: linear-gradient(135deg, ${primary}, ${primaryDark}); 
+                               color: #FFFFFF;
+                               padding: 3px 10px; 
+                               border-radius: 20px; 
+                               text-decoration: none;
+                               font-family: 'Cairo', sans-serif; 
+                               font-weight: 600; 
+                               font-size: 9px;
+                               transition: all 0.3s ease; 
+                               display: inline-flex; 
+                               align-items: center; 
+                               gap: 4px;
+                               box-shadow: 0 3px 10px rgba(108,76,224,0.15);
+                           "
+                           onmouseover="this.style.transform='translateY(-2px) scale(1.03)'"
+                           onmouseout="this.style.transform='translateY(0) scale(1)'">
+                            <i class="fas fa-globe" style="font-size: 10px;"></i> موقع الشركة
+                        </a>
+                        <span style="color: ${isLightMode ? '#bbb' : 'rgba(255,255,255,0.1)'}; font-size: 7px;">
+                            <i class="fas fa-code" style="color: ${primary};"></i> Developed by Tecno Shark
+                        </span>
+                    </div>
+                </div>
+
+                <!-- خط فاصل رفيع -->
+                <div style="
+                    height: 1px; 
+                    background: linear-gradient(90deg, transparent, rgba(108,76,224,0.08), transparent); 
+                    margin: 5px auto 4px; 
+                    max-width: 90%;
+                "></div>
+                
+                <!-- حقوق النشر -->
+                <div style="
+                    text-align: center; 
+                    color: ${isLightMode ? '#bbb' : 'rgba(255,255,255,0.08)'}; 
+                    font-size: 7px;
+                ">
+                    <p>© 2025 جميع الحقوق محفوظة | 
+                        <span style="color: ${primary}; font-weight: 600;">The Best Academy</span> 
+                        | <span style="color: ${isLightMode ? '#999' : 'rgba(255,255,255,0.15)'};">Ms: Amira Sobhy</span>
+                    </p>
+                </div>
+            </footer>
         </div>
     `;
-    initTheme();
+    
+    // تفعيل أنيميشن السكرول
+    initScrollAnimations();
 }
 
-        // ==================== THEME TOGGLE ====================
-function toggleTheme() {
+      function toggleTheme() {
     const body = document.body;
     const themeBtn = document.getElementById('themeToggleBtn');
     
@@ -3158,22 +3547,118 @@ function toggleTheme() {
             themeBtn.title = 'الوضع النهاري';
         }
     }
+    
+    // تطبيق الألوان الجديدة
+    updateThemeColors();
 }
 
-function initTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    const body = document.body;
+function updateThemeColors() {
+    const isLightMode = document.body.classList.contains('light-mode');
     
-    if (savedTheme === 'light') {
-        body.classList.add('light-mode');
-    } else {
-        body.classList.remove('light-mode');
+    // الألوان الأساسية
+    const primary = '#6C4CE0';
+    const primaryLight = '#8B6FF5';
+    const primaryDark = '#4A2F9E';
+    const bgLight = '#F0EEFF';
+    const bgDark = '#0D0825';
+    const textLight = '#1A1035';
+    const textDark = '#E8E4F5';
+    const cardLight = 'rgba(255,255,255,0.7)';
+    const cardDark = 'rgba(26,16,64,0.7)';
+    
+    // تطبيق على العناصر
+    document.documentElement.style.setProperty('--primary-color', primary);
+    document.documentElement.style.setProperty('--primary-light', primaryLight);
+    document.documentElement.style.setProperty('--primary-dark', primaryDark);
+    
+    // تحديث خلفية الصفحة
+    document.body.style.background = isLightMode ? bgLight : bgDark;
+    document.body.style.color = isLightMode ? textLight : textDark;
+    
+    // ===== تحديث السايدبار (القائمة الجانبية) =====
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        if (isLightMode) {
+            sidebar.style.background = 'linear-gradient(180deg, #F0EEFF, #E8E4F5)';
+        } else {
+            sidebar.style.background = 'linear-gradient(180deg, #0D0825, #1A1040)';
+        }
     }
     
-    // تحديث شكل الزر
+    // ===== تحديث عناصر القائمة في السايدبار =====
+    document.querySelectorAll('.sidebar-menu li a').forEach(el => {
+        if (el) {
+            if (isLightMode) {
+                el.style.color = '#1A1035';
+            } else {
+                el.style.color = '#FFFFFF';  // في الوضع الليلي: النص أبيض
+            }
+        }
+    });
+    
+    // ===== تحديث العنصر النشط في السايدبار =====
+    document.querySelectorAll('.sidebar-menu li.active a').forEach(el => {
+        if (el) {
+            el.style.background = 'linear-gradient(90deg, #6C4CE0, #4A2F9E)';
+            el.style.color = '#FFFFFF';
+        }
+    });
+    
+    // ===== تحديث عنوان السايدبار =====
+    document.querySelectorAll('.sidebar-header h3').forEach(el => {
+        if (el) {
+            el.style.color = isLightMode ? '#1A1035' : '#8B6FF5';
+        }
+    });
+    
+    document.querySelectorAll('.sidebar-header p').forEach(el => {
+        if (el) {
+            el.style.color = isLightMode ? '#8A7AA8' : 'rgba(255,255,255,0.4)';
+        }
+    });
+    
+    // ===== تحديث أيقونات السايدبار =====
+    document.querySelectorAll('.sidebar-menu li a i').forEach(el => {
+        if (el) {
+            el.style.color = isLightMode ? '#6C4CE0' : '#8B6FF5';
+        }
+    });
+    
+    // ===== تحديث العنصر الأخير (تسجيل الخروج) =====
+    document.querySelectorAll('.sidebar-menu li:last-child a, .sidebar-menu li:last-child a i').forEach(el => {
+        if (el) {
+            el.style.color = '#e74c3c';
+        }
+    });
+    
+    // ===== تحديث خلفية الهيدر =====
+    document.querySelectorAll('header, .header, .landing-header, .about-nav').forEach(el => {
+        if (el) {
+            el.style.background = isLightMode ? 'rgba(255,255,255,0.95)' : 'rgba(13,8,37,0.95)';
+        }
+    });
+    
+    // ===== تحديث الفوتر =====
+    document.querySelectorAll('footer, .footer, .landing-footer').forEach(el => {
+        if (el) {
+            el.style.background = isLightMode ? 'rgba(255,255,255,0.95)' : 'rgba(13,8,37,0.95)';
+        }
+    });
+    
+    // ===== تحديث الأزرار =====
+    document.querySelectorAll('.btn-primary, .btn-header-login, .btn-landing-primary, .login-btn, .btn-success, .btn-header-join, .btn-success-landing').forEach(el => {
+        if (el) {
+            el.style.background = `linear-gradient(135deg, ${primary}, ${primaryDark})`;
+            el.style.color = '#FFFFFF';
+        }
+    });
+    
+    // ===== تحديث زر الثيم =====
     const themeBtn = document.getElementById('themeToggleBtn');
     if (themeBtn) {
-        if (body.classList.contains('light-mode')) {
+        themeBtn.style.borderColor = primary;
+        themeBtn.style.color = primary;
+        if (isLightMode) {
             themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
             themeBtn.title = 'الوضع النهاري';
         } else {
@@ -3181,6 +3666,201 @@ function initTheme() {
             themeBtn.title = 'الوضع الليلي';
         }
     }
+}
+
+
+// ==================== الدالة 4: أنيميشن السكرول ====================
+function initScrollAnimations() {
+    // إضافة CSS للأنيميشن
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .animate-on-scroll.fade-left {
+            transform: translateX(-60px);
+        }
+        
+        .animate-on-scroll.fade-left.visible {
+            transform: translateX(0);
+        }
+        
+        .animate-on-scroll.fade-right {
+            transform: translateX(60px);
+        }
+        
+        .animate-on-scroll.fade-right.visible {
+            transform: translateX(0);
+        }
+        
+        .animate-on-scroll.scale-up {
+            transform: scale(0.8);
+        }
+        
+        .animate-on-scroll.scale-up.visible {
+            transform: scale(1);
+        }
+        
+        .animate-on-scroll.rotate-in {
+            transform: rotate(-10deg) scale(0.9);
+        }
+        
+        .animate-on-scroll.rotate-in.visible {
+            transform: rotate(0deg) scale(1);
+        }
+        
+        .animate-on-scroll.delay-1 { transition-delay: 0.1s; }
+        .animate-on-scroll.delay-2 { transition-delay: 0.2s; }
+        .animate-on-scroll.delay-3 { transition-delay: 0.3s; }
+        .animate-on-scroll.delay-4 { transition-delay: 0.4s; }
+        .animate-on-scroll.delay-5 { transition-delay: 0.5s; }
+        .animate-on-scroll.delay-6 { transition-delay: 0.6s; }
+        .animate-on-scroll.delay-7 { transition-delay: 0.7s; }
+        .animate-on-scroll.delay-8 { transition-delay: 0.8s; }
+    `;
+    document.head.appendChild(style);
+    
+    // مراقبة العناصر عند السكرول
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, {
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+    });
+    
+    // تطبيق على جميع العناصر في الصفحة
+    document.querySelectorAll('.about-section, .about-card, .stat-card, .about-hero, .cta-section, .flow-step, .about-grid > *').forEach((el, index) => {
+        el.classList.add('animate-on-scroll');
+        const delay = (index % 6) + 1;
+        el.classList.add(`delay-${delay}`);
+        observer.observe(el);
+    });
+    
+    // إعادة المراقبة عند تحديث الصفحة
+    const observerInterval = setInterval(() => {
+        document.querySelectorAll('.animate-on-scroll:not(.visible)').forEach(el => {
+            observer.observe(el);
+        });
+    }, 1000);
+    
+    window.scrollObserverInterval = observerInterval;
+}
+
+function addThemeStyles() {
+    const style = document.createElement('style');
+    style.innerHTML = `
+        /* ===== الوضع الفاتح ===== */
+        body.light-mode {
+            background: #F0EEFF !important;
+            color: #1A1035 !important;
+        }
+        
+        body.light-mode .card,
+        body.light-mode .stat-card,
+        body.light-mode .about-card,
+        body.light-mode .login-card,
+        body.light-mode .landing-content,
+        body.light-mode .about-section,
+        body.light-mode .about-hero {
+            background: rgba(255,255,255,0.7) !important;
+            border-color: rgba(108,76,224,0.12) !important;
+        }
+        
+        /* ===== جميع النصوص البيضاء تتحول إلى اللون الداكن ===== */
+        body.light-mode * {
+            color: #1A1035 !important;
+        }
+        
+        /* استثناء الأزرار */
+        body.light-mode .btn-primary,
+        body.light-mode .btn-header-login,
+        body.light-mode .btn-landing-primary,
+        body.light-mode .login-btn,
+        body.light-mode .btn-success,
+        body.light-mode .btn-header-join,
+        body.light-mode .btn-success-landing {
+            color: #FFFFFF !important;
+        }
+        
+        /* استثناء الروابط والأيقونات في الأزرار */
+        body.light-mode .btn-primary i,
+        body.light-mode .btn-header-login i,
+        body.light-mode .btn-landing-primary i,
+        body.light-mode .login-btn i,
+        body.light-mode .btn-success i,
+        body.light-mode .btn-header-join i,
+        body.light-mode .btn-success-landing i {
+            color: #FFFFFF !important;
+        }
+        
+        /* استثناء اللون الذهبي */
+        body.light-mode .gold,
+        body.light-mode .gold-text,
+        body.light-mode .landing-title,
+        body.light-mode .landing-title .highlight {
+            color: #6C4CE0 !important;
+        }
+        
+        body.light-mode .about-hero h1 span {
+            color: #6C4CE0 !important;
+        }
+        
+        body.light-mode .stat-card .number {
+            color: #6C4CE0 !important;
+        }
+        
+        body.light-mode .stat-card i {
+            color: #6C4CE0 !important;
+        }
+        
+        /* ===== الوضع الغامق ===== */
+        body:not(.light-mode) {
+            background: #0D0825 !important;
+            color: #E8E4F5 !important;
+        }
+        
+        body:not(.light-mode) .card,
+        body:not(.light-mode) .stat-card,
+        body:not(.light-mode) .about-card,
+        body:not(.light-mode) .login-card,
+        body:not(.light-mode) .landing-content,
+        body:not(.light-mode) .about-section,
+        body:not(.light-mode) .about-hero {
+            background: rgba(26,16,64,0.7) !important;
+            border-color: rgba(108,76,224,0.2) !important;
+        }
+        
+        body:not(.light-mode) .gold,
+        body:not(.light-mode) .gold-text,
+        body:not(.light-mode) .landing-title {
+            color: #8B6FF5 !important;
+        }
+        
+        body:not(.light-mode) .landing-title .highlight {
+            color: #E8E4F5 !important;
+        }
+        
+        body:not(.light-mode) .stat-card .number {
+            color: #8B6FF5 !important;
+        }
+        
+        body:not(.light-mode) .stat-card i {
+            color: #8B6FF5 !important;
+        }
+    `;
+    document.head.appendChild(style);
 }
 
       // ==================== LOGIN PAGE ====================
@@ -4424,13 +5104,13 @@ function filterHomeworkDetails(filter, homeworkId) {
         </div>
 
         <div class="header" style="background:rgba(10,22,40,0.95); backdrop-filter:blur(10px); padding:10px 20px; margin-right:80px; margin-left:20px; margin-top:20px; border-radius:20px; border:1px solid rgba(232,185,49,0.1); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-            <div class="header-logo" style="display:flex; align-items:center; gap:10px;">
-                <img src="https://i.ibb.co/SX9y9f5m/Chat-GPT-Image-Aug-31-2026-09-29-15-AM.png" alt="The Best Academy" style="width:40px; height:40px; border-radius:50%; border:2px solid #e8b931;">
-                <div class="logo-text">
-                    <h1 style="font-size:16px; color:#e8b931; margin:0;">The Best <span style="color:#fff;">Academy</span></h1>
-                    <p style="font-size:9px; color:rgba(255,255,255,0.3); margin:0;">🏆 Ms: Amira Sobhy</p>
-                </div>
-            </div>
+            <div style="display:flex; align-items:center; gap:10px; cursor: pointer;" onclick="renderLandingPage()">
+    <img src="https://i.ibb.co/SX9y9f5m/Chat-GPT-Image-Aug-31-2026-09-29-15-AM.png" alt="The Best Academy" style="width:40px; height:40px; border-radius:50%; border:2px solid #6C4CE0;">
+    <div class="logo-text">
+        <h1 style="font-size:16px; color:#6C4CE0; margin:0;">The Best <span style="color:#fff;">Academy</span></h1>
+        <p style="font-size:9px; color:rgba(255,255,255,0.3); margin:0;">🏆 Ms: Amira Sobhy</p>
+    </div>
+</div>
             <div class="user-info" style="display:flex; gap:10px; align-items:center; background:rgba(255,255,255,0.03); padding:5px 12px; border-radius:40px;">
                 <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="تغيير الوضع" style="width:40px; height:40px; border-radius:50%; border:2px solid #e8b931; background:rgba(255,255,255,0.05); color:#e8b931; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s ease; font-size:18px;">
                     <i class="fas ${document.body.classList.contains('light-mode') ? 'fa-sun' : 'fa-moon'}"></i>
@@ -4486,6 +5166,8 @@ function filterHomeworkDetails(filter, homeworkId) {
     `;
 
     renderAdminRanking();
+        renderAdminClassRanking();
+
     initTheme();
 }
 
@@ -4501,45 +5183,54 @@ function showPendingRequestsModal() {
 
     const modal = document.createElement('div');
     modal.className = 'modal';
-    modal.style.display = 'flex';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.background = 'rgba(0,0,0,0.85)';
-    modal.style.backdropFilter = 'blur(10px)';
-    modal.style.zIndex = '3000';
-    modal.style.justifyContent = 'center';
-    modal.style.alignItems = 'center';
+    modal.style.cssText = `
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(8px);
+        z-index: 3000;
+        justify-content: center;
+        align-items: center;
+    `;
 
     let requestsHtml = '';
     pendingStudents.forEach((student, idx) => {
         const cls = appData.classes.find(c => c.id === student.classId);
         requestsHtml += `
-            <div style="background:rgba(255,255,255,0.05); border-radius:16px; padding:18px; margin-bottom:15px; border-right:4px solid #f39c12; transition:0.3s;">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+            <div style="
+                background: rgba(255,255,255,0.03);
+                border-radius: 12px;
+                padding: 14px;
+                margin-bottom: 10px;
+                border-right: 3px solid #f39c12;
+                transition: 0.3s;
+            ">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
                     <div style="flex:1;">
-                        <strong style="color:#fff; font-size:17px;">
-                            <i class="fas fa-user" style="color:#e8b931;"></i> ${escapeHtml(student.name)}
+                        <strong style="color:#fff; font-size:15px;">
+                            <i class="fas fa-user" style="color:#6C4CE0;"></i> ${escapeHtml(student.name)}
                         </strong>
                         <br>
-                        <small style="color:rgba(255,255,255,0.4);">
+                        <small style="color:rgba(255,255,255,0.3);">
                             📚 ${cls?.name || 'فصل غير محدد'} | 📱 ${student.phone || 'رقم غير موجود'}
                         </small>
                         <br>
-                        <small style="color:rgba(255,255,255,0.3);">
-                            👤 ${student.username} | 📅 ${new Date(student.createdAt).toLocaleDateString('ar-EG')}
+                        <small style="color:rgba(255,255,255,0.2);">
+                            👤 ${student.username}
                         </small>
                     </div>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button class="btn btn-sm btn-info" onclick="showStudentDetails(${student.id})" style="background:#3498db; color:white; padding:6px 14px; border:none; border-radius:20px; cursor:pointer; font-family:'Cairo'; font-weight:600; transition:0.3s;">
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button onclick="showStudentDetails(${student.id})" style="background:#3498db; color:white; padding:4px 12px; border:none; border-radius:20px; cursor:pointer; font-family:'Cairo'; font-weight:600; font-size:12px;">
                             <i class="fas fa-eye"></i> تفاصيل
                         </button>
-                        <button class="btn btn-sm btn-success" onclick="approveStudentRequest(${student.id})" style="background:#2ecc71; color:#0a1628; padding:6px 14px; border:none; border-radius:20px; cursor:pointer; font-family:'Cairo'; font-weight:600; transition:0.3s;">
+                        <button onclick="approveStudentRequest(${student.id})" style="background:#2ecc71; color:#0a1628; padding:4px 12px; border:none; border-radius:20px; cursor:pointer; font-family:'Cairo'; font-weight:600; font-size:12px;">
                             <i class="fas fa-check"></i> قبول
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="rejectStudentRequest(${student.id})" style="background:#e74c3c; color:white; padding:6px 14px; border:none; border-radius:20px; cursor:pointer; font-family:'Cairo'; font-weight:600; transition:0.3s;">
+                        <button onclick="rejectStudentRequest(${student.id})" style="background:#e74c3c; color:white; padding:4px 12px; border:none; border-radius:20px; cursor:pointer; font-family:'Cairo'; font-weight:600; font-size:12px;">
                             <i class="fas fa-times"></i> رفض
                         </button>
                     </div>
@@ -4549,25 +5240,34 @@ function showPendingRequestsModal() {
     });
 
     modal.innerHTML = `
-        <div style="background: #0a1628; border-radius: 30px; padding: 30px; max-width: 700px; width: 95%; border: 1px solid rgba(232,185,49,0.15); max-height: 90vh; overflow-y: auto;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom: 2px solid rgba(232,185,49,0.1); padding-bottom:15px;">
+        <div style="
+            background: ${document.body.classList.contains('light-mode') ? '#FFFFFF' : '#0D0825'};
+            border-radius: 24px;
+            padding: 25px;
+            max-width: 600px;
+            width: 95%;
+            border: 1px solid rgba(108,76,224,0.12);
+            max-height: 85vh;
+            overflow-y: auto;
+        ">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom: 2px solid rgba(108,76,224,0.08); padding-bottom:12px;">
                 <div>
-                    <h3 style="color:#e8b931; margin:0; font-size:22px;">
+                    <h3 style="color:#6C4CE0; margin:0; font-size:20px;">
                         <i class="fas fa-clock"></i> طلبات الانضمام
                     </h3>
-                    <p style="color:rgba(255,255,255,0.3); margin:5px 0 0; font-size:14px;">
+                    <p style="color:rgba(255,255,255,0.2); margin:3px 0 0; font-size:13px;">
                         ${pendingStudents.length} طلب بانتظار الموافقة
                     </p>
                 </div>
-                <span onclick="this.closest('.modal').remove()" style="cursor:pointer; font-size:30px; color:rgba(255,255,255,0.3); transition:0.3s;">&times;</span>
+                <span onclick="this.closest('.modal').remove()" style="cursor:pointer; font-size:26px; color:rgba(255,255,255,0.3); transition:0.3s;">&times;</span>
             </div>
 
             <div id="pendingRequestsList">
                 ${requestsHtml}
             </div>
 
-            <div style="text-align:center; margin-top:20px;">
-                <button onclick="this.closest('.modal').remove()" style="background:#4a6a8a; color:white; padding:10px 30px; border:none; border-radius:30px; cursor:pointer; font-family:'Cairo'; font-weight:600;">
+            <div style="text-align:center; margin-top:15px;">
+                <button onclick="this.closest('.modal').remove()" style="background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.5); padding:8px 25px; border:1px solid rgba(255,255,255,0.05); border-radius:30px; cursor:pointer; font-family:'Cairo'; font-weight:600;">
                     <i class="fas fa-times"></i> إغلاق
                 </button>
             </div>
@@ -6765,13 +7465,13 @@ function exportHomeworkDetailsToPDF(homeworkId, filter = 'all') {
             flex-wrap: wrap;
             gap: 10px;
         ">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <img src="https://i.ibb.co/SX9y9f5m/Chat-GPT-Image-Aug-31-2026-09-29-15-AM.png" alt="The Best Academy" style="width:40px; height:40px; border-radius:50%; border:2px solid #e8b931;">
-                <div>
-                    <h1 style="font-size:16px; color:#e8b931; margin:0;">The Best <span style="color:#fff;">Academy</span></h1>
-                    <p style="font-size:9px; color:rgba(255,255,255,0.3); margin:0;">🏆 Ms: Amira Sobhy</p>
-                </div>
-            </div>
+            <div style="display:flex; align-items:center; gap:10px; cursor: pointer;" onclick="renderLandingPage()">
+    <img src="https://i.ibb.co/SX9y9f5m/Chat-GPT-Image-Aug-31-2026-09-29-15-AM.png" alt="The Best Academy" style="width:40px; height:40px; border-radius:50%; border:2px solid #6C4CE0;">
+    <div>
+        <h1 style="font-size:16px; color:#6C4CE0; margin:0;">The Best <span style="color:#fff;">Academy</span></h1>
+        <p style="font-size:9px; color:rgba(255,255,255,0.3); margin:0;">🏆 Ms: Amira Sobhy</p>
+    </div>
+</div>
             <div style="display:flex; gap:10px; align-items:center; background:rgba(255,255,255,0.03); padding:5px 12px; border-radius:40px;">
                 <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="تغيير الوضع" style="width:40px; height:40px; border-radius:50%; border:2px solid #e8b931; background:rgba(255,255,255,0.05); color:#e8b931; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s ease; font-size:18px;">
                     <i class="fas ${document.body.classList.contains('light-mode') ? 'fa-sun' : 'fa-moon'}"></i>
@@ -6897,10 +7597,237 @@ function exportHomeworkDetailsToPDF(homeworkId, filter = 'all') {
     // عرض الواجبات الأخيرة
     renderStudentRecentHomeworks();
     
+    renderStudentClassRanking();
+
+
     // عرض الاجتماعات القادمة
     renderStudentUpcomingMeetings();
     
     initTheme();
+}
+
+function renderAdminClassRanking() {
+    const container = document.getElementById('adminRankingList');
+    if (!container) return;
+
+    const classes = appData.classes;
+    
+    if (classes.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:rgba(255,255,255,0.3); padding:20px;">لا توجد فصول لعرض ترتيبها</p>';
+        return;
+    }
+
+    let html = `
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:15px;">
+    `;
+    
+    // لكل فصل
+    classes.forEach(cls => {
+        // جلب طلاب هذا الفصل النشطين
+        const students = appData.students.filter(s => s.classId === cls.id && s.status === 'active');
+        
+        // ترتيبهم حسب النقاط (تنازلي)
+        const sorted = [...students].sort((a, b) => (b.points || 0) - (a.points || 0));
+        
+        // أخذ أعلى 5 فقط
+        const top5 = sorted.slice(0, 5);
+        
+        html += `
+            <div style="
+                background: rgba(255,255,255,0.03);
+                backdrop-filter: blur(10px);
+                border-radius: 16px;
+                padding: 15px;
+                border: 1px solid rgba(108,76,224,0.12);
+                transition: all 0.3s ease;
+            ">
+                <h4 style="
+                    color: #6C4CE0;
+                    font-size: 16px;
+                    margin-bottom: 10px;
+                    padding-bottom: 8px;
+                    border-bottom: 2px solid rgba(108,76,224,0.1);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                ">
+                    <span>📚 ${cls.name}</span>
+                    <span style="font-size: 12px; color: rgba(255,255,255,0.3);">👨‍🎓 ${sorted.length} طالب</span>
+                </h4>
+                
+                ${top5.length === 0 ? `
+                    <p style="text-align:center; color:rgba(255,255,255,0.2); font-size:13px; padding:10px 0;">لا يوجد طلاب في هذا الفصل</p>
+                ` : `
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        ${top5.map((student, idx) => {
+                            const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}`;
+                            const isMe = student.id === currentUser?.id;
+                            return `
+                                <div style="
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                    padding: 6px 10px;
+                                    background: ${isMe ? 'rgba(108,76,224,0.1)' : 'rgba(255,255,255,0.02)'};
+                                    border-radius: 10px;
+                                    border-right: 3px solid ${idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : idx === 2 ? '#CD7F32' : 'transparent'};
+                                    transition: all 0.2s ease;
+                                ">
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <span style="font-size:16px; width:28px; text-align:center;">${medal}</span>
+                                        <span style="color: ${isMe ? '#6C4CE0' : 'rgba(255,255,255,0.8)'}; font-weight: ${isMe ? '700' : '400'}; font-size:14px;">
+                                            ${student.name} ${isMe ? '👈' : ''}
+                                        </span>
+                                    </div>
+                                    <span style="color: #6C4CE0; font-weight: bold; font-size:16px;">⭐ ${student.points || 0}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    ${sorted.length > 5 ? `
+                        <div style="text-align:center; margin-top:8px; color:rgba(255,255,255,0.2); font-size:12px;">
+                            ... و ${sorted.length - 5} طلاب آخرين
+                        </div>
+                    ` : ''}
+                `}
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+function renderStudentClassRanking() {
+    const container = document.getElementById('studentRankingContainer');
+    if (!container) return;
+
+    const student = currentUser;
+    if (!student) return;
+
+    // جلب طلاب نفس الفصل
+    const classStudents = appData.students.filter(s => s.classId === student.classId && s.status === 'active');
+    
+    if (classStudents.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:rgba(255,255,255,0.3); padding:20px;">لا يوجد طلاب في فصلنا</p>';
+        return;
+    }
+
+    // ترتيب حسب النقاط (تنازلي)
+    const sorted = [...classStudents].sort((a, b) => (b.points || 0) - (a.points || 0));
+    const myRank = sorted.findIndex(s => s.id === student.id) + 1;
+
+    // حساب إحصائيات
+    const totalPoints = sorted.reduce((sum, s) => sum + (s.points || 0), 0);
+    const avgPoints = Math.round(totalPoints / sorted.length);
+    const topStudent = sorted[0];
+
+    let html = `
+        <!-- إحصائيات الفصل -->
+        <div style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        ">
+            <div style="
+                background: rgba(108,76,224,0.06);
+                border-radius: 12px;
+                padding: 10px;
+                text-align: center;
+                border: 1px solid rgba(108,76,224,0.08);
+            ">
+                <div style="font-size: 20px; font-weight: bold; color: #6C4CE0;">${sorted.length}</div>
+                <div style="font-size: 11px; color: rgba(255,255,255,0.3);">👨‍🎓 عدد الطلاب</div>
+            </div>
+            <div style="
+                background: rgba(108,76,224,0.06);
+                border-radius: 12px;
+                padding: 10px;
+                text-align: center;
+                border: 1px solid rgba(108,76,224,0.08);
+            ">
+                <div style="font-size: 20px; font-weight: bold; color: #FFD700;">#${myRank}</div>
+                <div style="font-size: 11px; color: rgba(255,255,255,0.3);">🏆 ترتيبك</div>
+            </div>
+            <div style="
+                background: rgba(108,76,224,0.06);
+                border-radius: 12px;
+                padding: 10px;
+                text-align: center;
+                border: 1px solid rgba(108,76,224,0.08);
+            ">
+                <div style="font-size: 20px; font-weight: bold; color: #6C4CE0;">${avgPoints}</div>
+                <div style="font-size: 11px; color: rgba(255,255,255,0.3);">📊 متوسط النقاط</div>
+            </div>
+            <div style="
+                background: rgba(108,76,224,0.06);
+                border-radius: 12px;
+                padding: 10px;
+                text-align: center;
+                border: 1px solid rgba(108,76,224,0.08);
+            ">
+                <div style="font-size: 16px; font-weight: bold; color: #FFD700;">${topStudent?.name || '-'}</div>
+                <div style="font-size: 11px; color: rgba(255,255,255,0.3);">🥇 الأعلى نقاطاً</div>
+            </div>
+        </div>
+
+        <!-- جدول الترتيب الكامل -->
+        <div style="
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(108,76,224,0.06);
+        ">
+            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                <thead>
+                    <tr style="background: rgba(108,76,224,0.06);">
+                        <th style="padding:8px 10px; text-align:right; border-bottom:2px solid rgba(108,76,224,0.1); color:rgba(255,255,255,0.4); font-weight:600; font-size:12px;">#</th>
+                        <th style="padding:8px 10px; text-align:right; border-bottom:2px solid rgba(108,76,224,0.1); color:rgba(255,255,255,0.4); font-weight:600; font-size:12px;">اسم الطالب</th>
+                        <th style="padding:8px 10px; text-align:center; border-bottom:2px solid rgba(108,76,224,0.1); color:rgba(255,255,255,0.4); font-weight:600; font-size:12px;">⭐ النقاط</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    sorted.forEach((s, idx) => {
+        const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}`;
+        const isMe = s.id === student.id;
+        html += `
+            <tr style="
+                ${isMe ? 'background: rgba(108,76,224,0.08);' : ''} 
+                border-bottom: 1px solid rgba(255,255,255,0.02);
+                transition: all 0.2s ease;
+            ">
+                <td style="padding:6px 10px; color:${isMe ? '#6C4CE0' : 'rgba(255,255,255,0.3)'}; font-weight:${isMe ? '700' : '400'}; font-size:13px;">
+                    ${medal}
+                </td>
+                <td style="
+                    padding:6px 10px; 
+                    color: ${isMe ? '#6C4CE0' : 'rgba(255,255,255,0.8)'}; 
+                    font-weight: ${isMe ? '700' : '400'};
+                ">
+                    ${s.name} ${isMe ? '👈 أنت' : ''}
+                </td>
+                <td style="
+                    padding:6px 10px; 
+                    text-align:center; 
+                    color: ${isMe ? '#6C4CE0' : '#6C4CE0'}; 
+                    font-weight: ${isMe ? '800' : '600'}; 
+                    font-size: ${isMe ? '18px' : '15px'};
+                ">
+                    ${s.points || 0}
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    container.innerHTML = html;
 }
 
 
@@ -7331,9 +8258,41 @@ function renderStudentUpcomingMeetings() {
             }
         }
 
-       async function startApp() {
+       function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const body = document.body;
+    
+    if (savedTheme === 'light') {
+        body.classList.add('light-mode');
+    } else {
+        body.classList.remove('light-mode');
+    }
+    
+    // تطبيق الألوان
+    updateThemeColors();
+    
+    // تطبيق الزوم
+    document.body.style.zoom = '0.9';
+    
+    // تحديث شكل زر الثيم
+    const themeBtn = document.getElementById('themeToggleBtn');
+    if (themeBtn) {
+        if (body.classList.contains('light-mode')) {
+            themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
+            themeBtn.title = 'الوضع النهاري';
+        } else {
+            themeBtn.innerHTML = '<i class="fas fa-moon"></i>';
+            themeBtn.title = 'الوضع الليلي';
+        }
+    }
+}
+
+
+     // ==================== الدالة 7: تحديث startApp ====================
+async function startApp() {
     await loadAllDataFromFirebase();
-    initTheme(); // <-- أضف هذا السطر
+    addThemeStyles();
+    initTheme();
     renderLandingPage();
     console.log('✅ The Best Academy started!');
 }
